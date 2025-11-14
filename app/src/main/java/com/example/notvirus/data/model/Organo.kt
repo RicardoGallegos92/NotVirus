@@ -1,6 +1,6 @@
 package com.example.notvirus.data.model
 
-enum class CartaImagen {
+enum class Organo {
     CORAZON,
     ESTOMAGO,
     CEREBRO,
