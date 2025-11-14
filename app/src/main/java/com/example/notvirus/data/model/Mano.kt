@@ -1,5 +1,13 @@
 package com.example.notvirus.data.model
 
 class Mano(
-    var cartas: List<Carta>,
-)
+    var cartas: MutableList <Carta>,
+){
+    fun addCards():Unit{
+
+    }
+
+    fun removeCards():Unit{
+
+    }
+}
