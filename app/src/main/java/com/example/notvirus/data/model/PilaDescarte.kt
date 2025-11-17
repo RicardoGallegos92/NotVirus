@@ -1,14 +1,14 @@
 package com.example.notvirus.data.model
 
 class PilaDescarte(
-    var pila: MutableList<Carta>,
+    var pila: MutableList<Carta> = mutableListOf(),
 ) {
-    fun addCarta(): Unit {
-
+    fun addCarta(cartasDescartadas: MutableList<Carta>): Unit {
+        pila.addAll( cartasDescartadas)
     }
 
-    fun empty(): List<Carta> {
-        var cartas: MutableList<Carta> = pila.map { it }.toMutableList()
+    fun empty(): MutableList<Carta> {
+        var cartas: MutableList<Carta> = pila.toMutableList()
         pila.clear()
         return cartas
     }
