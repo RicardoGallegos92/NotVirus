@@ -7,27 +7,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.CartaColor
+import com.example.notvirus.data.model.CartaIcono
 import com.example.notvirus.data.model.CartaImagen
 import com.example.notvirus.data.model.CartaTipo
 
@@ -36,8 +32,9 @@ import com.example.notvirus.data.model.CartaTipo
 fun CartaItem(
     carta: Carta = Carta(
         tipo = CartaTipo.TRATAMIENTO,
-        color = CartaColor.ROJO,
-        cartaImagen = CartaImagen.TRATAMIENTO
+        color = CartaColor.BLANCO,
+        icono = CartaIcono.TRATAMIENTO,
+        imagen = CartaImagen.TRATAMIENTO_GUANTE_LATEX,
     ),
 ) {
     Box(
@@ -60,10 +57,9 @@ fun CartaItem(
                     .aspectRatio(ratio = 0.6f)
                     .border(
                         width = 2.dp,
-                        color = Color(0,0,0),
+                        color = Color(0, 0, 0),
                         shape = RoundedCornerShape(10.dp),
-                    )
-                ,
+                    ),
             ) {
                 Column(
                     modifier = Modifier
@@ -73,13 +69,12 @@ fun CartaItem(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
-                        ,
+                            .weight(1f),
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            imageVector = carta.cartaImagen.linkImagen,
+                            imageVector = carta.icono.vector,
                             tint = Color(0, 0, 0),
                             contentDescription = "icono de la carta",
                         )
@@ -88,24 +83,25 @@ fun CartaItem(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(8f)
-                        ,
+                            .weight(8f),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
-                    ){
-
+                    ) {
+                        Icon(
+                            painter = painterResource(id = carta.imagen.id),
+                            contentDescription = "Icono de carta",
+                        )
                     }
                     // Abajo
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
-                        ,
+                            .weight(1f),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
-                    ){
+                    ) {
                         Icon(
-                            imageVector = carta.cartaImagen.linkImagen,
+                            imageVector = carta.icono.vector,
                             tint = Color(0, 0, 0),
                             contentDescription = "icono de la carta",
                         )
@@ -115,5 +111,4 @@ fun CartaItem(
         }
 
     }
-
 }

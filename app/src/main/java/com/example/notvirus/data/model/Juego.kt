@@ -1,9 +1,11 @@
 package com.example.notvirus.data.model
 
 class Juego(
-    val jugadores: MutableList<Jugador>,
-    val baraja: Baraja,
-    val pilaDescarte: PilaDescarte,
+    val jugadores: MutableList<Jugador> = mutableListOf(Jugador(nombre = "Jugador1"), Jugador(nombre = "Jugador2")),
+    val baraja: Baraja = Baraja(),
+    val pilaDescarte: PilaDescarte = PilaDescarte(),
+    val jugador1Activo: Boolean = true,
+    val jugador2Activo: Boolean = false,
     var jugadorActivo: Jugador? = null,
 ) {
     init {
@@ -12,8 +14,8 @@ class Juego(
 
     fun startJuego() {
         jugadores.forEach { jugador ->
-            var nuevaMano = baraja.takeCartas(3)
-            jugador.mano.addCarta(nuevaMano)
+            val nuevaMano = baraja.takeCartas(3)
+            jugador.takeCartas(nuevaMano)
         }
         // se podría cambiar el 0 por un Random
         jugadores[0].isActive = true

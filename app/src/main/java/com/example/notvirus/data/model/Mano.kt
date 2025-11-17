@@ -1,20 +1,20 @@
 package com.example.notvirus.data.model
 
 class Mano(
-    var cartas: MutableList<Carta>, // máximo 3 elementos
+    val cartas: MutableList<Carta> = mutableListOf(), // máximo 3 elementos
 ) {
-    fun addCarta(nuevasCartas: MutableList<Carta>): Unit {
-        cartas.addAll(nuevasCartas);
+    fun addCartas(nuevasCartas: MutableList<Carta>) {
+        cartas.addAll(nuevasCartas)
     }
 
-    fun removeSelectedCartas(): Unit {
+    fun removeSelectedCartas() {
         cartas.removeIf {
             it.seleccionada
         }
     }
 
     fun takeSelectedCarta():MutableList<Carta>{
-        var seleccionadas = cartas.filter {
+        val seleccionadas = cartas.filter {
             it.seleccionada
         } as MutableList<Carta>
 

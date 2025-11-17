@@ -1,12 +1,12 @@
 package com.example.notvirus.data.model
 
 class Mesa(
-    var pilaAzul: MutableList<Carta>,
-    var pilaRoja: MutableList<Carta>,
-    var pilaVerde: MutableList<Carta>,
-    var pilaAmarilla: MutableList<Carta>,
-    var pilaMulticolor: MutableList<Carta>,
-    var movementsToWin: Int,
+    var pilaAzul: MutableList<Carta> = mutableListOf(),
+    var pilaRoja: MutableList<Carta> = mutableListOf(),
+    var pilaVerde: MutableList<Carta> = mutableListOf(),
+    var pilaAmarilla: MutableList<Carta> = mutableListOf(),
+    var pilaMulticolor: MutableList<Carta> = mutableListOf(),
+    var movementsToWin: Int = 4, // int = [ 0, 4 ]
 ) {
     // metodos
     fun calculateMovementsToWin(): Unit {
