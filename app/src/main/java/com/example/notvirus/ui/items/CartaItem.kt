@@ -37,6 +37,7 @@ fun CartaItem(
         icono = CartaIcono.TRATAMIENTO,
         imagen = CartaImagen.TRATAMIENTO_GUANTE_LATEX,
     ),
+    anchoCarta: Int = 100,
 ) {
     Box(
         modifier = Modifier
@@ -54,7 +55,7 @@ fun CartaItem(
         ) {
             Card(
                 modifier = Modifier
-                    .width(100.dp)
+                    .width(anchoCarta.dp)
                     .aspectRatio(ratio = 0.6f)
                     .border(
                         width = 2.dp,

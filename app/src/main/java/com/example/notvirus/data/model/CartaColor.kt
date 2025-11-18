@@ -10,4 +10,5 @@ enum class CartaColor(val colorRGB: Color) {
     AMARILLO(Color(255, 255, 0)),
     VERDE(Color(0, 255, 0)),
     MULTICOLOR(Color(0, 0, 0)),
+    NULL(Color(0,0,0,0))
 }

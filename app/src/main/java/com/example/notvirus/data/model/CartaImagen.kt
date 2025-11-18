@@ -30,4 +30,6 @@ enum class CartaImagen(val id: Int) {
     TRATAMIENTO_GUANTE_LATEX(R.drawable.tratamiento_guante_latex),
     TRATAMIENTO_ROBO_ORGANO(R.drawable.tratamiento_robo_organo),
     TRATAMIENTO_TRANSPLANTE(R.drawable.tratamiento_transplante),
+// VACIO
+    NADA(R.drawable.nada)
 }

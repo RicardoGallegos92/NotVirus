@@ -3,8 +3,6 @@ package com.example.notvirus.ui.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notvirus.data.model.Juego
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -12,10 +10,13 @@ import kotlinx.coroutines.launch
 
 data class JugarUiState(
     val isStarted: Boolean = false,
+    val isPaused: Boolean = false,
     val juego: Juego = Juego(),
 )
 
-class JugarViewModel() : ViewModel() {
+class JugarViewModel(
+    private val partidaGuardada: JugarUiState? = null
+) : ViewModel() {
     private val _uiState = MutableStateFlow(value = JugarUiState())
     val uiState: StateFlow<JugarUiState> = _uiState
 
@@ -31,6 +32,27 @@ class JugarViewModel() : ViewModel() {
             _uiState.update {
                 it.copy(
                     isStarted = true
+                )
+            }
+        }
+    }
+
+    fun pauseJuego(){
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isPaused = true
+                )
+            }
+        }
+        // mandar a guardar
+    }
+
+    fun unPauseJuego(){
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isPaused = false
                 )
             }
         }

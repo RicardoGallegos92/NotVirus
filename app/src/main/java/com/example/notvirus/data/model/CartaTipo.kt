@@ -5,4 +5,5 @@ enum class CartaTipo {
     VIRUS,
     MEDICINA,
     TRATAMIENTO,
+    NULL,
 }

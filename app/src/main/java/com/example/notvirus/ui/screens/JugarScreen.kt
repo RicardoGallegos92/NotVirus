@@ -12,19 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,12 +27,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.notvirus.ui.items.ManoItem
 import com.example.notvirus.ui.items.MesaItem
 import com.example.notvirus.ui.viewModels.JugarViewModel
-import org.intellij.lang.annotations.JdkConstants
-
 
 @Composable
 fun JugarScreen(
-    innerPadding: PaddingValues,
+    innerPadding: PaddingValues = PaddingValues(
+        top = 56.dp,
+        start = 16.dp,
+        end = 16.dp,
+        bottom = 16.dp
+    ),
     juegoViewModel: JugarViewModel = viewModel(),
 ) {
     // aplicar viewModel
@@ -45,88 +43,140 @@ fun JugarScreen(
 
     val isStarted = uiState.isStarted
 
+    val isPaused = uiState.isPaused
+
     val juego = uiState.juego
 
     Box(
         modifier = Modifier
             .padding(paddingValues = innerPadding)
-            .padding(10.dp)
             .fillMaxSize(),
     ) {
-        if (!isStarted) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly,
-            ) {
+        Column(
+            // TABLERO / Pantalla completa
+            modifier = Modifier
+                .background(color = Color(53, 101, 77))
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            if (!isStarted) {
                 Button(
                     onClick = { juegoViewModel.cargarJuego() }
                 ) { Text("Empezar Juego") }
-            }
-        } else {
-            //JuegoItem(juego = juego)
-            Column(
-                // TABLERO
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                Row(
-                    // JUGADOR CONTRARIO
-                    modifier = Modifier
-                        .background(color = Color(3, 70, 148))
-                        .padding(horizontal = 5.dp)
-                        .fillMaxWidth()
-                        .weight(1f)
-                ) {
-                    if (juego.jugador1Activo) {
-                        MesaItem(juego.jugadores[0].mesa)
-                    } else {
-                        MesaItem(juego.jugadores[1].mesa)
+            } else {
+                if (isPaused) {
+                    // boton de UnPause
+                    Button(
+                        onClick = { juegoViewModel.unPauseJuego() }
+                    ) {
+                        Text(text = "Continuar")
                     }
-                }
-                Row(
-                    // centro mesa
-                    modifier = Modifier
-                        .background(color = Color(53, 101, 77))
-                        .padding(
-                            vertical = 10.dp,
-                            horizontal = 3.dp
+                }else{
+                    Column(
+                        // Zona Jugador CPU
+                        modifier = Modifier
+                            .background(color = Color(3, 70, 148))
+                            .fillMaxWidth()
+                            .weight(2f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                    ) {
+                        Row(
+                            // Jugador CPU - Mano
+                            modifier = Modifier
+                                .background(color = Color(3, 70, 148))
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) {
+                            if (juego.jugador1Activo) {
+                                ManoItem(
+                                    juego.jugadores[0].mano
+                                )
+                            } else {
+                                ManoItem(
+                                    juego.jugadores[1].mano
+                                )
+                            }
+                        }
+                        Row(
+                            // Jugador CPU - Mesa
+                            modifier = Modifier
+                                .background(color = Color(3, 70, 148))
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) {
+                            if (juego.jugador1Activo) {
+                                MesaItem(juego.jugadores[0].mesa)
+                            } else {
+                                MesaItem(juego.jugadores[1].mesa)
+                            }
+                        }
+                    }
+                    Row(
+                        // centro mesa (zona Neutral)
+                        modifier = Modifier
+                            .background(color = Color(0,0,0,256))
+                            .fillMaxWidth()
+                            .weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                    ) {
+                        // baraja
+                        PilaDeCartas(
+                            texto = "Baraja",
+                            cantidadCartas = juego.baraja.mazo.size,
                         )
-                        .fillMaxWidth()
-                        .weight(4f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    // baraja
-                    PilaDeCartas(
-                        texto = "Baraja",
-                        cantidadCartas = juego.baraja.mazo.size,
-                    )
-                    // pila descarte
-                    PilaDeCartas(
-                        texto = "Descarte",
-                        cantidadCartas = juego.pilaDescarte.pila.size,
-                    )
-                }
-                Row(
-                    // abajo (mano del jugador en turno)
-                    modifier = Modifier
-                        .background(color = Color(128, 128, 0))
-                        .padding(horizontal = 0.dp)
-                        .fillMaxWidth()
-                        .weight(1f),
-                ) {
-                    if (juego.jugador1Activo) {
-                        ManoItem(
-                            juego.jugadores[1].mano
+                        // boton de Pausa
+                        Button(
+                            onClick = { juegoViewModel.pauseJuego() }
+                        ) {
+                            Text(text = "Pausar")
+                        }
+                        // pila descarte
+                        PilaDeCartas(
+                            texto = "Descarte",
+                            cantidadCartas = juego.pilaDescarte.pila.size,
                         )
-                    } else {
-                        ManoItem(
-                            juego.jugadores[0].mano
-                        )
+                    }
+                    Column(
+                        // Zona Jugador Humano
+                        modifier = Modifier
+                            .background(color = Color(128, 128, 0))
+                            .fillMaxWidth()
+                            .weight(2f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                    ) {
+                        Row(
+                            // Jugador Humano - Mesa
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                        ) {
+                            if (juego.jugador1Activo) {
+                                MesaItem(juego.jugadores[1].mesa)
+                            } else {
+                                MesaItem(juego.jugadores[0].mesa)
+                            }
+                        }
+                        Row(
+                            // Jugador Humano - Mano
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                        ) {
+                            if (juego.jugador1Activo) {
+                                ManoItem(
+                                    juego.jugadores[1].mano
+                                )
+                            } else {
+                                ManoItem(
+                                    juego.jugadores[0].mano
+                                )
+                            }
+                        }
+
                     }
                 }
             }
@@ -139,10 +189,10 @@ fun PilaDeCartas(
     texto: String = "Nombre Pila",
     cantidadCartas: Int = 30,
 ) {
-    val ANCHO_PILA: Int = 80
+    val ANCHO_PILA: Int = 100
     val ALTO_PILA: Int = (68 * 2)
-    val FUENTE_NUMERO: Int = 24
-    val FUENTE_TEXTO: Int = 20
+    val FUENTE_NUMERO: Int = 20
+    val FUENTE_TEXTO: Int = 18
     Column(
         // Cajón
         modifier = Modifier
@@ -161,8 +211,7 @@ fun PilaDeCartas(
             modifier = Modifier
                 .background(color = Color(0, 0, 0))
                 .width(ANCHO_PILA.dp)
-                .height(ALTO_PILA.dp)
-            ,
+                .height(ALTO_PILA.dp),
             verticalArrangement = Arrangement.Bottom
         ) {
             Column(

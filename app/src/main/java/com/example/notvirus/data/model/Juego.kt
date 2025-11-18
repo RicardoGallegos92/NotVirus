@@ -48,6 +48,7 @@ class Juego(
             CartaTipo.MEDICINA -> addMedicina(cartaJugada)
             CartaTipo.VIRUS -> addVirus(cartaJugada)
             CartaTipo.TRATAMIENTO -> playTratamiento(cartaJugada)
+            CartaTipo.NULL -> {}
         }
     }
 
