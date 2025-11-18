@@ -1,6 +1,5 @@
 package com.example.notvirus.ui.screens
 
-import android.R.attr.text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,19 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.notvirus.ui.items.ManoItem
+import com.example.notvirus.data.model.Carta
+import com.example.notvirus.ui.items.CartaItem
 import com.example.notvirus.ui.items.ManoItemCPU
 import com.example.notvirus.ui.items.MesaItem
 import com.example.notvirus.ui.viewModels.JugarViewModel
 
 @Composable
 fun JugarScreen(
-    innerPadding: PaddingValues = PaddingValues(
-        top = 56.dp,
-        start = 16.dp,
-        end = 16.dp,
-        bottom = 16.dp
-    ),
+    innerPadding: PaddingValues,
     juegoViewModel: JugarViewModel = viewModel(),
 ) {
     // aplicar viewModel
@@ -63,7 +61,7 @@ fun JugarScreen(
         ) {
             if (!isStarted) {
                 Button(
-                    onClick = { juegoViewModel.cargarJuego() }
+                    onClick = { juegoViewModel.startJuego() }
                 ) { Text("Empezar Juego") }
             } else {
                 if (isPaused) {
@@ -116,6 +114,7 @@ fun JugarScreen(
                             texto = "Baraja",
                             cantidadCartas = juego.baraja.mazo.size,
                         )
+                        println("Baraja: ${juego.baraja.mazo.size}")
                         // boton de Pausa
                         Button(onClick = { juegoViewModel.pauseJuego() })
                         { Text(text = "Pausar") }
@@ -124,6 +123,7 @@ fun JugarScreen(
                             texto = "Descarte",
                             cantidadCartas = juego.pilaDescarte.pila.size,
                         )
+                        println("Descarte: ${juego.pilaDescarte.pila.size}")
                     }
                     Column(
                         // Zona Jugador Humano
@@ -148,6 +148,59 @@ fun JugarScreen(
                                 .fillMaxWidth()
                                 .weight(1f),
                         ) {
+
+                            //val selectedCartas = uiState.selectedCartas
+                            val activeBtnPlayCard = uiState.activeBtnPlayCard
+                            val activeBtnDiscardCards = uiState.activeBtnDiscardCards
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                            ) {
+                                if (true) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .wrapContentHeight(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Button(
+                                            enabled = activeBtnPlayCard,
+                                            onClick = {
+                                            //    juegoViewModel.jugarCartas()
+                                            }
+                                        ) { Text(text = "Jugar") }
+                                        Button(
+                                            enabled = activeBtnDiscardCards,
+                                            onClick = {
+                                                println("btn discard presionado")
+                                                juegoViewModel.descartarCartas()
+                                            }
+                                        ) { Text(text = "Descartar") }
+                                    }
+                                }
+                                LazyRow(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    items(juego.jugadores[1].mano.cartas) { carta: Carta ->
+                                        val index = juego.jugadores[1].mano.cartas.indexOf(carta)
+                                        CartaItem(
+                                            carta = carta,
+                                            //seleccionada = selectedCartas[index],
+                                            onClick = {
+                                                juegoViewModel.clickedCard(index)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            /*
                             ManoItem(
                                 mano = juego.jugadores[1].mano,
                                 play = { },
@@ -156,6 +209,7 @@ fun JugarScreen(
                                 },
                                 useButtons = true,
                             )
+                            */
                         }
                     }
                 }

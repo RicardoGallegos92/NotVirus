@@ -1,55 +1,59 @@
 package com.example.notvirus.data.model
 
-class Mesa(
-    var pilaAzul: MutableList<Carta> = mutableListOf(),
-    var pilaRoja: MutableList<Carta> = mutableListOf(),
-    var pilaVerde: MutableList<Carta> = mutableListOf(),
-    var pilaAmarilla: MutableList<Carta> = mutableListOf(),
-    var pilaMulticolor: MutableList<Carta> = mutableListOf(),
-    var movementsToWin: Int = 4, // int = [ 0, 4 ]
+data class Mesa(
+    val pilaAzul: List<Carta> = listOf(),
+    val pilaRoja: List<Carta> = listOf(),
+    val pilaVerde: List<Carta> = listOf(),
+    val pilaAmarilla: List<Carta> = listOf(),
+    val pilaMulticolor: List<Carta> = listOf(),
+    val movementsToWin: Int = 4, // int = [ 0, 4 ]
 ) {
-    // metodos
-    fun calculateMovementsToWin(): Unit {
-        // calcular minimo de turnos para ganar
+    // Métodos que devuelven nuevas instancias de Mesa
+
+    fun addAmarillo(nuevaCarta: Carta): Mesa {
+        return this.copy(pilaAmarilla = this.pilaAmarilla + nuevaCarta)
     }
 
-    fun addAmarillo(nuevaCarta:Carta): Unit {
-        pilaAmarilla.add(nuevaCarta)
+    fun addVerde(nuevaCarta: Carta): Mesa {
+        return this.copy(pilaVerde = this.pilaVerde + nuevaCarta)
     }
 
-    fun addVerde(nuevaCarta:Carta): Unit {
-        pilaVerde.add(nuevaCarta)
+    fun addRojo(nuevaCarta: Carta): Mesa {
+        return this.copy(pilaRoja = this.pilaRoja + nuevaCarta)
     }
 
-    fun addRojo(nuevaCarta:Carta): Unit {
-        pilaRoja.add(nuevaCarta)
+    fun addAzul(nuevaCarta: Carta): Mesa {
+        return this.copy(pilaAzul = this.pilaAzul + nuevaCarta)
     }
 
-    fun addAzul(nuevaCarta:Carta): Unit {
-        pilaAzul.add(nuevaCarta)
+    fun addMulticolor(nuevaCarta: Carta): Mesa {
+        return this.copy(pilaMulticolor = this.pilaMulticolor + nuevaCarta)
     }
 
-    fun addMulticolor(nuevaCarta:Carta): Unit {
-        pilaMulticolor.add(nuevaCarta)
+    fun flushAmarillo(): Mesa {
+        return this.copy(pilaAmarilla = emptyList())
     }
 
-    fun flushAmarillo(): Unit {
-        pilaAmarilla.clear()
+    fun flushVerde(): Mesa {
+        return this.copy(pilaVerde = emptyList())
     }
 
-    fun flushVerde(): Unit {
-        pilaVerde.clear()
+    fun flushRojo(): Mesa {
+        return this.copy(pilaRoja = emptyList())
     }
 
-    fun flushRojo(): Unit {
-        pilaRoja.clear()
+    fun flushAzul(): Mesa {
+        return this.copy(pilaAzul = emptyList())
     }
 
-    fun flushAzul(): Unit {
-        pilaAzul.clear()
+    fun flushMulticolor(): Mesa {
+        return this.copy(pilaMulticolor = emptyList())
     }
 
-    fun flushMulticolor(): Unit {
-        pilaMulticolor.clear()
+    // Si necesitas recalcular movementsToWin, puedes tener un método que devuelva una nueva Mesa
+    fun calculateMovementsToWin(): Mesa {
+        // Lógica para calcular el nuevo valor
+        val nuevoMovimientos = 4 // Coloca tu lógica aquí
+        return this.copy(movementsToWin = nuevoMovimientos)
     }
 }

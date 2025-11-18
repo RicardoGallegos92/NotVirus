@@ -1,33 +1,54 @@
 package com.example.notvirus.data.model
 
-class Mano(
-    val cartas: MutableList<Carta> = mutableListOf(), // máximo 3 elementos
+data class Mano(
+    val cartas: List<Carta> = listOf(), // Cambiado a List inmutable
 ) {
-    fun addCartas(nuevasCartas: MutableList<Carta>) {
-        cartas.addAll(nuevasCartas)
+    // Devuelve una nueva Mano con las cartas añadidas
+    fun addCartas(nuevasCartas: List<Carta>): Mano {
+        return this.copy(cartas = (this.cartas + nuevasCartas))
     }
 
-    fun removeSelectedCartas() {
-        cartas.removeIf {
-            it.seleccionada
+    // Devuelve una nueva Mano sin las cartas seleccionadas
+    fun removeSelectedCartas(): Mano {
+        val nuevaMano = this.cartas.filter { !it.seleccionada }
+        return this.copy(cartas = nuevaMano)
+    }
+
+    // Devuelve las cartas seleccionadas (sin modificar estado)
+    fun takeSelectedCarta(): List<Carta> {
+        println("Cartas en mano")
+        cartas.forEach { carta ->
+            println("${carta}")
         }
+        val cartasSeleccionadas = cartas.filter { it.seleccionada }
+        println("Cartas Seleccionadas de la mano")
+        cartasSeleccionadas.forEach { carta ->
+            println("${carta}")
+        }
+        return cartasSeleccionadas
     }
 
-    fun takeSelectedCarta():MutableList<Carta>{
-        val seleccionadas = cartas.filter {
-            it.seleccionada
-        } as MutableList<Carta>
-
-        return seleccionadas
+    // Devuelve una nueva Mano con una carta marcada como seleccionada
+    fun selectCarta(cartaElegida: Carta): Mano {
+        val nuevasCartas = this.cartas.map { carta ->
+            if (carta.id == cartaElegida.id) { // Comparar por ID único
+                carta.copy(seleccionada = !carta.seleccionada)
+            } else {
+                carta
+            }
+        }
+        return this.copy(cartas = nuevasCartas)
     }
 
-    fun selectCarta(cartaElegida: Carta) {
-        val index = cartas.indexOf(cartaElegida)
-        cartas[index].seleccionada = true
-    }
-
-    fun unSelectCarta(cartaElegida: Carta) {
-        val index = cartas.indexOf(cartaElegida)
-        cartas[index].seleccionada = false
+    // Devuelve una nueva Mano con una carta desmarcada como seleccionada
+    fun unSelectCarta(cartaElegida: Carta): Mano {
+        val nuevasCartas = this.cartas.map { carta ->
+            if (carta.id == cartaElegida.id) { // Comparar por ID único
+                carta.copy(seleccionada = false)
+            } else {
+                carta
+            }
+        }
+        return this.copy(cartas = nuevasCartas)
     }
 }

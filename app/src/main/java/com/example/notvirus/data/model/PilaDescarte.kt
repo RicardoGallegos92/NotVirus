@@ -1,15 +1,15 @@
 package com.example.notvirus.data.model
 
-class PilaDescarte(
-    var pila: MutableList<Carta> = mutableListOf(),
+data class PilaDescarte(
+    val pila: List<Carta> = listOf(), // Cambiado a val
 ) {
-    fun addCarta(cartasDescartadas: MutableList<Carta>): Unit {
-        pila.addAll( cartasDescartadas)
+    fun addCarta(cartasDescartadas: List<Carta>): PilaDescarte { // Cambiado MutableList a List
+        return this.copy(
+            pila = this.pila + cartasDescartadas
+        )
     }
 
-    fun empty(): MutableList<Carta> {
-        var cartas: MutableList<Carta> = pila.toMutableList()
-        pila.clear()
-        return cartas
+    fun empty(): Pair<PilaDescarte, List<Carta>> { // Devuelve nueva pila vacía y las cartas anteriores
+        return Pair(this.copy(pila = listOf()), this.pila)
     }
 }

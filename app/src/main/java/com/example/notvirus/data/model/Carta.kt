@@ -17,11 +17,6 @@ data class Carta(
     var seleccionada: Boolean = false,
     val id: String = UUID.randomUUID().toString(),
 ){
-/*
-    fun clicked(){
-        seleccionada != seleccionada
-    }
-*/
 
     @Composable
     fun rotateCarta(rotar: Boolean) {

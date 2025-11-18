@@ -1,55 +1,58 @@
 package com.example.notvirus.data.model
 
-class Baraja(
-    val mazo: MutableList<Carta> = mutableListOf(),
+data class Baraja(
+    val mazo: List<Carta> = crearMazoInicial() // Cambiado a List y valor por defecto
 ) {
-    init {
-        // 21 cartas de órganos
-        repeat(5) { mazo.add(Carta(CartaTipo.ORGANO, CartaColor.ROJO,imagen =  CartaImagen.CORAZON, icono = CartaIcono.CORAZON)) }
-        repeat(5) { mazo.add(Carta(tipo = CartaTipo.ORGANO, color = CartaColor.AZUL, imagen = CartaImagen.CEREBRO, icono = CartaIcono.CEREBRO)) }
-        repeat(5) { mazo.add(Carta(tipo = CartaTipo.ORGANO, color = CartaColor.AMARILLO, imagen = CartaImagen.HUESO, icono = CartaIcono.HUESO)) }
-        repeat(5) { mazo.add(Carta(tipo = CartaTipo.ORGANO, color = CartaColor.VERDE,imagen =  CartaImagen.ESTOMAGO, icono = CartaIcono.ESTOMAGO)) }
-        mazo.add(Carta(tipo = CartaTipo.ORGANO, color = CartaColor.MULTICOLOR, imagen = CartaImagen.CUERPO, icono = CartaIcono.CUERPO)) // 1 comodín de órgano (CUERPO)
+    companion object {
+        fun crearMazoInicial(): List<Carta> {
+            val cartas = mutableListOf<Carta>()
 
-        // 17 cartas de virus
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.VIRUS, color = CartaColor.ROJO,imagen =  CartaImagen.VIRUS_ROJO, icono = CartaIcono.VIRUS)) }
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.VIRUS, color = CartaColor.VERDE, imagen = CartaImagen.VIRUS_VERDE, icono = CartaIcono.VIRUS)) }
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.VIRUS, color = CartaColor.AZUL,imagen =  CartaImagen.VIRUS_AZUL, icono = CartaIcono.VIRUS)) }
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.VIRUS, color = CartaColor.AMARILLO,imagen =  CartaImagen.VIRUS_AMARILLO, icono = CartaIcono.VIRUS)) }
-        mazo.add(Carta(tipo = CartaTipo.VIRUS, color = CartaColor.MULTICOLOR, imagen = CartaImagen.VIRUS_MULTICOLOR,icono = CartaIcono.VIRUS)) // 1 comodín
+            // 21 cartas de órganos
+            repeat(5) { cartas.add(Carta(CartaTipo.ORGANO, CartaColor.ROJO, CartaIcono.CORAZON, CartaImagen.CORAZON)) }
+            repeat(5) { cartas.add(Carta(CartaTipo.ORGANO, CartaColor.AZUL, CartaIcono.CEREBRO, CartaImagen.CEREBRO)) }
+            repeat(5) { cartas.add(Carta(CartaTipo.ORGANO, CartaColor.AMARILLO, CartaIcono.HUESO, CartaImagen.HUESO)) }
+            repeat(5) { cartas.add(Carta(CartaTipo.ORGANO, CartaColor.VERDE, CartaIcono.ESTOMAGO, CartaImagen.ESTOMAGO)) }
+            cartas.add(Carta(CartaTipo.ORGANO, CartaColor.MULTICOLOR, CartaIcono.CUERPO, CartaImagen.CUERPO))
 
-        // 20 cartas de medicinas
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.MEDICINA, color = CartaColor.ROJO, imagen = CartaImagen.MEDICINA_ROJO, icono = CartaIcono.MEDICINA)) }
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.MEDICINA, color = CartaColor.VERDE, imagen = CartaImagen.MEDICINA_VERDE, icono = CartaIcono.MEDICINA)) }
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.MEDICINA, color = CartaColor.AZUL, imagen = CartaImagen.MEDICINA_AZUL, icono = CartaIcono.MEDICINA)) }
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.MEDICINA, color = CartaColor.AMARILLO, imagen = CartaImagen.MEDICINA_AMARILLO, icono = CartaIcono.MEDICINA)) }
-        repeat(4) { mazo.add(Carta(tipo = CartaTipo.MEDICINA, color = CartaColor.MULTICOLOR, imagen = CartaImagen.MEDICINA_MULTICOLOR, icono = CartaIcono.MEDICINA)) }
+            // 17 cartas de virus
+            repeat(4) { cartas.add(Carta(CartaTipo.VIRUS, CartaColor.ROJO, CartaIcono.VIRUS, CartaImagen.VIRUS_ROJO)) }
+            repeat(4) { cartas.add(Carta(CartaTipo.VIRUS, CartaColor.VERDE, CartaIcono.VIRUS, CartaImagen.VIRUS_VERDE)) }
+            repeat(4) { cartas.add(Carta(CartaTipo.VIRUS, CartaColor.AZUL, CartaIcono.VIRUS, CartaImagen.VIRUS_AZUL)) }
+            repeat(4) { cartas.add(Carta(CartaTipo.VIRUS, CartaColor.AMARILLO, CartaIcono.VIRUS, CartaImagen.VIRUS_AMARILLO)) }
+            cartas.add(Carta(CartaTipo.VIRUS, CartaColor.MULTICOLOR, CartaIcono.VIRUS, CartaImagen.VIRUS_MULTICOLOR))
 
-        // 10 cartas de tratamientos
-        repeat(2) { mazo.add(Carta(tipo = CartaTipo.TRATAMIENTO, color = CartaColor.BLANCO, imagen = CartaImagen.TRATAMIENTO_CONTAGIO , icono = CartaIcono.TRATAMIENTO)) }
-        repeat(3) { mazo.add(Carta(tipo = CartaTipo.TRATAMIENTO, color = CartaColor.BLANCO, imagen = CartaImagen.TRATAMIENTO_ROBO_ORGANO , icono = CartaIcono.TRATAMIENTO)) }
-        repeat(3) { mazo.add(Carta(tipo = CartaTipo.TRATAMIENTO, color = CartaColor.BLANCO, imagen = CartaImagen.TRATAMIENTO_TRANSPLANTE , icono = CartaIcono.TRATAMIENTO)) }
-        repeat(1) { mazo.add(Carta(tipo = CartaTipo.TRATAMIENTO, color = CartaColor.BLANCO, imagen = CartaImagen.TRATAMIENTO_ERROR_MEDICO , icono = CartaIcono.TRATAMIENTO)) }
-        repeat(1) { mazo.add(Carta(tipo = CartaTipo.TRATAMIENTO, color = CartaColor.BLANCO, imagen = CartaImagen.TRATAMIENTO_GUANTE_LATEX , icono = CartaIcono.TRATAMIENTO)) }
+            // 20 cartas de medicinas
+            repeat(4) { cartas.add(Carta(CartaTipo.MEDICINA, CartaColor.ROJO, CartaIcono.MEDICINA, CartaImagen.MEDICINA_ROJO)) }
+            repeat(4) { cartas.add(Carta(CartaTipo.MEDICINA, CartaColor.VERDE, CartaIcono.MEDICINA, CartaImagen.MEDICINA_VERDE)) }
+            repeat(4) { cartas.add(Carta(CartaTipo.MEDICINA, CartaColor.AZUL, CartaIcono.MEDICINA, CartaImagen.MEDICINA_AZUL)) }
+            repeat(4) { cartas.add(Carta(CartaTipo.MEDICINA, CartaColor.AMARILLO, CartaIcono.MEDICINA, CartaImagen.MEDICINA_AMARILLO)) }
+            repeat(4) { cartas.add(Carta(CartaTipo.MEDICINA, CartaColor.MULTICOLOR, CartaIcono.MEDICINA, CartaImagen.MEDICINA_MULTICOLOR)) }
 
-        repeat(10){ shuffle() }
+            // 10 cartas de tratamientos
+            repeat(2) { cartas.add(Carta(CartaTipo.TRATAMIENTO, CartaColor.BLANCO, CartaIcono.TRATAMIENTO, CartaImagen.TRATAMIENTO_CONTAGIO)) }
+            repeat(3) { cartas.add(Carta(CartaTipo.TRATAMIENTO, CartaColor.BLANCO, CartaIcono.TRATAMIENTO, CartaImagen.TRATAMIENTO_ROBO_ORGANO)) }
+            repeat(3) { cartas.add(Carta(CartaTipo.TRATAMIENTO, CartaColor.BLANCO, CartaIcono.TRATAMIENTO, CartaImagen.TRATAMIENTO_TRANSPLANTE)) }
+            repeat(1) { cartas.add(Carta(CartaTipo.TRATAMIENTO, CartaColor.BLANCO, CartaIcono.TRATAMIENTO, CartaImagen.TRATAMIENTO_ERROR_MEDICO)) }
+            repeat(1) { cartas.add(Carta(CartaTipo.TRATAMIENTO, CartaColor.BLANCO, CartaIcono.TRATAMIENTO, CartaImagen.TRATAMIENTO_GUANTE_LATEX)) }
 
-    }
-    // barajar
-    private fun shuffle(): Unit {
-        // random sort
-        mazo.shuffle()
-    }
-
-    // @params n => cantidad de cartas pedidas
-    fun takeCartas(n: Int): MutableList<Carta> {
-        val cartas = mazo.subList(0, n).toMutableList()
-        mazo.removeAll(cartas)
-        return cartas
+            cartas.shuffle()
+            return cartas
+        }
     }
 
-    fun reassemble(descarte: MutableList<Carta>){
-        mazo.addAll(descarte)
-        shuffle()
+    // Devuelve nuevas cartas y una nueva Baraja sin esas cartas
+    fun takeCartas(n: Int): Pair<Baraja, List<Carta>> {
+        if (n > mazo.size) {
+            // tomar las cartas de la pila de descarte
+        }
+        val cartasTomadas = mazo.take(n)
+        val nuevoMazo = mazo.drop(n) // Nuevo mazo sin las cartas tomadas
+        return Pair(this.copy(mazo = nuevoMazo), cartasTomadas)
+    }
+
+    // Devuelve una nueva Baraja con las cartas del descarte reensambladas y barajadas
+    fun reassemble(descarte: Pair<PilaDescarte, List<Carta>>): Baraja {
+        val nuevoMazo = (mazo + descarte).shuffled()
+        return this.copy(mazo = nuevoMazo as List<Carta>)
     }
 }

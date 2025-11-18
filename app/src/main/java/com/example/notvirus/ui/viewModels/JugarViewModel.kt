@@ -3,34 +3,42 @@ package com.example.notvirus.ui.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notvirus.data.model.Juego
+import com.example.notvirus.data.model.Mano
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class JugarUiState(
+    // Tablero
     val isStarted: Boolean = false,
     val isPaused: Boolean = false,
-    val juego: Juego = Juego(),
+    val juego: Juego,
+
+    // Mano
+
+    //val selectedCartas: MutableList<Boolean> = mutableListOf(false, false, false),
+    val cantCartasSelected: Int = 0,
+    val activeBtnPlayCard: Boolean = false,
+    val activeBtnDiscardCards: Boolean = false,
 )
 
 class JugarViewModel(
     private val partidaGuardada: JugarUiState? = null,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(value = JugarUiState())
+    private val _uiState = MutableStateFlow(value = JugarUiState(juego = Juego()))
     val uiState: StateFlow<JugarUiState> = _uiState
 
     init {
         // no sé
     }
 
-    fun cargarJuego() {
-        // corrutina wiiiii :3
+    fun startJuego() {
         viewModelScope.launch {
-            // let's GO !!!
-            _uiState.value.juego.startJuego()
             _uiState.update {
+                val nuevoJuego = it.juego.startJuego() // Devuelve un nuevo Juego
                 it.copy(
+                    juego = nuevoJuego,
                     isStarted = true
                 )
             }
@@ -59,9 +67,80 @@ class JugarViewModel(
     }
 
     fun descartarCartas() {
+        println("JugarVM.descartarCartas()")
         viewModelScope.launch {
-            _uiState.value.juego.passCartasToPilaDescarte()
-            _uiState.value = _uiState.value.copy()
+            _uiState.update {
+                val nuevoJuego = it.juego.passCartasToPilaDescarte() // devuelve un nuevo Juego
+                it.copy(juego = nuevoJuego)
+            }
+        }
+    }
+
+    // MANO
+
+    fun clickedCard(index: Int) {
+        viewModelScope.launch {
+            _uiState.update {
+                val nuevoJuego = it.juego.marcarCarta(index) // devuelve un nuevo Juego
+                it.copy(juego = nuevoJuego)
+            }
+        }
+        /*
+        viewModelScope.launch {
+// para la IU
+            val nuevoSelectedCartas = _uiState.value.selectedCartas.toMutableList()
+            nuevoSelectedCartas[index] = !nuevoSelectedCartas[index]
+            _uiState.update {
+                it.copy(
+                    selectedCartas = nuevoSelectedCartas
+                )
+            }
+// IU
+        }
+         */
+        //println(_uiState.value.selectedCartas)
+        countCartasSelected()
+    }
+
+    fun countCartasSelected() {
+        var conteo = 0
+        for (i in 0..2) {
+            if (_uiState.value.juego.jugadores[1].mano.cartas[i].seleccionada) {
+                conteo++
+            }
+        }
+        _uiState.update {
+            it.copy(
+                cantCartasSelected = conteo
+            )
+        }
+        activeButton()
+    }
+
+    private fun activeButton() {
+        if (_uiState.value.cantCartasSelected == 0) {
+            _uiState.update {
+                it.copy(
+                    activeBtnPlayCard = false,
+                    activeBtnDiscardCards = false,
+                )
+            }
+        }
+        if (_uiState.value.cantCartasSelected == 1) {
+            _uiState.update {
+                it.copy(
+                    activeBtnPlayCard = true,
+                    activeBtnDiscardCards = true,
+                )
+            }
+        }
+        if (_uiState.value.cantCartasSelected > 1) {
+            _uiState.update {
+                it.copy(
+                    activeBtnPlayCard = false,
+                    activeBtnDiscardCards = true,
+                )
+            }
         }
     }
 }

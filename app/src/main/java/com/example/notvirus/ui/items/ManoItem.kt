@@ -1,3 +1,4 @@
+/*
 package com.example.notvirus.ui.items
 
 import android.R.attr.onClick
@@ -85,10 +86,9 @@ fun ManoItem(
             ) {
                 items(mano.cartas) { carta: Carta ->
                     val index = mano.cartas.indexOf(carta)
-//                    carta.seleccionada = selectedCartas[index]
                     CartaItem(
                         carta = carta,
-                        seleccionada = selectedCartas[index],
+                        //seleccionada = selectedCartas[index],
                         onClick = {
                             manoViewModel.clickedCard(index)
                         }
@@ -98,3 +98,4 @@ fun ManoItem(
         }
     }
 }
+*/

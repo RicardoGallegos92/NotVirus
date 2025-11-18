@@ -1,30 +1,46 @@
 package com.example.notvirus.data.model
 
-import com.example.notvirus.data.model.Carta
-
-class Jugador(
-    var nombre: String = "Player X", // nombre de Usuario
-    var isActive: Boolean = false,
-    var mano: Mano = Mano(),
-    var mesa: Mesa = Mesa(),
+data class Jugador(
+    val nombre: String = "Player X", // nombre de Usuario
+    val isActive: Boolean = false,
+    val mano: Mano = Mano(),
+    val mesa: Mesa = Mesa(),
 ) {
-    fun takeCartas(nuevasCartas: MutableList<Carta>): Unit {
-        mano.addCartas(nuevasCartas = nuevasCartas)
+    // Método para "tomar cartas" y devolver un nuevo Jugador con la mano actualizada
+    fun takeCartas(nuevasCartas:List<Carta>): Jugador {
+        println("Jugador.takeCartas()")
+        val nuevaMano = mano.addCartas(nuevasCartas = nuevasCartas)
+        return this.copy(mano = nuevaMano)
     }
 
-    fun discardCartas(): MutableList<Carta> {
-        val cartasDescartardas = mano.takeSelectedCarta()
-        mano.removeSelectedCartas()
-        return cartasDescartardas
+    // Método para "descartar cartas" y devolver un nuevo Jugador con la mano actualizada
+    fun discardCartas(): Pair<Jugador, List<Carta>> {
+        println("Jugador.discardCartas()")
+        // jugador separa las cartas a descartar
+        val cartasDescartadas = mano.takeSelectedCarta()
+        // jugador mantiene en mano las NO seleccionadas
+        val nuevaMano = mano.removeSelectedCartas()
+        val nuevoJugador = this.copy(mano = nuevaMano)
+        // jugador pasa las cartas para descartar
+        return Pair(nuevoJugador, cartasDescartadas)
     }
 
-    fun playCarta(): Carta {
-        // mover una carta a la mesa
-        val cartaJugada = mano.takeSelectedCarta()
-        if (cartaJugada.size > 1) {
-            throw Exception("Más de una carta seleccionada")
+    fun actualizarMano(index: Int): Jugador{
+        val manoAct = mano.selectCarta(mano.cartas[index])
+        return this.copy(
+            mano = manoAct
+        )
+    }
+
+    // Método para "jugar una carta" y devolver un nuevo Jugador con la mano actualizada
+    fun playCarta(): Pair<Jugador, Carta> {
+        val cartaSeleccionada = mano.takeSelectedCarta()
+        if (cartaSeleccionada.size != 1) {
+            // tomar cartas de la pila de descarte
         }
-        mano.removeSelectedCartas()
-        return cartaJugada[0]
+        val cartaJugada = cartaSeleccionada[0]
+        val nuevaMano = mano.removeSelectedCartas()
+        val nuevoJugador = this.copy(mano = nuevaMano)
+        return Pair(nuevoJugador, cartaJugada)
     }
 }

@@ -62,7 +62,7 @@ class ManoViewModel() : ViewModel() {
             _uiState.update {
                 it.copy(
                     activeBtnPlayCard = true,
-                    activeBtnDiscardCards = false,
+                    activeBtnDiscardCards = true,
                 )
             }
         }
