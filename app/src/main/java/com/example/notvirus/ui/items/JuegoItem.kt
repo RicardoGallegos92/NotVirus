@@ -1,3 +1,4 @@
+/*
 package com.example.notvirus.ui.items
 
 import androidx.compose.foundation.background
@@ -93,7 +94,10 @@ fun JuegoItem(
                     .fillMaxWidth()
             ) {
                 if (juego.jugador1Activo) {
-                    ManoItem(juego.jugadores[1].mano)
+                    ManoItem(
+                        mano = juego.jugadores[1].mano,
+                        discard = { juego.passCartasToPilaDescarte() }
+                    )
                 } else {
                     ManoItem(juego.jugadores[0].mano)
                 }
@@ -102,3 +106,4 @@ fun JuegoItem(
 
     }
 }
+*/

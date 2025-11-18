@@ -1,8 +1,10 @@
 package com.example.notvirus.ui.items
 
+import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,13 +33,16 @@ import com.example.notvirus.data.model.CartaTipo
 @Preview(showBackground = true)
 @Composable
 fun CartaItem(
+    index: Int = -1,
     carta: Carta = Carta(
         tipo = CartaTipo.TRATAMIENTO,
         color = CartaColor.BLANCO,
         icono = CartaIcono.TRATAMIENTO,
         imagen = CartaImagen.TRATAMIENTO_GUANTE_LATEX,
     ),
+    seleccionada: Boolean = false,
     anchoCarta: Int = 100,
+    onClick: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -59,9 +64,13 @@ fun CartaItem(
                     .aspectRatio(ratio = 0.6f)
                     .border(
                         width = 2.dp,
-                        color = Color(0, 0, 0),
+                        color = if ( seleccionada ){ Color(255, 255, 255)} else{ Color(0, 0, 0) },
                         shape = RoundedCornerShape(10.dp),
-                    ),
+                    )
+                    .clickable{
+                        onClick()
+                    }
+                ,
             ) {
                 Column(
                     modifier = Modifier

@@ -1,7 +1,7 @@
 package com.example.notvirus.data.model
 
 class Juego(
-    val jugadores: MutableList<Jugador> = mutableListOf(Jugador(nombre = "Jugador1"), Jugador(nombre = "Jugador2")),
+    val jugadores: MutableList<Jugador> = mutableListOf(Jugador(nombre = "CPU"), Jugador(nombre = "Jugador1")),
     val baraja: Baraja = Baraja(),
     val pilaDescarte: PilaDescarte = PilaDescarte(),
     val jugador1Activo: Boolean = true,
@@ -34,9 +34,16 @@ class Juego(
     }
 
     fun passCartasToPilaDescarte(): Unit {
+        println("passCartasToPilaDescarte()")
+        // val cartasDescartadas = jugadorActivo!!.discardCartas()
+        // pedir las cartas de la mano
+        val cartasDescartadas = jugadores[1].discardCartas()
         // pasar cartas de la mano a Pila descarte
-        val cartasDescartadas = jugadorActivo!!.discardCartas()
         pilaDescarte.addCarta(cartasDescartadas)
+        // pedir n nuevas cartas a la baraja
+        val nuevasCartas = baraja.takeCartas(n = cartasDescartadas.size)
+        // pasar las n cartas a la mano del jugador
+        jugadores[1].takeCartas(nuevasCartas)
     }
 
     fun passCartasToMesa(): Unit {

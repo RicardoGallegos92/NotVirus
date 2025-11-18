@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.notvirus.ui.items.ManoItem
+import com.example.notvirus.ui.items.ManoItemCPU
 import com.example.notvirus.ui.items.MesaItem
 import com.example.notvirus.ui.viewModels.JugarViewModel
 
@@ -72,7 +73,7 @@ fun JugarScreen(
                     ) {
                         Text(text = "Continuar")
                     }
-                }else{
+                } else {
                     Column(
                         // Zona Jugador CPU
                         modifier = Modifier
@@ -89,15 +90,7 @@ fun JugarScreen(
                                 .fillMaxWidth()
                                 .weight(1f)
                         ) {
-                            if (juego.jugador1Activo) {
-                                ManoItem(
-                                    juego.jugadores[0].mano
-                                )
-                            } else {
-                                ManoItem(
-                                    juego.jugadores[1].mano
-                                )
-                            }
+                            ManoItemCPU(mano = juego.jugadores[0].mano)
                         }
                         Row(
                             // Jugador CPU - Mesa
@@ -106,17 +99,13 @@ fun JugarScreen(
                                 .fillMaxWidth()
                                 .weight(1f)
                         ) {
-                            if (juego.jugador1Activo) {
-                                MesaItem(juego.jugadores[0].mesa)
-                            } else {
-                                MesaItem(juego.jugadores[1].mesa)
-                            }
+                            MesaItem(mesa = juego.jugadores[0].mesa)
                         }
                     }
                     Row(
                         // centro mesa (zona Neutral)
                         modifier = Modifier
-                            .background(color = Color(0,0,0,256))
+                            .background(color = Color(0, 0, 0, 256))
                             .fillMaxWidth()
                             .weight(1f),
                         verticalAlignment = Alignment.CenterVertically,
@@ -128,11 +117,8 @@ fun JugarScreen(
                             cantidadCartas = juego.baraja.mazo.size,
                         )
                         // boton de Pausa
-                        Button(
-                            onClick = { juegoViewModel.pauseJuego() }
-                        ) {
-                            Text(text = "Pausar")
-                        }
+                        Button(onClick = { juegoViewModel.pauseJuego() })
+                        { Text(text = "Pausar") }
                         // pila descarte
                         PilaDeCartas(
                             texto = "Descarte",
@@ -154,11 +140,7 @@ fun JugarScreen(
                                 .fillMaxWidth()
                                 .weight(1f),
                         ) {
-                            if (juego.jugador1Activo) {
-                                MesaItem(juego.jugadores[1].mesa)
-                            } else {
-                                MesaItem(juego.jugadores[0].mesa)
-                            }
+                            MesaItem(mesa = juego.jugadores[1].mesa)
                         }
                         Row(
                             // Jugador Humano - Mano
@@ -166,17 +148,15 @@ fun JugarScreen(
                                 .fillMaxWidth()
                                 .weight(1f),
                         ) {
-                            if (juego.jugador1Activo) {
-                                ManoItem(
-                                    juego.jugadores[1].mano
-                                )
-                            } else {
-                                ManoItem(
-                                    juego.jugadores[0].mano
-                                )
-                            }
+                            ManoItem(
+                                mano = juego.jugadores[1].mano,
+                                play = { },
+                                discard = {
+                                    juegoViewModel.descartarCartas()
+                                },
+                                useButtons = true,
+                            )
                         }
-
                     }
                 }
             }

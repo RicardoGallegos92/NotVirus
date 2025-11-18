@@ -15,7 +15,7 @@ data class JugarUiState(
 )
 
 class JugarViewModel(
-    private val partidaGuardada: JugarUiState? = null
+    private val partidaGuardada: JugarUiState? = null,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(value = JugarUiState())
     val uiState: StateFlow<JugarUiState> = _uiState
@@ -37,7 +37,7 @@ class JugarViewModel(
         }
     }
 
-    fun pauseJuego(){
+    fun pauseJuego() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
@@ -48,13 +48,20 @@ class JugarViewModel(
         // mandar a guardar
     }
 
-    fun unPauseJuego(){
+    fun unPauseJuego() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
                     isPaused = false
                 )
             }
+        }
+    }
+
+    fun descartarCartas() {
+        viewModelScope.launch {
+            _uiState.value.juego.passCartasToPilaDescarte()
+            _uiState.value = _uiState.value.copy()
         }
     }
 }
