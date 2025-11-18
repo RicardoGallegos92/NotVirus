@@ -11,23 +11,28 @@ data class Mesa(
     // Métodos que devuelven nuevas instancias de Mesa
 
     fun addAmarillo(nuevaCarta: Carta): Mesa {
-        return this.copy(pilaAmarilla = this.pilaAmarilla + nuevaCarta)
+        println("Amarillo añadido")
+        return this.copy(pilaAmarilla = pilaAmarilla + nuevaCarta)
     }
 
     fun addVerde(nuevaCarta: Carta): Mesa {
-        return this.copy(pilaVerde = this.pilaVerde + nuevaCarta)
+        println("Verde añadido")
+        return this.copy(pilaVerde = pilaVerde + nuevaCarta)
     }
 
     fun addRojo(nuevaCarta: Carta): Mesa {
-        return this.copy(pilaRoja = this.pilaRoja + nuevaCarta)
+        println("Rojo añadido")
+        return this.copy(pilaRoja = pilaRoja + nuevaCarta)
     }
 
     fun addAzul(nuevaCarta: Carta): Mesa {
-        return this.copy(pilaAzul = this.pilaAzul + nuevaCarta)
+        println("Azul añadido")
+        return this.copy(pilaAzul = pilaAzul + nuevaCarta)
     }
 
     fun addMulticolor(nuevaCarta: Carta): Mesa {
-        return this.copy(pilaMulticolor = this.pilaMulticolor + nuevaCarta)
+        println("Multicolor añadido")
+        return this.copy(pilaMulticolor = pilaMulticolor + nuevaCarta)
     }
 
     fun flushAmarillo(): Mesa {

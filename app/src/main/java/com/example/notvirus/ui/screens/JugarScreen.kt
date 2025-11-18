@@ -169,7 +169,7 @@ fun JugarScreen(
                                         Button(
                                             enabled = activeBtnPlayCard,
                                             onClick = {
-                                            //    juegoViewModel.jugarCartas()
+                                                juegoViewModel.jugarCarta()
                                             }
                                         ) { Text(text = "Jugar") }
                                         Button(

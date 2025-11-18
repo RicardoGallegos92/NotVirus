@@ -17,7 +17,6 @@ data class JugarUiState(
 
     // Mano
 
-    //val selectedCartas: MutableList<Boolean> = mutableListOf(false, false, false),
     val cantCartasSelected: Int = 0,
     val activeBtnPlayCard: Boolean = false,
     val activeBtnDiscardCards: Boolean = false,
@@ -66,6 +65,17 @@ class JugarViewModel(
         }
     }
 
+    fun jugarCarta(){
+        viewModelScope.launch {
+            _uiState.update{
+                val juegoAct = it.juego.passCartaToMesa()
+                it.copy(
+                    juego = juegoAct
+                )
+            }
+        }
+    }
+
     fun descartarCartas() {
         println("JugarVM.descartarCartas()")
         viewModelScope.launch {
@@ -85,20 +95,6 @@ class JugarViewModel(
                 it.copy(juego = nuevoJuego)
             }
         }
-        /*
-        viewModelScope.launch {
-// para la IU
-            val nuevoSelectedCartas = _uiState.value.selectedCartas.toMutableList()
-            nuevoSelectedCartas[index] = !nuevoSelectedCartas[index]
-            _uiState.update {
-                it.copy(
-                    selectedCartas = nuevoSelectedCartas
-                )
-            }
-// IU
-        }
-         */
-        //println(_uiState.value.selectedCartas)
         countCartasSelected()
     }
 

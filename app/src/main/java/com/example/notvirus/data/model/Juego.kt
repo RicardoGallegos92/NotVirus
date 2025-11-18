@@ -1,5 +1,7 @@
 package com.example.notvirus.data.model
 
+import java.nio.file.Files.size
+
 data class Juego(
     val jugadores: List<Jugador>,
     val baraja: Baraja,
@@ -59,9 +61,13 @@ data class Juego(
     fun passCartasToPilaDescarte(): Juego {
         println("Juego.passCartasToPilaDescarte()")
         val (nuevoJugador, cartasDescartadas) = jugadores[1].discardCartas()
+        // pila descarte actualizada
         val nuevaPilaDescarte = pilaDescarte.addCarta(cartasDescartadas)
+        // baraja actualizada y cartas extraidas
         val (nuevaBaraja, nuevasCartasMano) = baraja.takeCartas(cartasDescartadas.size)
+        // jugador recibe las cartas tomadas de la baraja
         val jugadorConNuevasCartas = nuevoJugador.takeCartas(nuevasCartasMano)
+        // actualizar jugadores para la UI
         val nuevosJugadores = jugadores.toMutableList()
         nuevosJugadores[1] = jugadorConNuevasCartas
 
@@ -72,7 +78,8 @@ data class Juego(
         )
     }
 
-    fun marcarCarta(index: Int): Juego{
+    // cambia el estado "selecciona" de la carta entre "true" y "false"
+    fun marcarCarta(index: Int): Juego {
         val jugadorActualizado = jugadores[1].actualizarMano(index)
         val jugadoresAct = jugadores.toMutableList()
         jugadoresAct[1] = jugadorActualizado
@@ -82,93 +89,27 @@ data class Juego(
         )
     }
 
-    // passCartasToMesa: Devuelve un nuevo Juego con la carta jugada en la mesa
-    fun passCartasToMesa(): Juego {
-        val jugadorActual = this.jugadorActivo ?: return this // No hay jugador activo
-        val (nuevoJugador, cartaJugada) = jugadorActual.playCarta() // <-- Desestructura aquí
+    // passCartaToMesa: Devuelve un nuevo Juego con la carta jugada en la mesa
+    fun passCartaToMesa(): Juego {
+        // val jugadorActual = this.jugadorActivo ?: return this
+        val jugadorActual = jugadores[1]
+        //val (nuevoJugador, cartaJugada) = jugadorActual.playCarta()
+        val jugadorActualizado = jugadorActual.jugarCarta()
+        // baraja actualizada y cartas extraidas
+        val (barajaActualizada, nuevasCartasMano) = baraja.takeCartas((3 - jugadorActualizado.mano.cartas.size) )
+        // jugador recibe las cartas tomadas de la baraja
+        val jugadorConManoLlena = jugadorActualizado.takeCartas(nuevasCartasMano)
+        // actualizar jugadores para la UI
+        val jugadoresActualizados = jugadores.toMutableList()
+        jugadoresActualizados[1] = jugadorConManoLlena
 
-        // Ahora puedes usar `cartaJugada` como una Carta
-        val nuevoJuegoConCartaJugada = when (cartaJugada.tipo) {
-            CartaTipo.ORGANO -> this.addOrgano(cartaJugada, nuevoJugador)
-            CartaTipo.MEDICINA -> this.addMedicina(cartaJugada, nuevoJugador)
-            CartaTipo.VIRUS -> this.addVirus(cartaJugada, nuevoJugador)
-            CartaTipo.TRATAMIENTO -> this.playTratamiento(cartaJugada, nuevoJugador)
-            CartaTipo.NULL -> this.copy(jugadores = jugadores.map {
-                if (it.nombre == nuevoJugador.nombre) nuevoJugador else it
-            })
-        }
-
-        val nuevosJugadores = nuevoJuegoConCartaJugada.jugadores.map {
-            if (it.nombre == nuevoJugador.nombre) nuevoJugador else it
-        }
-
-        return nuevoJuegoConCartaJugada.copy(jugadores = nuevosJugadores)
+        return this.copy(
+            jugadores = jugadoresActualizados,
+            baraja = barajaActualizada
+        )
     }
 
-    private fun addOrgano(cartaJugada: Carta, jugadorActual: Jugador): Juego {
-        val nuevaMesa = when (cartaJugada.color) {
-            CartaColor.AMARILLO ->
-                if (!existeOrgano(CartaColor.AMARILLO, jugadorActual)) {
-                    jugadorActual.mesa.addAmarillo(cartaJugada)
-                } else jugadorActual.mesa
-
-            CartaColor.VERDE ->
-                if (!existeOrgano(CartaColor.VERDE, jugadorActual)) {
-                    jugadorActual.mesa.addVerde(cartaJugada)
-                } else jugadorActual.mesa
-
-            CartaColor.ROJO ->
-                if (!existeOrgano(CartaColor.ROJO, jugadorActual)) {
-                    jugadorActual.mesa.addRojo(cartaJugada)
-                } else jugadorActual.mesa
-
-            CartaColor.AZUL ->
-                if (!existeOrgano(CartaColor.AZUL, jugadorActual)) {
-                    jugadorActual.mesa.addAzul(cartaJugada)
-                } else jugadorActual.mesa
-
-            CartaColor.MULTICOLOR ->
-                if (!existeOrgano(CartaColor.MULTICOLOR, jugadorActual)) {
-                    jugadorActual.mesa.addMulticolor(cartaJugada)
-                } else jugadorActual.mesa
-
-            else -> jugadorActual.mesa
-        }
-
-        val nuevoJugador = jugadorActual.copy(mesa = nuevaMesa)
-        val nuevosJugadores = this.jugadores.map {
-            if (it.nombre == jugadorActual.nombre) nuevoJugador else it
-        }
-
-        return this.copy(jugadores = nuevosJugadores)
-    }
-
-    private fun addMedicina(cartaJugada: Carta, jugadorActual: Jugador): Juego {
-        // Implementar lógica de medicina
-        return this
-    }
-
-    private fun addVirus(cartaJugada: Carta, jugadorActual: Jugador): Juego {
-        // Implementar lógica de virus
-        return this
-    }
-
-    private fun playTratamiento(cartaJugada: Carta, jugadorActual: Jugador): Juego {
-        // Implementar lógica de tratamiento
-        return this
-    }
-
-    private fun existeOrgano(color: CartaColor, jugador: Jugador): Boolean {
-        return when (color) {
-            CartaColor.ROJO -> jugador.mesa.pilaRoja.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.AZUL -> jugador.mesa.pilaAzul.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.AMARILLO -> jugador.mesa.pilaAmarilla.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.VERDE -> jugador.mesa.pilaVerde.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.MULTICOLOR -> jugador.mesa.pilaMulticolor.any { it.tipo == CartaTipo.ORGANO }
-            else -> false
-        }
-    }
-
+    // cambiar jugador en turno (escalable)
     fun passTurn(): Juego {
         val currentIndex = jugadores.indexOf(this.jugadorActivo)
         if (currentIndex == -1) return this // No hay jugador activo

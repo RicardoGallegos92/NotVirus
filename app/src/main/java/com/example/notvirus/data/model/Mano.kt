@@ -16,15 +16,7 @@ data class Mano(
 
     // Devuelve las cartas seleccionadas (sin modificar estado)
     fun takeSelectedCarta(): List<Carta> {
-        println("Cartas en mano")
-        cartas.forEach { carta ->
-            println("${carta}")
-        }
         val cartasSeleccionadas = cartas.filter { it.seleccionada }
-        println("Cartas Seleccionadas de la mano")
-        cartasSeleccionadas.forEach { carta ->
-            println("${carta}")
-        }
         return cartasSeleccionadas
     }
 
@@ -33,18 +25,6 @@ data class Mano(
         val nuevasCartas = this.cartas.map { carta ->
             if (carta.id == cartaElegida.id) { // Comparar por ID único
                 carta.copy(seleccionada = !carta.seleccionada)
-            } else {
-                carta
-            }
-        }
-        return this.copy(cartas = nuevasCartas)
-    }
-
-    // Devuelve una nueva Mano con una carta desmarcada como seleccionada
-    fun unSelectCarta(cartaElegida: Carta): Mano {
-        val nuevasCartas = this.cartas.map { carta ->
-            if (carta.id == cartaElegida.id) { // Comparar por ID único
-                carta.copy(seleccionada = false)
             } else {
                 carta
             }
