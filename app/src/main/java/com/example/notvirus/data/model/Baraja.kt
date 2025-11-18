@@ -43,7 +43,7 @@ class Baraja(
 
     // @params n => cantidad de cartas pedidas
     fun takeCartas(n: Int): MutableList<Carta> {
-        val cartas = mazo.subList(0, n - 1)
+        val cartas = mazo.subList(0, n).toMutableList()
         mazo.removeAll(cartas)
         return cartas
     }

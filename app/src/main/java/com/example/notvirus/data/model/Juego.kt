@@ -9,7 +9,7 @@ class Juego(
     var jugadorActivo: Jugador? = null,
 ) {
     init {
-        startJuego()
+//        startJuego()
     }
 
     fun startJuego() {

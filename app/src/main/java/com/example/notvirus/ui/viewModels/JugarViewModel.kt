@@ -1,14 +1,18 @@
 package com.example.notvirus.ui.viewModels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.notvirus.data.model.Juego
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class JugarUiState(
-    val isLoading: Boolean = false,
-    val juego: Juego = Juego()
+    val isStarted: Boolean = false,
+    val juego: Juego = Juego(),
 )
 
 class JugarViewModel() : ViewModel() {
@@ -20,11 +24,15 @@ class JugarViewModel() : ViewModel() {
     }
 
     fun cargarJuego() {
-        _uiState.update {
-            it.copy(
-                isLoading = true,
-            )
+        // corrutina wiiiii :3
+        viewModelScope.launch {
+            // let's GO !!!
+            _uiState.value.juego.startJuego()
+            _uiState.update {
+                it.copy(
+                    isStarted = true
+                )
+            }
         }
-
     }
 }

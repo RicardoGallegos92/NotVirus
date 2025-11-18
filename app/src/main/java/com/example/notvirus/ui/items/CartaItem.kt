@@ -1,5 +1,6 @@
 package com.example.notvirus.ui.items
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -87,9 +88,10 @@ fun CartaItem(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
+                        Image(
                             painter = painterResource(id = carta.imagen.id),
-                            contentDescription = "Icono de carta",
+                            contentDescription = "Imagen de carta",
+                            colorFilter = null,
                         )
                     }
                     // Abajo
