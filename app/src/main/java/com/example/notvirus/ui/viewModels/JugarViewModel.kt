@@ -16,7 +16,6 @@ data class JugarUiState(
     val juego: Juego,
 
     // Mano
-
     val cantCartasSelected: Int = 0,
     val activeBtnPlayCard: Boolean = false,
     val activeBtnDiscardCards: Boolean = false,

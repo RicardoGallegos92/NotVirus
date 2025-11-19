@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.ui.items.CartaItem
+import com.example.notvirus.ui.items.ManoItem
 import com.example.notvirus.ui.items.ManoItemCPU
 import com.example.notvirus.ui.items.MesaItem
 import com.example.notvirus.ui.viewModels.JugarViewModel
@@ -148,68 +149,15 @@ fun JugarScreen(
                                 .fillMaxWidth()
                                 .weight(1f),
                         ) {
-
-                            //val selectedCartas = uiState.selectedCartas
                             val activeBtnPlayCard = uiState.activeBtnPlayCard
                             val activeBtnDiscardCards = uiState.activeBtnDiscardCards
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight(),
-                            ) {
-                                if (true) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentHeight(),
-                                        horizontalArrangement = Arrangement.SpaceEvenly,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Button(
-                                            enabled = activeBtnPlayCard,
-                                            onClick = {
-                                                juegoViewModel.jugarCarta()
-                                            }
-                                        ) { Text(text = "Jugar") }
-                                        Button(
-                                            enabled = activeBtnDiscardCards,
-                                            onClick = {
-                                                println("btn discard presionado")
-                                                juegoViewModel.descartarCartas()
-                                            }
-                                        ) { Text(text = "Descartar") }
-                                    }
-                                }
-                                LazyRow(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentHeight(),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    items(juego.jugadores[1].mano.cartas) { carta: Carta ->
-                                        val index = juego.jugadores[1].mano.cartas.indexOf(carta)
-                                        CartaItem(
-                                            carta = carta,
-                                            //seleccionada = selectedCartas[index],
-                                            onClick = {
-                                                juegoViewModel.clickedCard(index)
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                            /*
                             ManoItem(
                                 mano = juego.jugadores[1].mano,
-                                play = { },
-                                discard = {
-                                    juegoViewModel.descartarCartas()
-                                },
+                                viewModel = juegoViewModel,
                                 useButtons = true,
+                                activeBtnPlayCard = activeBtnPlayCard,
+                                activeBtnDiscardCards = activeBtnDiscardCards,
                             )
-                            */
                         }
                     }
                 }

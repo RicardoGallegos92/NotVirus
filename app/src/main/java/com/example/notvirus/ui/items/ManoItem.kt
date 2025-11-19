@@ -1,8 +1,5 @@
-/*
 package com.example.notvirus.ui.items
 
-import android.R.attr.onClick
-import android.R.attr.text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,38 +11,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.notvirus.data.model.Carta
-import com.example.notvirus.data.model.CartaColor
-import com.example.notvirus.data.model.CartaIcono
-import com.example.notvirus.data.model.CartaImagen
-import com.example.notvirus.data.model.CartaTipo
 import com.example.notvirus.data.model.Mano
-import com.example.notvirus.ui.viewModels.ManoViewModel
+import com.example.notvirus.ui.viewModels.JugarViewModel
 
-@Preview(showBackground = true)
 @Composable
 fun ManoItem(
     mano: Mano = Mano(),
-    play: () -> Unit = {},
-    discard: () -> Unit = {},
-    manoViewModel: ManoViewModel = viewModel(),
+    viewModel: JugarViewModel,
     useButtons: Boolean = false,
-    ) {
-    val uiState by manoViewModel.uiState.collectAsStateWithLifecycle()
-
-    val selectedCartas = uiState.selectedCartas
-
-    val activeBtnPlayCard = uiState.activeBtnPlayCard
-
-    val activeBtnDiscardCards = uiState.activeBtnDiscardCards
-
+    activeBtnPlayCard: Boolean,
+    activeBtnDiscardCards: Boolean,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -66,13 +45,15 @@ fun ManoItem(
                 ) {
                     Button(
                         enabled = activeBtnPlayCard,
-                        onClick = { play() }
+                        onClick = {
+                            viewModel.jugarCarta()
+                        }
                     ) { Text(text = "Jugar") }
                     Button(
                         enabled = activeBtnDiscardCards,
                         onClick = {
                             println("btn discard presionado")
-                            discard()
+                            viewModel.descartarCartas()
                         }
                     ) { Text(text = "Descartar") }
                 }
@@ -90,7 +71,7 @@ fun ManoItem(
                         carta = carta,
                         //seleccionada = selectedCartas[index],
                         onClick = {
-                            manoViewModel.clickedCard(index)
+                            viewModel.clickedCard(index)
                         }
                     )
                 }
@@ -98,4 +79,3 @@ fun ManoItem(
         }
     }
 }
-*/

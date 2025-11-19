@@ -6,15 +6,15 @@ data class Jugador(
     val mano: Mano = Mano(),
     val mesa: Mesa = Mesa(),
 ) {
-    // Método para "tomar cartas" y devolver un nuevo Jugador con la mano actualizada
     fun takeCartas(nuevasCartas: List<Carta>): Jugador {
+    // Metodo para "tomar cartas" y devolver el Jugador con la mano actualizada
         println("Jugador.takeCartas()")
         val nuevaMano = mano.addCartas(nuevasCartas = nuevasCartas)
         return this.copy(mano = nuevaMano)
     }
 
-    // Método para "descartar cartas" y devolver un nuevo Jugador con la mano actualizada
     fun discardCartas(): Pair<Jugador, List<Carta>> {
+    // Metodo para "descartar cartas" y devolver el Jugador con la mano actualizada
         println("Jugador.discardCartas()")
         // jugador separa las cartas a descartar
         val cartasDescartadas = mano.takeSelectedCarta()
@@ -48,9 +48,22 @@ data class Jugador(
                     // lanzar mensaje (snackBar)
                 }
 
-            CartaTipo.VIRUS -> {}
-            CartaTipo.MEDICINA -> {}
-            CartaTipo.TRATAMIENTO -> {}
+            CartaTipo.VIRUS ->
+                if (existeOrgano(color = carta.color)
+                    || existeMedicina(color = carta.color)){
+                    addOrgano(cartaJugada = carta)
+                } else {
+                    // lanzar mensaje (snackBar)
+                }
+            CartaTipo.MEDICINA ->
+                if (existeOrgano(color = carta.color)
+                    || existeVirus(color = carta.color)){
+                    addOrgano(cartaJugada = carta)
+                } else {
+                    // lanzar mensaje (snackBar)
+                }
+            CartaTipo.TRATAMIENTO ->
+                playTratamiento(carta)
             else -> {}
         }
         return this.copy(
@@ -58,7 +71,7 @@ data class Jugador(
             mano = manoAct
         )
     }
-
+// ORGANO :Start
     private fun addOrgano(cartaJugada: Carta): Mesa {
         val nuevaMesa = when (cartaJugada.color) {
             CartaColor.AMARILLO ->
@@ -90,19 +103,19 @@ data class Jugador(
         }
         return nuevaMesa
     }
-
-    // verifica si la pila ya está ocupada por un órgano
     private fun existeOrgano(color: CartaColor): Boolean {
+    // verifica si la pila ya está ocupada por un órgano
         return when (color) {
             CartaColor.ROJO -> mesa.pilaRoja.any { it.tipo == CartaTipo.ORGANO }
             CartaColor.AZUL -> mesa.pilaAzul.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.AMARILLO -> mesa.pilaAmarilla.any { it.tipo == CartaTipo.ORGANO }
             CartaColor.VERDE -> mesa.pilaVerde.any { it.tipo == CartaTipo.ORGANO }
+            CartaColor.AMARILLO -> mesa.pilaAmarilla.any { it.tipo == CartaTipo.ORGANO }
             CartaColor.MULTICOLOR -> mesa.pilaMulticolor.any { it.tipo == CartaTipo.ORGANO }
             else -> false
         }
     }
-
+// ORGANO :End
+// MEDICINA :Start
     private fun addMedicina(cartaJugada: Carta): Mesa {
         val nuevaMesa = when (cartaJugada.color) {
             CartaColor.AMARILLO ->
@@ -135,6 +148,11 @@ data class Jugador(
         return nuevaMesa
     }
 
+    private fun existeMedicina(color: CartaColor):Boolean{
+        return false
+    }
+// MEDICINA :End
+// VIRUS:Start
     private fun addVirus(cartaJugada: Carta): Mesa {
         val nuevaMesa = when (cartaJugada.color) {
             CartaColor.AMARILLO ->
@@ -167,10 +185,18 @@ data class Jugador(
         return nuevaMesa
     }
 
+    private fun existeVirus(color: CartaColor):Boolean{
+        return false
+    }
+// VIRUS:End
+
+// TRATAMIENTOS:Start
     private fun playTratamiento(cartaJugada: Carta): Jugador {
-        // tratamiento tiene efecto particular y se va directo a la pila de descarte
+        // tratamiento activa su efecto particular
+        // va directo a la pila de descarte
         return this.copy(
 
         )
     }
+// TRATAMIENTOS:End
 }
