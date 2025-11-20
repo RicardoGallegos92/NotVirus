@@ -1,7 +1,9 @@
 package com.example.notvirus.data.model
 
+import kotlin.collections.toMutableList
+
 data class Baraja(
-    val mazo: List<Carta> = crearMazoInicial(), // Cambiado a List y valor por defecto
+    val pila: List<Carta> = crearMazoInicial(), // Cambiado a List y valor por defecto
 ) {
     companion object {
         fun crearMazoInicial(): List<Carta> {
@@ -216,25 +218,32 @@ data class Baraja(
         }
     }
 
-    // Devuelve nuevas cartas y una nueva Baraja sin esas cartas
-    fun takeCartas(cantCartas: Int): Pair<Baraja, List<Carta>> {
-        if (cantCartas > mazo.size) {
-            // solicitar cartas a la 'Pila de Descarte'
-            // throw error
-        }
-        val cartasTomadas = mazo.take(cantCartas)
-        val nuevoMazo = mazo.drop(cantCartas) // Nuevo mazo sin las cartas tomadas
+    // Devuelve cartas solicitadas y la Baraja sin esas cartas
+    fun pedirCartas(cantCartas: Int): Pair<List<Carta>, Baraja> {
+        val cartasPedidas = pila.take(cantCartas)
+        val nuevoMazo = pila.drop(cantCartas) // Nuevo pila sin las cartas tomadas
         return Pair(
-            first = this.copy(
-                        mazo = nuevoMazo
-                    ),
-            second = cartasTomadas
+            cartasPedidas,
+            this.copy(
+                pila = nuevoMazo
+            ),
         )
     }
 
     // Devuelve una nueva Baraja con las cartas del descarte reensambladas y barajadas
-    fun reassemble(cartasParaAgregar: Pair<PilaDescarte, List<Carta>>): Baraja {
-        val nuevoMazo = (mazo + descarte).shuffled()
-        return this.copy(mazo = nuevoMazo as List<Carta>)
+    fun agregarCartas(cartasParaAgregar: Pair<PilaDescarte, List<Carta>>): Baraja {
+        var nuevoMazo = (pila + cartasParaAgregar).toMutableList()
+        return this.copy(
+            pila = nuevoMazo as List<Carta>
+        )
+    }
+
+    // Devuelve una baraja revuelta
+    fun revolver(): Baraja {
+        var cartas = this.pila.toMutableList()
+        repeat(10) { cartas.shuffle() }
+        return this.copy(
+            pila = cartas
+        )
     }
 }
