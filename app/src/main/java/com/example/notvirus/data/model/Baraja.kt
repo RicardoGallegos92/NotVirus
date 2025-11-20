@@ -231,10 +231,10 @@ data class Baraja(
     }
 
     // Devuelve una nueva Baraja con las cartas del descarte reensambladas y barajadas
-    fun agregarCartas(cartasParaAgregar: Pair<PilaDescarte, List<Carta>>): Baraja {
-        var nuevoMazo = (pila + cartasParaAgregar).toMutableList()
+    fun agregarCartas(cartasParaAgregar: List<Carta>): Baraja {
+        var nuevoMazo = ( pila + cartasParaAgregar )
         return this.copy(
-            pila = nuevoMazo as List<Carta>
+            pila = nuevoMazo
         )
     }
 

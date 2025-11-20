@@ -6,6 +6,8 @@ data class Juego(
     val jugadores: List<Jugador>,
     val baraja: Baraja,
     val pilaDescarte: PilaDescarte,
+
+    val maxCartasEnMano: Int,
     val jugador1Activo: Boolean,
     val jugador2Activo: Boolean,
     val jugadorActivo: Jugador?,
@@ -14,6 +16,8 @@ data class Juego(
         jugadores = listOf(Jugador(nombre = "CPU"), Jugador(nombre = "Jugador1")),
         baraja = Baraja(),
         pilaDescarte = PilaDescarte(),
+
+        maxCartasEnMano = 3,
         jugador1Activo = true,
         jugador2Activo = false,
         jugadorActivo = null
@@ -23,20 +27,20 @@ data class Juego(
     fun startJuego(): Juego {
         var barajaActual = this.baraja // Mantén un registro de la baraja actualizada
         val nuevosJugadores = jugadores.map { jugador ->
-            val (nuevaBaraja, cartasTomadas) = barajaActual.takeCartas(3) // <-- solicitar cartas para la mano
+            val (cartasParaJugador, nuevaBaraja) = barajaActual.pedirCartas(maxCartasEnMano) // <-- solicitar cartas para la mano
             barajaActual = nuevaBaraja // Actualiza la baraja para el siguiente jugador
-            jugador.takeCartas(cartasTomadas) // <-- Pasa la lista de cartas
+            jugador.tomaCartas(cartasParaJugador) // <-- Pasa la lista de cartas
         }.toMutableList()
-
-        // Activar primer jugador
-        val jugadorInicial = nuevosJugadores[0]
-        val jugadorConEstadoActivo = jugadorInicial.copy(isActive = true)
-        nuevosJugadores[0] = jugadorConEstadoActivo
-
+        /*
+                // Activar primer jugador
+                val jugadorInicial = nuevosJugadores[0]
+                val jugadorConEstadoActivo = jugadorInicial.copy(isActive = true)
+                nuevosJugadores[0] = jugadorConEstadoActivo
+        */
         return this.copy(
-            jugadores = nuevosJugadores,
+            jugadores = nuevosJugadores.toList(),
             baraja = barajaActual, // <-- Asegúrate de usar la baraja actualizada
-            jugadorActivo = jugadorConEstadoActivo,
+            //jugadorActivo = jugadorConEstadoActivo,
             jugador1Activo = true // <-- Ajusta según tu lógica, puede ser solo una bandera
             // jugador2Activo = false // <-- Opcionalmente actualiza también este
         )
@@ -45,16 +49,7 @@ data class Juego(
     fun winner(): Juego {
         // Lógica para determinar ganador
         // Devolver nuevo estado si aplica
-        return this // Placeholder
-    }
-
-    fun leftInDeckCartas(): Juego {
-        if (baraja.mazo.isEmpty()) {
-            val nuevasCartasReensambladas = pilaDescarte.empty()
-            val nuevaBaraja = baraja.reassemble(nuevasCartasReensambladas)
-            return this.copy(baraja = nuevaBaraja)
-        }
-        return this
+        return this.copy() // Placeholder
     }
 
     // passCartasToPilaDescarte: Devuelve un nuevo Juego con cartas descartadas
@@ -62,11 +57,11 @@ data class Juego(
         println("Juego.passCartasToPilaDescarte()")
         val (nuevoJugador, cartasDescartadas) = jugadores[1].discardCartas()
         // pila descarte actualizada
-        val nuevaPilaDescarte = pilaDescarte.addCarta(cartasDescartadas)
+        val nuevaPilaDescarte = pilaDescarte.agregarCartas(cartasDescartadas)
         // baraja actualizada y cartas extraidas
-        val (nuevaBaraja, nuevasCartasMano) = baraja.takeCartas(cartasDescartadas.size)
+        val (nuevasCartasMano, nuevaBaraja) = baraja.pedirCartas(cartasDescartadas.size)
         // jugador recibe las cartas tomadas de la baraja
-        val jugadorConNuevasCartas = nuevoJugador.takeCartas(nuevasCartasMano)
+        val jugadorConNuevasCartas = nuevoJugador.tomaCartas(nuevasCartasMano)
         // actualizar jugadores para la UI
         val nuevosJugadores = jugadores.toMutableList()
         nuevosJugadores[1] = jugadorConNuevasCartas
@@ -79,8 +74,8 @@ data class Juego(
     }
 
     // cambia el estado "selecciona" de la carta entre "true" y "false"
-    fun marcarCarta(index: Int): Juego {
-        val jugadorActualizado = jugadores[1].actualizarMano(index)
+    fun marcarCarta(carta: Carta): Juego {
+        val jugadorActualizado = jugadores[1].marcarCartaEnMano(carta)
         val jugadoresAct = jugadores.toMutableList()
         jugadoresAct[1] = jugadorActualizado
 
@@ -93,20 +88,33 @@ data class Juego(
     fun passCartaToMesa(): Juego {
         // val jugadorActual = this.jugadorActivo ?: return this
         val jugadorActual = jugadores[1]
-        //val (nuevoJugador, cartaJugada) = jugadorActual.playCarta()
-        val jugadorActualizado = jugadorActual.jugarCarta()
+        //val (cartaJugada, jugadorActualizado) = jugadorActual.playCarta()
+
+        var jugadorActualizado = jugadorActual.jugarCarta()
         // baraja actualizada y cartas extraidas
-        val (barajaActualizada, nuevasCartasMano) = baraja.takeCartas((3 - jugadorActualizado.mano.cartas.size) )
+        val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas((maxCartasEnMano - jugadorActualizado.mano.cartas.size))
         // jugador recibe las cartas tomadas de la baraja
-        val jugadorConManoLlena = jugadorActualizado.takeCartas(nuevasCartasMano)
+        jugadorActualizado = jugadorActualizado.tomaCartas(nuevasCartasMano)
         // actualizar jugadores para la UI
         val jugadoresActualizados = jugadores.toMutableList()
-        jugadoresActualizados[1] = jugadorConManoLlena
+        jugadoresActualizados[1] = jugadorActualizado
 
         return this.copy(
             jugadores = jugadoresActualizados,
             baraja = barajaActualizada
         )
+    }
+
+    fun llenarBaraja(): Juego {
+        if (baraja.pila.size < maxCartasEnMano) {
+            val (cartasPila, pilaDescarteActualizada) = pilaDescarte.tomarTodasLasCartas()
+            return this.copy(
+                baraja = baraja.agregarCartas(cartasPila),
+                pilaDescarte = pilaDescarteActualizada
+            )
+        } else {
+            return this
+        }
     }
 
     // cambiar jugador en turno (escalable)

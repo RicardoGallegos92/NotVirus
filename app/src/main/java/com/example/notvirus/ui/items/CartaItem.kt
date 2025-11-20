@@ -63,7 +63,9 @@ fun CartaItem(
                     .aspectRatio(ratio = 0.6f)
                     .border(
                         width = 2.dp,
-                        color = if ( carta.seleccionada ){ Color(255, 255, 255)} else{ Color(0, 0, 0) },
+                        color = if ( carta.seleccionada )
+                        { Color(255, 255, 255)}
+                        else{ Color(0, 0, 0) },
                         shape = RoundedCornerShape(10.dp),
                     )
                     .clickable{

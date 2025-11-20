@@ -4,8 +4,10 @@ data class Mano(
     val cartas: List<Carta> = listOf(), // Cambiado a List inmutable
 ) {
     // Devuelve una nueva Mano con las cartas añadidas
-    fun addCartas(nuevasCartas: List<Carta>): Mano {
-        return this.copy(cartas = (this.cartas + nuevasCartas))
+    fun agregarCartas(nuevasCartas: List<Carta>): Mano {
+        return this.copy(
+            cartas = ( this.cartas + nuevasCartas )
+        )
     }
 
     // Devuelve una nueva Mano sin las cartas seleccionadas
@@ -14,10 +16,15 @@ data class Mano(
         return this.copy(cartas = nuevaMano)
     }
 
-    // Devuelve las cartas seleccionadas (sin modificar estado)
-    fun takeSelectedCarta(): List<Carta> {
-        val cartasSeleccionadas = cartas.filter { it.seleccionada }
-        return cartasSeleccionadas
+    // Devuelve las cartas seleccionadas y la 'Mano' actualizada
+    fun tomarCartasSeleccionadas():Pair<List<Carta>,Mano> {
+        return Pair(
+            cartas.filter { it.seleccionada }
+            ,
+            this.copy(
+                cartas = cartas.filter { !it.seleccionada }
+            )
+        )
     }
 
     // Devuelve una nueva Mano con una carta marcada como seleccionada

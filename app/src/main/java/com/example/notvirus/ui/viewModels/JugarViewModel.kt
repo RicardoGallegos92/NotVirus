@@ -2,6 +2,7 @@ package com.example.notvirus.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.Juego
 import com.example.notvirus.data.model.Mano
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,7 +68,8 @@ class JugarViewModel(
     fun jugarCarta(){
         viewModelScope.launch {
             _uiState.update{
-                val juegoAct = it.juego.passCartaToMesa()
+                var juegoAct = it.juego.passCartaToMesa()
+                juegoAct = juegoAct.llenarBaraja()
                 it.copy(
                     juego = juegoAct
                 )
@@ -79,18 +81,19 @@ class JugarViewModel(
         println("JugarVM.descartarCartas()")
         viewModelScope.launch {
             _uiState.update {
-                val nuevoJuego = it.juego.passCartasToPilaDescarte() // devuelve un nuevo Juego
-                it.copy(juego = nuevoJuego)
+                var juegoAct = it.juego.passCartasToPilaDescarte()
+                juegoAct = juegoAct.llenarBaraja()
+                it.copy(juego = juegoAct)
             }
         }
     }
 
     // MANO
 
-    fun clickedCard(index: Int) {
+    fun clickedCard(carta: Carta) {
         viewModelScope.launch {
             _uiState.update {
-                val nuevoJuego = it.juego.marcarCarta(index) // devuelve un nuevo Juego
+                val nuevoJuego = it.juego.marcarCarta(carta) // devuelve un nuevo Juego
                 it.copy(juego = nuevoJuego)
             }
         }

@@ -6,27 +6,32 @@ data class Jugador(
     val mano: Mano = Mano(),
     val mesa: Mesa = Mesa(),
 ) {
-    fun takeCartas(nuevasCartas: List<Carta>): Jugador {
-    // Metodo para "tomar cartas" y devolver el Jugador con la mano actualizada
-        println("Jugador.takeCartas()")
-        val nuevaMano = mano.addCartas(nuevasCartas = nuevasCartas)
-        return this.copy(mano = nuevaMano)
+    fun tomaCartas(nuevasCartas: List<Carta>): Jugador {
+        // Metodo para "tomar cartas" y devolver el Jugador con la mano actualizada
+        println("Jugador.tomaCartas()")
+        val manoActualizada = mano.agregarCartas(nuevasCartas = nuevasCartas)
+        return this.copy(
+            mano = manoActualizada
+        )
     }
 
     fun discardCartas(): Pair<Jugador, List<Carta>> {
-    // Metodo para "descartar cartas" y devolver el Jugador con la mano actualizada
+        // Metodo para "descartar cartas" y devolver el Jugador con la mano actualizada
         println("Jugador.discardCartas()")
-        // jugador separa las cartas a descartar
-        val cartasDescartadas = mano.takeSelectedCarta()
-        // jugador mantiene en mano las NO seleccionadas
-        val nuevaMano = mano.removeSelectedCartas()
-        val nuevoJugador = this.copy(mano = nuevaMano)
+        // jugador separa las cartas a descartar y mantiene en mano las NO seleccionadas
+        val (cartasDescartadas, manoActualizada) = mano.tomarCartasSeleccionadas()
+        val nuevoJugador = this.copy(
+            mano = manoActualizada
+        )
         // jugador pasa las cartas para descartar
-        return Pair(nuevoJugador, cartasDescartadas)
+        return Pair(
+            nuevoJugador,
+            cartasDescartadas
+        )
     }
 
-    fun actualizarMano(index: Int): Jugador {
-        val manoAct = mano.selectCarta(mano.cartas[index])
+    fun marcarCartaEnMano(carta: Carta): Jugador {
+        val manoAct = mano.selectCarta(carta)
         return this.copy(
             mano = manoAct
         )
@@ -34,7 +39,7 @@ data class Jugador(
 
     fun jugarCarta(): Jugador {
         // qué carta se pretende jugar
-        val cartaSeleccionada = mano.takeSelectedCarta()
+        val (cartaSeleccionada, manoActualizada) = mano.tomarCartasSeleccionadas()
         val carta = cartaSeleccionada[0]
         // ¿puede jugarse? - depende del tipo
         var mesaAct: Mesa = this.mesa
@@ -43,68 +48,79 @@ data class Jugador(
             CartaTipo.ORGANO ->
                 if (!existeOrgano(color = carta.color)) {
                     mesaAct = addOrgano(cartaJugada = carta)
-                    manoAct = mano.removeSelectedCartas()
+                    manoAct = manoActualizada
                 } else {
                     // lanzar mensaje (snackBar)
                 }
 
             CartaTipo.VIRUS ->
                 if (existeOrgano(color = carta.color)
-                    || existeMedicina(color = carta.color)){
-                    addOrgano(cartaJugada = carta)
+                    || existeMedicina(color = carta.color)
+                ) {
+                    mesaAct = addVirus(cartaJugada = carta)
+                    manoAct = manoActualizada
                 } else {
                     // lanzar mensaje (snackBar)
                 }
+
             CartaTipo.MEDICINA ->
                 if (existeOrgano(color = carta.color)
-                    || existeVirus(color = carta.color)){
-                    addOrgano(cartaJugada = carta)
+                    || existeVirus(color = carta.color)
+                ) {
+                    mesaAct = addMedicina(cartaJugada = carta)
+                    manoAct = manoActualizada
                 } else {
                     // lanzar mensaje (snackBar)
                 }
+
             CartaTipo.TRATAMIENTO ->
                 playTratamiento(carta)
-            else -> {}
+
+            else -> {
+                println("Accion de carta no implementada")
+            }
         }
         return this.copy(
             mesa = mesaAct,
             mano = manoAct
         )
     }
-// ORGANO :Start
+
+    // ORGANO :Start
     private fun addOrgano(cartaJugada: Carta): Mesa {
         val nuevaMesa = when (cartaJugada.color) {
             CartaColor.AMARILLO ->
                 if (!existeOrgano(CartaColor.AMARILLO)) {
-                    mesa.addAmarillo(cartaJugada)
+                    mesa.agregarToAmarillo(cartaJugada)
                 } else mesa
 
             CartaColor.VERDE ->
                 if (!existeOrgano(CartaColor.VERDE)) {
-                    mesa.addVerde(cartaJugada)
+                    mesa.agregarToVerde(cartaJugada)
                 } else mesa
 
             CartaColor.ROJO ->
                 if (!existeOrgano(CartaColor.ROJO)) {
-                    mesa.addRojo(cartaJugada)
+                    mesa.agregarToRojo(cartaJugada)
                 } else mesa
 
             CartaColor.AZUL ->
                 if (!existeOrgano(CartaColor.AZUL)) {
-                    mesa.addAzul(cartaJugada)
+                    mesa.agregarToAzul(cartaJugada)
                 } else mesa
 
             CartaColor.MULTICOLOR ->
                 if (!existeOrgano(CartaColor.MULTICOLOR)) {
-                    mesa.addMulticolor(cartaJugada)
+                    mesa.agregarToMulticolor(cartaJugada)
                 } else mesa
 
             else -> mesa
         }
         return nuevaMesa
     }
+
     private fun existeOrgano(color: CartaColor): Boolean {
-    // verifica si la pila ya está ocupada por un órgano
+        // verifica si la pila ya está ocupada por un órgano
         return when (color) {
             CartaColor.ROJO -> mesa.pilaRoja.any { it.tipo == CartaTipo.ORGANO }
             CartaColor.AZUL -> mesa.pilaAzul.any { it.tipo == CartaTipo.ORGANO }
@@ -114,33 +130,34 @@ data class Jugador(
             else -> false
         }
     }
+
 // ORGANO :End
 // MEDICINA :Start
     private fun addMedicina(cartaJugada: Carta): Mesa {
         val nuevaMesa = when (cartaJugada.color) {
             CartaColor.AMARILLO ->
                 if (existeOrgano(CartaColor.AMARILLO)) {
-                    mesa.addAmarillo(cartaJugada)
+                    mesa.agregarToAmarillo(cartaJugada)
                 } else mesa
 
             CartaColor.VERDE ->
                 if (existeOrgano(CartaColor.VERDE)) {
-                    mesa.addVerde(cartaJugada)
+                    mesa.agregarToVerde(cartaJugada)
                 } else mesa
 
             CartaColor.ROJO ->
                 if (existeOrgano(CartaColor.ROJO)) {
-                    mesa.addRojo(cartaJugada)
+                    mesa.agregarToRojo(cartaJugada)
                 } else mesa
 
             CartaColor.AZUL ->
                 if (existeOrgano(CartaColor.AZUL)) {
-                    mesa.addAzul(cartaJugada)
+                    mesa.agregarToAzul(cartaJugada)
                 } else mesa
 
             CartaColor.MULTICOLOR ->
                 if (existeOrgano(CartaColor.MULTICOLOR)) {
-                    mesa.addMulticolor(cartaJugada)
+                    mesa.agregarToMulticolor(cartaJugada)
                 } else mesa
 
             else -> mesa
@@ -148,36 +165,48 @@ data class Jugador(
         return nuevaMesa
     }
 
-    private fun existeMedicina(color: CartaColor):Boolean{
+    private fun existeMedicina(color: CartaColor): Boolean {
         return false
     }
+
 // MEDICINA :End
 // VIRUS:Start
     private fun addVirus(cartaJugada: Carta): Mesa {
         val nuevaMesa = when (cartaJugada.color) {
             CartaColor.AMARILLO ->
-                if (!existeOrgano(CartaColor.AMARILLO)) {
-                    mesa.addAmarillo(cartaJugada)
+                if (existeOrgano(CartaColor.AMARILLO)
+                    || existeMedicina(CartaColor.AMARILLO)
+                ) {
+                    mesa.agregarToAmarillo(cartaJugada)
                 } else mesa
 
-            CartaColor.VERDE ->
-                if (!existeOrgano(CartaColor.VERDE)) {
-                    mesa.addVerde(cartaJugada)
+            CartaColor.VERDE,
+                ->
+                if (existeOrgano(CartaColor.VERDE)
+                    || existeMedicina(CartaColor.VERDE)
+                ) {
+                    mesa.agregarToVerde(cartaJugada)
                 } else mesa
 
             CartaColor.ROJO ->
-                if (!existeOrgano(CartaColor.ROJO)) {
-                    mesa.addRojo(cartaJugada)
+                if (existeOrgano(CartaColor.ROJO)
+                    || existeMedicina(CartaColor.ROJO)
+                ) {
+                    mesa.agregarToRojo(cartaJugada)
                 } else mesa
 
             CartaColor.AZUL ->
-                if (!existeOrgano(CartaColor.AZUL)) {
-                    mesa.addAzul(cartaJugada)
+                if (existeOrgano(CartaColor.AZUL)
+                    || existeMedicina(CartaColor.AZUL)
+                ) {
+                    mesa.agregarToAzul(cartaJugada)
                 } else mesa
 
             CartaColor.MULTICOLOR ->
-                if (!existeOrgano(CartaColor.MULTICOLOR)) {
-                    mesa.addMulticolor(cartaJugada)
+                if (existeOrgano(CartaColor.MULTICOLOR)
+                    || existeMedicina(CartaColor.MULTICOLOR)
+                ) {
+                    mesa.agregarToMulticolor(cartaJugada)
                 } else mesa
 
             else -> mesa
@@ -185,7 +214,7 @@ data class Jugador(
         return nuevaMesa
     }
 
-    private fun existeVirus(color: CartaColor):Boolean{
+    private fun existeVirus(color: CartaColor): Boolean {
         return false
     }
 // VIRUS:End

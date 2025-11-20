@@ -6,59 +6,65 @@ data class Mesa(
     val pilaVerde: List<Carta> = listOf(),
     val pilaAmarilla: List<Carta> = listOf(),
     val pilaMulticolor: List<Carta> = listOf(),
-    val movementsToWin: Int = 4, // int = [ 0, 4 ]
+    val movementsParaGanar: Int = 4, // int = [ 0, 4 ]
 ) {
     // Métodos que devuelven nuevas instancias de Mesa
 
-    fun addAmarillo(nuevaCarta: Carta): Mesa {
+    fun agregarToAmarillo(nuevaCarta: Carta): Mesa {
         println("Amarillo añadido")
         return this.copy(pilaAmarilla = pilaAmarilla + nuevaCarta)
     }
 
-    fun addVerde(nuevaCarta: Carta): Mesa {
+    fun agregarToVerde(nuevaCarta: Carta): Mesa {
         println("Verde añadido")
         return this.copy(pilaVerde = pilaVerde + nuevaCarta)
     }
 
-    fun addRojo(nuevaCarta: Carta): Mesa {
+    fun agregarToRojo(nuevaCarta: Carta): Mesa {
         println("Rojo añadido")
         return this.copy(pilaRoja = pilaRoja + nuevaCarta)
     }
 
-    fun addAzul(nuevaCarta: Carta): Mesa {
+    fun agregarToAzul(nuevaCarta: Carta): Mesa {
         println("Azul añadido")
         return this.copy(pilaAzul = pilaAzul + nuevaCarta)
     }
 
-    fun addMulticolor(nuevaCarta: Carta): Mesa {
+    fun agregarToMulticolor(nuevaCarta: Carta): Mesa {
         println("Multicolor añadido")
         return this.copy(pilaMulticolor = pilaMulticolor + nuevaCarta)
     }
 
-    fun flushAmarillo(): Mesa {
+    fun quitarDeAmarillo(): Mesa {
+        println("Multicolor quitado")
         return this.copy(pilaAmarilla = emptyList())
     }
 
-    fun flushVerde(): Mesa {
+    fun quitarDeVerde(): Mesa {
+        println("Verde quitado")
         return this.copy(pilaVerde = emptyList())
     }
 
-    fun flushRojo(): Mesa {
+    fun quitarDeRojo(): Mesa {
+        println("Rojo quitado")
         return this.copy(pilaRoja = emptyList())
     }
 
-    fun flushAzul(): Mesa {
+    fun quitarDeAzul(): Mesa {
+        println("Azul quitado")
         return this.copy(pilaAzul = emptyList())
     }
 
-    fun flushMulticolor(): Mesa {
+    fun quitarDeMulticolor(): Mesa {
+        println("Multicolor quitado")
         return this.copy(pilaMulticolor = emptyList())
     }
-
-    // Si necesitas recalcular movementsToWin, puedes tener un método que devuelva una nueva Mesa
+    
     fun calculateMovementsToWin(): Mesa {
         // Lógica para calcular el nuevo valor
-        val nuevoMovimientos = 4 // Coloca tu lógica aquí
-        return this.copy(movementsToWin = nuevoMovimientos)
+        val movementsParaGanar = 4 // Coloca tu lógica aquí
+        return this.copy(
+            movementsParaGanar = movementsParaGanar
+        )
     }
 }

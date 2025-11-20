@@ -113,9 +113,9 @@ fun JugarScreen(
                         // baraja
                         PilaDeCartas(
                             texto = "Baraja",
-                            cantidadCartas = juego.baraja.mazo.size,
+                            cantidadCartas = juego.baraja.pila.size,
                         )
-                        println("Baraja: ${juego.baraja.mazo.size}")
+                        println("Baraja: ${juego.baraja.pila.size}")
                         // boton de Pausa
                         Button(onClick = { juegoViewModel.pauseJuego() })
                         { Text(text = "Pausar") }

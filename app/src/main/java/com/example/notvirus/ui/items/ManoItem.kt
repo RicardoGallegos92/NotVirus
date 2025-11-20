@@ -71,7 +71,7 @@ fun ManoItem(
                         carta = carta,
                         //seleccionada = selectedCartas[index],
                         onClick = {
-                            viewModel.clickedCard(index)
+                            viewModel.clickedCard(carta)
                         }
                     )
                 }
