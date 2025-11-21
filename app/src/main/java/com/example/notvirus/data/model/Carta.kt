@@ -14,8 +14,10 @@ data class Carta(
     val color: CartaColor,
     val icono: CartaIcono,
     val imagen: CartaImagen,
-    var seleccionada: Boolean = false,
+
     val id: String = UUID.randomUUID().toString(),
+    var estaSeleccionada: Boolean = false,
+    var esInmune: Boolean = false,
 ){
 
     @Composable

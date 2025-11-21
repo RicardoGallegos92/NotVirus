@@ -31,50 +31,18 @@ import com.example.notvirus.data.model.Mesa
 fun MesaItem(
     mesa: Mesa = Mesa(),
 ) {
+    val cartaDefault: Carta = Carta(
+        tipo = CartaTipo.NULL,
+        color = CartaColor.NULL,
+        icono = CartaIcono.NULL,
+        imagen = CartaImagen.NADA
+    )
     Box(
         modifier = Modifier
             .background(Color(0, 0, 0, 128))
             .fillMaxSize()
     ) {
-        val pilaSize = mutableListOf(
-            mesa.pilaAzul.size,
-            mesa.pilaRoja.size,
-            mesa.pilaVerde.size,
-            mesa.pilaAmarilla.size,
-            mesa.pilaMulticolor.size
-        )
-        val cartasEnMesa = mutableListOf(
-            mesa.pilaAzul.lastOrNull() ?: Carta(
-                tipo = CartaTipo.NULL,
-                color = CartaColor.AZUL,
-                icono = CartaIcono.NULL,
-                imagen = CartaImagen.NADA,
-            ),
-            mesa.pilaRoja.lastOrNull() ?: Carta(
-                tipo = CartaTipo.NULL,
-                color = CartaColor.ROJO,
-                icono = CartaIcono.NULL,
-                imagen = CartaImagen.NADA,
-            ),
-            mesa.pilaVerde.lastOrNull() ?: Carta(
-                tipo = CartaTipo.NULL,
-                color = CartaColor.VERDE,
-                icono = CartaIcono.NULL,
-                imagen = CartaImagen.NADA,
-            ),
-            mesa.pilaAmarilla.lastOrNull() ?: Carta(
-                tipo = CartaTipo.NULL,
-                color = CartaColor.AMARILLO,
-                icono = CartaIcono.NULL,
-                imagen = CartaImagen.NADA,
-            ),
-            mesa.pilaMulticolor.lastOrNull() ?: Carta(
-                tipo = CartaTipo.NULL,
-                color = CartaColor.MULTICOLOR,
-                icono = CartaIcono.NULL,
-                imagen = CartaImagen.NADA,
-            ),
-        )
+        Text( text = mesa.turnosParaGanar.toString() )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,19 +50,19 @@ fun MesaItem(
             horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            cartasEnMesa.forEach { carta: Carta ->
-                Column(
-                    modifier = Modifier
-                        .wrapContentSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CartaItem(
-                        carta = carta,
-                        anchoCarta = 70
-                    )
-                    Text( text = pilaSize[cartasEnMesa.indexOf(carta)].toString() )
-                }
+            mesa.pilas.forEach { (_, pila) ->
+                    Column(
+                        modifier = Modifier
+                            .wrapContentSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CartaItem(
+                            carta = pila.lastOrNull() ?: cartaDefault,
+                            anchoCarta = 70,
+                        )
+                        Text( text = pila.size.toString() )
+                    }
             }
         }
     }

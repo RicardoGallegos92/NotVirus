@@ -1,6 +1,5 @@
 package com.example.notvirus.ui.items
 
-import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,19 +59,33 @@ fun CartaItem(
         ) {
             Card(
                 modifier = Modifier
-                    .width(anchoCarta.dp)
+                    .width(
+                        width = if (carta.esInmune) {
+                            ( anchoCarta *.8 ).dp
+                        } else {
+                            anchoCarta.dp
+                        }
+                    )
+                    .rotate(
+                        degrees = if (carta.esInmune) {
+                            -90f
+                        } else {
+                            0f
+                        }
+                    )
                     .aspectRatio(ratio = 0.6f)
                     .border(
                         width = 2.dp,
-                        color = if ( carta.seleccionada )
-                        { Color(255, 255, 255)}
-                        else{ Color(0, 0, 0) },
+                        color = if (carta.estaSeleccionada) {
+                            Color(255, 255, 255)
+                        } else {
+                            Color(0, 0, 0)
+                        },
                         shape = RoundedCornerShape(10.dp),
                     )
-                    .clickable{
+                    .clickable {
                         onClick()
-                    }
-                ,
+                    },
             ) {
                 Column(
                     modifier = Modifier

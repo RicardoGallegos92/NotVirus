@@ -86,6 +86,7 @@ class JugarViewModel(
                 it.copy(juego = juegoAct)
             }
         }
+        countCartasSelected()
     }
 
     // MANO
@@ -103,7 +104,7 @@ class JugarViewModel(
     fun countCartasSelected() {
         var conteo = 0
         for (i in 0..2) {
-            if (_uiState.value.juego.jugadores[1].mano.cartas[i].seleccionada) {
+            if (_uiState.value.juego.jugadores[1].mano.cartas[i].estaSeleccionada) {
                 conteo++
             }
         }

@@ -54,9 +54,7 @@ data class Jugador(
                 }
 
             CartaTipo.VIRUS ->
-                if (existeOrgano(color = carta.color)
-                    || existeMedicina(color = carta.color)
-                ) {
+                if ( existeOrgano(color = carta.color) ) {
                     mesaAct = addVirus(cartaJugada = carta)
                     manoAct = manoActualizada
                 } else {
@@ -64,9 +62,7 @@ data class Jugador(
                 }
 
             CartaTipo.MEDICINA ->
-                if (existeOrgano(color = carta.color)
-                    || existeVirus(color = carta.color)
-                ) {
+                if ( existeOrgano(color = carta.color) ) {
                     mesaAct = addMedicina(cartaJugada = carta)
                     manoAct = manoActualizada
                 } else {
@@ -86,139 +82,58 @@ data class Jugador(
         )
     }
 
-    // ORGANO :Start
-    private fun addOrgano(cartaJugada: Carta): Mesa {
-        val nuevaMesa = when (cartaJugada.color) {
-            CartaColor.AMARILLO ->
-                if (!existeOrgano(CartaColor.AMARILLO)) {
-                    mesa.agregarToAmarillo(cartaJugada)
-                } else mesa
-
-            CartaColor.VERDE ->
-                if (!existeOrgano(CartaColor.VERDE)) {
-                    mesa.agregarToVerde(cartaJugada)
-                } else mesa
-
-            CartaColor.ROJO ->
-                if (!existeOrgano(CartaColor.ROJO)) {
-                    mesa.agregarToRojo(cartaJugada)
-                } else mesa
-
-            CartaColor.AZUL ->
-                if (!existeOrgano(CartaColor.AZUL)) {
-                    mesa.agregarToAzul(cartaJugada)
-                } else mesa
-
-            CartaColor.MULTICOLOR ->
-                if (!existeOrgano(CartaColor.MULTICOLOR)) {
-                    mesa.agregarToMulticolor(cartaJugada)
-                } else mesa
-
-            else -> mesa
-        }
-        return nuevaMesa
+// ORGANO :Start
+    private fun existeOrgano(color: CartaColor): Boolean {
+        // verifica si la pila ya contiene un órgano
+        return mesa.pilas[color]!!.any { it.tipo == CartaTipo.ORGANO }
     }
 
-    private fun existeOrgano(color: CartaColor): Boolean {
-        // verifica si la pila ya está ocupada por un órgano
-        return when (color) {
-            CartaColor.ROJO -> mesa.pilaRoja.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.AZUL -> mesa.pilaAzul.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.VERDE -> mesa.pilaVerde.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.AMARILLO -> mesa.pilaAmarilla.any { it.tipo == CartaTipo.ORGANO }
-            CartaColor.MULTICOLOR -> mesa.pilaMulticolor.any { it.tipo == CartaTipo.ORGANO }
-            else -> false
+    private fun addOrgano(cartaJugada: Carta): Mesa {
+        val mesaActualizada = if (!existeOrgano(cartaJugada.color)) {
+            mesa.agregarToPila(cartaJugada)
+        } else {
+            mesa
         }
+        return mesaActualizada
     }
 
 // ORGANO :End
 // MEDICINA :Start
-    private fun addMedicina(cartaJugada: Carta): Mesa {
-        val nuevaMesa = when (cartaJugada.color) {
-            CartaColor.AMARILLO ->
-                if (existeOrgano(CartaColor.AMARILLO)) {
-                    mesa.agregarToAmarillo(cartaJugada)
-                } else mesa
-
-            CartaColor.VERDE ->
-                if (existeOrgano(CartaColor.VERDE)) {
-                    mesa.agregarToVerde(cartaJugada)
-                } else mesa
-
-            CartaColor.ROJO ->
-                if (existeOrgano(CartaColor.ROJO)) {
-                    mesa.agregarToRojo(cartaJugada)
-                } else mesa
-
-            CartaColor.AZUL ->
-                if (existeOrgano(CartaColor.AZUL)) {
-                    mesa.agregarToAzul(cartaJugada)
-                } else mesa
-
-            CartaColor.MULTICOLOR ->
-                if (existeOrgano(CartaColor.MULTICOLOR)) {
-                    mesa.agregarToMulticolor(cartaJugada)
-                } else mesa
-
-            else -> mesa
+    private fun existeMedicina(color: CartaColor, colorPila: CartaColor? = null): Boolean {
+        return if (colorPila != null) {
+            mesa.pilas[colorPila]!!.any { it.tipo == CartaTipo.MEDICINA }
+        } else {
+            mesa.pilas[color]!!.any { it.tipo == CartaTipo.MEDICINA }
         }
-        return nuevaMesa
     }
 
-    private fun existeMedicina(color: CartaColor): Boolean {
-        return false
+    private fun addMedicina(cartaJugada: Carta, colorPila: CartaColor? = null): Mesa {
+        val mesaActualizada = if (existeOrgano(cartaJugada.color)) {
+            mesa.agregarToPila(cartaJugada, colorPila)
+        } else {
+            mesa
+        }
+        return mesaActualizada
     }
 
 // MEDICINA :End
 // VIRUS:Start
-    private fun addVirus(cartaJugada: Carta): Mesa {
-        val nuevaMesa = when (cartaJugada.color) {
-            CartaColor.AMARILLO ->
-                if (existeOrgano(CartaColor.AMARILLO)
-                    || existeMedicina(CartaColor.AMARILLO)
-                ) {
-                    mesa.agregarToAmarillo(cartaJugada)
-                } else mesa
-
-            CartaColor.VERDE,
-                ->
-                if (existeOrgano(CartaColor.VERDE)
-                    || existeMedicina(CartaColor.VERDE)
-                ) {
-                    mesa.agregarToVerde(cartaJugada)
-                } else mesa
-
-            CartaColor.ROJO ->
-                if (existeOrgano(CartaColor.ROJO)
-                    || existeMedicina(CartaColor.ROJO)
-                ) {
-                    mesa.agregarToRojo(cartaJugada)
-                } else mesa
-
-            CartaColor.AZUL ->
-                if (existeOrgano(CartaColor.AZUL)
-                    || existeMedicina(CartaColor.AZUL)
-                ) {
-                    mesa.agregarToAzul(cartaJugada)
-                } else mesa
-
-            CartaColor.MULTICOLOR ->
-                if (existeOrgano(CartaColor.MULTICOLOR)
-                    || existeMedicina(CartaColor.MULTICOLOR)
-                ) {
-                    mesa.agregarToMulticolor(cartaJugada)
-                } else mesa
-
-            else -> mesa
+    private fun existeVirus(color: CartaColor, colorPila: CartaColor? = null): Boolean {
+    return if (colorPila != null) {
+            mesa.pilas[colorPila]!!.any { it.tipo == CartaTipo.VIRUS}
+        } else {
+            mesa.pilas[color]!!.any { it.tipo == CartaTipo.VIRUS }
         }
-        return nuevaMesa
     }
-
-    private fun existeVirus(color: CartaColor): Boolean {
-        return false
+    private fun addVirus(cartaJugada: Carta): Mesa {
+        val mesaActualizada = if (existeOrgano(cartaJugada.color)) {
+            mesa.agregarToPila(cartaJugada)
+        } else {
+            mesa
+        }
+        return mesaActualizada
     }
 // VIRUS:End
-
 // TRATAMIENTOS:Start
     private fun playTratamiento(cartaJugada: Carta): Jugador {
         // tratamiento activa su efecto particular

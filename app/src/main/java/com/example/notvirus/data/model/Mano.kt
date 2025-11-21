@@ -12,17 +12,17 @@ data class Mano(
 
     // Devuelve una nueva Mano sin las cartas seleccionadas
     fun removeSelectedCartas(): Mano {
-        val nuevaMano = this.cartas.filter { !it.seleccionada }
+        val nuevaMano = this.cartas.filter { !it.estaSeleccionada }
         return this.copy(cartas = nuevaMano)
     }
 
     // Devuelve las cartas seleccionadas y la 'Mano' actualizada
     fun tomarCartasSeleccionadas():Pair<List<Carta>,Mano> {
         return Pair(
-            cartas.filter { it.seleccionada }
+            cartas.filter { it.estaSeleccionada }
             ,
             this.copy(
-                cartas = cartas.filter { !it.seleccionada }
+                cartas = cartas.filter { !it.estaSeleccionada }
             )
         )
     }
@@ -31,11 +31,15 @@ data class Mano(
     fun selectCarta(cartaElegida: Carta): Mano {
         val nuevasCartas = this.cartas.map { carta ->
             if (carta.id == cartaElegida.id) { // Comparar por ID único
-                carta.copy(seleccionada = !carta.seleccionada)
+                carta.copy(
+                    estaSeleccionada = !carta.estaSeleccionada
+                )
             } else {
                 carta
             }
         }
-        return this.copy(cartas = nuevasCartas)
+        return this.copy(
+            cartas = nuevasCartas
+        )
     }
 }

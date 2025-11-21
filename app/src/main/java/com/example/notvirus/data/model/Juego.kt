@@ -76,11 +76,11 @@ data class Juego(
     // cambia el estado "selecciona" de la carta entre "true" y "false"
     fun marcarCarta(carta: Carta): Juego {
         val jugadorActualizado = jugadores[1].marcarCartaEnMano(carta)
-        val jugadoresAct = jugadores.toMutableList()
-        jugadoresAct[1] = jugadorActualizado
+        val jugadoresActualizados = jugadores.toMutableList()
+        jugadoresActualizados[1] = jugadorActualizado
 
         return this.copy(
-            jugadores = jugadoresAct
+            jugadores = jugadoresActualizados
         )
     }
 

@@ -1,70 +1,49 @@
 package com.example.notvirus.data.model
 
 data class Mesa(
-    val pilaAzul: List<Carta> = listOf(),
-    val pilaRoja: List<Carta> = listOf(),
-    val pilaVerde: List<Carta> = listOf(),
-    val pilaAmarilla: List<Carta> = listOf(),
-    val pilaMulticolor: List<Carta> = listOf(),
-    val movementsParaGanar: Int = 4, // int = [ 0, 4 ]
+    val pilas: Map<CartaColor, MutableList<Carta>> = mapOf(
+        CartaColor.AMARILLO to mutableListOf(),
+        CartaColor.AZUL to mutableListOf(),
+        CartaColor.ROJO to mutableListOf(),
+        CartaColor.VERDE to mutableListOf(),
+        CartaColor.MULTICOLOR to mutableListOf(),
+    ),
+    val turnosParaGanar: Int = 4, // int = [ 0, 4 ]
 ) {
-    // Métodos que devuelven nuevas instancias de Mesa
-
-    fun agregarToAmarillo(nuevaCarta: Carta): Mesa {
-        println("Amarillo añadido")
-        return this.copy(pilaAmarilla = pilaAmarilla + nuevaCarta)
-    }
-
-    fun agregarToVerde(nuevaCarta: Carta): Mesa {
-        println("Verde añadido")
-        return this.copy(pilaVerde = pilaVerde + nuevaCarta)
-    }
-
-    fun agregarToRojo(nuevaCarta: Carta): Mesa {
-        println("Rojo añadido")
-        return this.copy(pilaRoja = pilaRoja + nuevaCarta)
-    }
-
-    fun agregarToAzul(nuevaCarta: Carta): Mesa {
-        println("Azul añadido")
-        return this.copy(pilaAzul = pilaAzul + nuevaCarta)
-    }
-
-    fun agregarToMulticolor(nuevaCarta: Carta): Mesa {
-        println("Multicolor añadido")
-        return this.copy(pilaMulticolor = pilaMulticolor + nuevaCarta)
-    }
-
-    fun quitarDeAmarillo(): Mesa {
-        println("Multicolor quitado")
-        return this.copy(pilaAmarilla = emptyList())
-    }
-
-    fun quitarDeVerde(): Mesa {
-        println("Verde quitado")
-        return this.copy(pilaVerde = emptyList())
-    }
-
-    fun quitarDeRojo(): Mesa {
-        println("Rojo quitado")
-        return this.copy(pilaRoja = emptyList())
-    }
-
-    fun quitarDeAzul(): Mesa {
-        println("Azul quitado")
-        return this.copy(pilaAzul = emptyList())
-    }
-
-    fun quitarDeMulticolor(): Mesa {
-        println("Multicolor quitado")
-        return this.copy(pilaMulticolor = emptyList())
-    }
-    
-    fun calculateMovementsToWin(): Mesa {
-        // Lógica para calcular el nuevo valor
-        val movementsParaGanar = 4 // Coloca tu lógica aquí
+    // Devuelve nueva instancia de Mesa
+    fun agregarToPila(nuevaCarta: Carta, colorPila: CartaColor? = null): Mesa {
+        val pilasCopia = pilas.toMutableMap()
+        if (colorPila != null) {
+            pilasCopia[colorPila]!!.add(nuevaCarta)
+        } else {
+            pilasCopia[nuevaCarta.color]!!.add(nuevaCarta)
+        }
         return this.copy(
-            movementsParaGanar = movementsParaGanar
+            pilas = pilasCopia
         )
+    }
+
+    fun quitarDePila(cartasParaQuitar: List<Carta>, colorPila: CartaColor): Mesa {
+        val pilasCopia = pilas.toMutableMap()
+        pilasCopia[colorPila]!!.removeAll(cartasParaQuitar)
+        return this.copy(
+            pilas = pilasCopia
+        )
+    }
+
+    fun calcularTurnosParaGanar(pilasCopia:Map<CartaColor, MutableList<Carta>>): Int {
+        // Lógica para calcular el nuevo valor
+        var turnosParaGanar = 4 // Coloca tu lógica aquí
+        pilasCopia.forEach { (color, pila) ->
+            pila.forEach { carta: Carta ->
+                turnosParaGanar += when (carta.tipo) {
+                    CartaTipo.ORGANO -> { -1 }
+                    CartaTipo.VIRUS -> { 1 }
+//                    CartaTipo.MEDICINA -> { 0 } // NO mueve el contador
+                    else -> { 0 }
+                }
+            }
+        }
+        return turnosParaGanar
     }
 }
