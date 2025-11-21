@@ -19,7 +19,8 @@ data class Mesa(
             pilasCopia[nuevaCarta.color]!!.add(nuevaCarta)
         }
         return this.copy(
-            pilas = pilasCopia
+            pilas = pilasCopia,
+            turnosParaGanar = calcularTurnosParaGanar(pilasCopia = pilasCopia)
         )
     }
 
@@ -27,7 +28,8 @@ data class Mesa(
         val pilasCopia = pilas.toMutableMap()
         pilasCopia[colorPila]!!.removeAll(cartasParaQuitar)
         return this.copy(
-            pilas = pilasCopia
+            pilas = pilasCopia,
+            turnosParaGanar = calcularTurnosParaGanar(pilasCopia = pilasCopia)
         )
     }
 

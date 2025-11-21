@@ -75,6 +75,7 @@ class JugarViewModel(
                 )
             }
         }
+        countCartasSelected()
     }
 
     fun descartarCartas() {
