@@ -6,8 +6,8 @@ data class Jugador(
     val mano: Mano = Mano(),
     val mesa: Mesa = Mesa(),
 ) {
-    fun tomaCartas(nuevasCartas: List<Carta>): Jugador {
-        // Metodo para "tomar cartas" y devolver el Jugador con la mano actualizada
+    fun recibirCartas(nuevasCartas: List<Carta>): Jugador {
+        // Metodo para "recibir cartas" -> "agregar a la mano" y devolver el Jugador con la mano actualizada
         println("Jugador.tomaCartas()")
         val manoActualizada = mano.agregarCartas(nuevasCartas = nuevasCartas)
         return this.copy(
@@ -39,38 +39,38 @@ data class Jugador(
 
     fun jugarCarta(): Jugador {
         // qué carta se pretende jugar
-        val (cartaSeleccionada, manoActualizada) = mano.tomarCartasSeleccionadas()
-        val carta = cartaSeleccionada[0]
-        // ¿puede jugarse? - depende del tipo
+        val (cartas, manoActualizada) = mano.tomarCartasSeleccionadas()
+        val cartaSeleccionada = cartas[0]
         var mesaAct: Mesa = this.mesa
         var manoAct: Mano = this.mano
-        when (carta.tipo) {
+        // ¿puede jugarse? - depende del tipo
+        when (cartaSeleccionada.tipo) {
             CartaTipo.ORGANO ->
-                if (!existeOrgano(color = carta.color)) {
-                    mesaAct = addOrgano(cartaJugada = carta)
+                if (!existeOrgano(color = cartaSeleccionada.color)) {
+                    mesaAct = addOrgano(cartaJugada = cartaSeleccionada)
                     manoAct = manoActualizada
                 } else {
                     // lanzar mensaje (snackBar)
                 }
 
             CartaTipo.VIRUS ->
-                if ( existeOrgano(color = carta.color) ) {
-                    mesaAct = addVirus(cartaJugada = carta)
+                if (existeOrgano(color = cartaSeleccionada.color)) {
+                    mesaAct = addVirus(cartaJugada = cartaSeleccionada)
                     manoAct = manoActualizada
                 } else {
                     // lanzar mensaje (snackBar)
                 }
 
             CartaTipo.MEDICINA ->
-                if ( existeOrgano(color = carta.color) ) {
-                    mesaAct = addMedicina(cartaJugada = carta)
+                if (existeOrgano(color = cartaSeleccionada.color)) {
+                    mesaAct = addMedicina(cartaJugada = cartaSeleccionada)
                     manoAct = manoActualizada
                 } else {
                     // lanzar mensaje (snackBar)
                 }
 
             CartaTipo.TRATAMIENTO ->
-                playTratamiento(carta)
+                playTratamiento(cartaSeleccionada)
 
             else -> {
                 println("Accion de carta no implementada")
@@ -82,7 +82,14 @@ data class Jugador(
         )
     }
 
-// ORGANO :Start
+    fun entregarCartaJugada(): Carta {
+        val (cartas, _) = mano.tomarCartasSeleccionadas()
+        val cartaJugada = cartas[0]
+
+        return cartaJugada
+    }
+
+    // ORGANO :Start
     private fun existeOrgano(color: CartaColor): Boolean {
         // verifica si la pila ya contiene un órgano
         return mesa.pilas[color]!!.any { it.tipo == CartaTipo.ORGANO }
@@ -97,7 +104,7 @@ data class Jugador(
         return mesaActualizada
     }
 
-// ORGANO :End
+    // ORGANO :End
 // MEDICINA :Start
     private fun existeMedicina(color: CartaColor, colorPila: CartaColor? = null): Boolean {
         return if (colorPila != null) {
@@ -116,15 +123,16 @@ data class Jugador(
         return mesaActualizada
     }
 
-// MEDICINA :End
+    // MEDICINA :End
 // VIRUS:Start
     private fun existeVirus(color: CartaColor, colorPila: CartaColor? = null): Boolean {
-    return if (colorPila != null) {
-            mesa.pilas[colorPila]!!.any { it.tipo == CartaTipo.VIRUS}
+        return if (colorPila != null) {
+            mesa.pilas[colorPila]!!.any { it.tipo == CartaTipo.VIRUS }
         } else {
             mesa.pilas[color]!!.any { it.tipo == CartaTipo.VIRUS }
         }
     }
+
     private fun addVirus(cartaJugada: Carta): Mesa {
         val mesaActualizada = if (existeOrgano(cartaJugada.color)) {
             mesa.agregarToPila(cartaJugada)
@@ -133,7 +141,8 @@ data class Jugador(
         }
         return mesaActualizada
     }
-// VIRUS:End
+
+    // VIRUS:End
 // TRATAMIENTOS:Start
     private fun playTratamiento(cartaJugada: Carta): Jugador {
         // tratamiento activa su efecto particular

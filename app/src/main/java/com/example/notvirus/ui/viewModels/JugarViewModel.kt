@@ -14,6 +14,7 @@ data class JugarUiState(
     // Tablero
     val isStarted: Boolean = false,
     val isPaused: Boolean = false,
+    val isOver: Boolean = false,
     val juego: Juego,
 
     // Mano
@@ -35,7 +36,7 @@ class JugarViewModel(
     fun startJuego() {
         viewModelScope.launch {
             _uiState.update {
-                val nuevoJuego = it.juego.startJuego() // Devuelve un nuevo Juego
+                val nuevoJuego = it.juego.empezarJuego() // Devuelve un nuevo Juego
                 it.copy(
                     juego = nuevoJuego,
                     isStarted = true
@@ -65,13 +66,21 @@ class JugarViewModel(
         }
     }
 
-    fun jugarCarta(){
+    fun jugarCarta() {
         viewModelScope.launch {
-            _uiState.update{
-                var juegoAct = it.juego.passCartaToMesa()
-                juegoAct = juegoAct.llenarBaraja()
+            _uiState.update {
+                var isOver: Boolean = false
+                var juegoAct = it.juego.jugarCarta()
+                if (it.juego.hayGanador().first) {
+                    // animacion del ganador se maneja en la pantalla
+                    isOver = true
+                    // it.juego.jugadorActivo -> Ganador !!
+                } else {
+                    juegoAct = juegoAct.llenarBaraja()
+                }
                 it.copy(
-                    juego = juegoAct
+                    juego = juegoAct,
+                    isOver = isOver,
                 )
             }
         }
