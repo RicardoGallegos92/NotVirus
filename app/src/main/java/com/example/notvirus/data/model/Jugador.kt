@@ -6,7 +6,7 @@ data class Jugador(
     val mano: Mano = Mano(),
     val mesa: Mesa = Mesa(),
 ) {
-    fun recibirCartas(nuevasCartas: List<Carta>): Jugador {
+    fun recibirCartasToMano(nuevasCartas: List<Carta>): Jugador {
         // Metodo para "recibir cartas" -> "agregar a la mano" y devolver el Jugador con la mano actualizada
         println("Jugador.tomaCartas()")
         val manoActualizada = mano.agregarCartas(nuevasCartas = nuevasCartas)
@@ -15,18 +15,18 @@ data class Jugador(
         )
     }
 
-    fun discardCartas(): Pair<Jugador, List<Carta>> {
+    fun descartarCartas(): Pair<List<Carta>, Jugador> {
         // Metodo para "descartar cartas" y devolver el Jugador con la mano actualizada
-        println("Jugador.discardCartas()")
+        println("Jugador.descartarCartas()")
         // jugador separa las cartas a descartar y mantiene en mano las NO seleccionadas
-        val (cartasDescartadas, manoActualizada) = mano.tomarCartasSeleccionadas()
-        val nuevoJugador = this.copy(
+        val (cartasSeleccionadas, manoActualizada) = mano.tomarCartasSeleccionadas()
+        val jugadorActualizado = this.copy(
             mano = manoActualizada
         )
         // jugador pasa las cartas para descartar
         return Pair(
-            nuevoJugador,
-            cartasDescartadas
+            cartasSeleccionadas,
+            jugadorActualizado,
         )
     }
 
@@ -37,7 +37,17 @@ data class Jugador(
         )
     }
 
+    fun agregaCartaToMesa(carta:Carta): Jugador{
+
+        val mesaActualizada = mesa.agregarToPila(carta)
+        return this.copy(
+            mesa = mesaActualizada
+        )
+    }
+
+    // jugarCarta en desuso
     fun jugarCarta(): Jugador {
+        // mover esta lógica a "Juego"
         // qué carta se pretende jugar
         val (cartas, manoActualizada) = mano.tomarCartasSeleccionadas()
         val cartaSeleccionada = cartas[0]
@@ -69,9 +79,6 @@ data class Jugador(
                     // lanzar mensaje (snackBar)
                 }
 
-            CartaTipo.TRATAMIENTO ->
-                playTratamiento(cartaSeleccionada)
-
             else -> {
                 println("Accion de carta no implementada")
             }
@@ -89,7 +96,7 @@ data class Jugador(
         return cartaJugada
     }
 
-    // ORGANO :Start
+// ORGANO :Start
     private fun existeOrgano(color: CartaColor): Boolean {
         // verifica si la pila ya contiene un órgano
         return mesa.pilas[color]!!.any { it.tipo == CartaTipo.ORGANO }
@@ -104,7 +111,7 @@ data class Jugador(
         return mesaActualizada
     }
 
-    // ORGANO :End
+// ORGANO :End
 // MEDICINA :Start
     private fun existeMedicina(color: CartaColor, colorPila: CartaColor? = null): Boolean {
         return if (colorPila != null) {
@@ -123,7 +130,7 @@ data class Jugador(
         return mesaActualizada
     }
 
-    // MEDICINA :End
+// MEDICINA :End
 // VIRUS:Start
     private fun existeVirus(color: CartaColor, colorPila: CartaColor? = null): Boolean {
         return if (colorPila != null) {
@@ -142,7 +149,8 @@ data class Jugador(
         return mesaActualizada
     }
 
-    // VIRUS:End
+// VIRUS:End
+/*
 // TRATAMIENTOS:Start
     private fun playTratamiento(cartaJugada: Carta): Jugador {
         // tratamiento activa su efecto particular
@@ -152,4 +160,5 @@ data class Jugador(
         )
     }
 // TRATAMIENTOS:End
+*/
 }

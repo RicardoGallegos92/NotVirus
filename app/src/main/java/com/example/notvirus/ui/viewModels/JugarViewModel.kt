@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.Juego
-import com.example.notvirus.data.model.Mano
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -24,14 +23,10 @@ data class JugarUiState(
 )
 
 class JugarViewModel(
-    private val partidaGuardada: JugarUiState? = null,
+//    private val partidaGuardada: JugarUiState? = null,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(value = JugarUiState(juego = Juego()))
     val uiState: StateFlow<JugarUiState> = _uiState
-
-    init {
-        // no sé
-    }
 
     fun startJuego() {
         viewModelScope.launch {
@@ -69,7 +64,7 @@ class JugarViewModel(
     fun jugarCarta() {
         viewModelScope.launch {
             _uiState.update {
-                var isOver: Boolean = false
+                var isOver = false
                 var juegoAct = it.juego.jugarCarta()
                 if (it.juego.hayGanador().first) {
                     // animacion del ganador se maneja en la pantalla
@@ -91,7 +86,7 @@ class JugarViewModel(
         println("JugarVM.descartarCartas()")
         viewModelScope.launch {
             _uiState.update {
-                var juegoAct = it.juego.passCartasToPilaDescarte()
+                var juegoAct = it.juego.descartarDesdeMano()
                 juegoAct = juegoAct.llenarBaraja()
                 it.copy(juego = juegoAct)
             }

@@ -24,20 +24,15 @@ data class Juego(
     // empezarJuego: Devuelve un nuevo Juego con manos repartidas y primer jugador activo
     fun empezarJuego(): Juego {
         var barajaActual = baraja // Mantén un registro de la baraja actualizada
-        val nuevosJugadores = jugadores.map { jugador ->
+        val jugadoresConCartas = jugadores.map { jugador ->
             val (cartasParaJugador, nuevaBaraja) = barajaActual.pedirCartas(maxCartasEnMano) // <-- solicitar cartas para la mano
             barajaActual = nuevaBaraja // Actualiza la baraja para el siguiente jugador
-            jugador.recibirCartas(cartasParaJugador) // <-- Pasa la lista de cartas
+            jugador.recibirCartasToMano(cartasParaJugador) // <-- Pasa la lista de cartas
         }
-        /*
-                // Activar primer jugador
-                val jugadorInicial = nuevosJugadores[0]
-                val jugadorConEstadoActivo = jugadorInicial.copy(isActive = true)
-                nuevosJugadores[0] = jugadorConEstadoActivo
-        */
+
         return this.copy(
-            jugadores = nuevosJugadores,
-            baraja = barajaActual, // <-- Asegúrate de usar la baraja actualizada
+            jugadores = jugadoresConCartas,
+            baraja = barajaActual, // <-- Baraja-Actualizada
             jugadorActivo = pasarTurno(),
         )
     }
@@ -49,39 +44,77 @@ data class Juego(
             jugador.mesa.turnosParaGanar == 0
         }
         return if (jugadorGanador.isEmpty()) {
-            Pair(true, jugadorGanador[0])
-        } else {
+            // vacio -> no ganador
             Pair(false, null)
+        } else {
+            Pair(true, jugadorGanador[0])
         }
     }
 
     fun jugarCarta(): Juego {
-        val carta: Carta = tomarCartaJugada()
+        val cartaJugada: Carta = tomarCartaJugada()
+        // distinguir entre TRATAMIENTO y otras
+        when(cartaJugada.tipo){
+            CartaTipo.TRATAMIENTO -> {
+                // activar Efecto
+                // quitar 'Carta' de la 'Mano'
+                // enviar 'Carta' a 'PilaDescarte'
+                return descartarDesdeMano()
+            }
+            else -> {
+                pasarCartaToMesa(
+                    cartaJugada = cartaJugada,
+                    jugadorObjetivo = pasarTurno() // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                )
+            }
+        }
 
         return this.copy(
 
         )
     }
+    fun pasarCartaToMesa(cartaJugada: Carta, jugadorObjetivo:Jugador): Juego {
+        // pasarCartaToMesa: Devuelve un 'Juego-Actualizado':
+        // por cohesión esto debería recibir la 'cartaJugada' y el 'jugadorObjetivo' y usar el 'jugadorActivo'
 
-    // passCartasToPilaDescarte: Devuelve un nuevo Juego con cartas descartadas
-    fun passCartasToPilaDescarte(): Juego {
-        // no hace falta lógica extra, las cartas pasan de la mano a la pila
-        println("Juego.passCartasToPilaDescarte()")
-        val (nuevoJugador, cartasDescartadas) = jugadores[1].discardCartas()
-        // pila descarte actualizada
-        val nuevaPilaDescarte = pilaDescarte.agregarCartas(cartasDescartadas)
-        // baraja actualizada y cartas extraidas
-        val (nuevasCartasMano, nuevaBaraja) = baraja.pedirCartas(cartasDescartadas.size)
-        // jugador recibe las cartas tomadas de la baraja
-        val jugadorConNuevasCartas = nuevoJugador.recibirCartas(nuevasCartasMano)
-        // actualizar jugadores para la UI
-        val nuevosJugadores = jugadores.toMutableList()
-        nuevosJugadores[1] = jugadorConNuevasCartas
+        // pasar la 'cartaJugada' a la mesa del 'jugadorObjetivo'
+        val jugadorObjetivoActualizado = jugadorObjetivo.agregaCartaToMesa(cartaJugada)
+        // quitar la 'cartaJugada' de la mano del 'jugadorActivo'
+        var (_,jugadorActivoActualizado) = jugadorActivo!!.descartarCartas()
+        // pedir 'cartaNueva' para la mano del 'jugadorActivo'
+        val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas((maxCartasEnMano - jugadorActivoActualizado.mano.cartas.size))
+        // pasar la 'cartaNueva' al 'jugadorActivo'
+        jugadorActivoActualizado = jugadorActivoActualizado.recibirCartasToMano(nuevasCartasMano)
+
+        // actualizar jugadores Activo y Objetivo para la UI
+        val jugadoresActualizados = jugadores.toMutableList()
+
+        jugadoresActualizados[ jugadoresActualizados.indexOf(jugadorActivo) ] = jugadorActivoActualizado
+        jugadoresActualizados[ jugadoresActualizados.indexOf(jugadorObjetivo) ] = jugadorObjetivoActualizado
 
         return this.copy(
-            jugadores = nuevosJugadores.toList(),
-            pilaDescarte = nuevaPilaDescarte,
-            baraja = nuevaBaraja
+            jugadores = jugadoresActualizados,
+            baraja = barajaActualizada
+        )
+    }
+
+    fun descartarDesdeMano(): Juego {
+        println("Juego.passCartasToPilaDescarte()")
+        // no hace falta lógica extra, las cartas pasan de la mano a la pila
+        val (cartasDescartadas, jugadorActivoActualizado) = jugadorActivo!!.descartarCartas()
+        // baraja actualizada y cartas extraidas
+        val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas(cartasDescartadas.size)
+        // jugador recibe las cartas tomadas de la baraja
+        val jugadorConNuevasCartas = jugadorActivoActualizado.recibirCartasToMano(nuevasCartasMano)
+        // actualizar jugadores para la UI
+        val jugadoresActualizados = jugadores.toMutableList()
+
+        jugadoresActualizados[ jugadoresActualizados.indexOf(jugadorActivo) ] = jugadorConNuevasCartas
+
+        return this.copy(
+            jugadores = jugadoresActualizados,
+            pilaDescarte = pilaDescarte.agregarCartas(cartasDescartadas),
+            baraja = barajaActualizada,
         )
     }
 
@@ -96,30 +129,8 @@ data class Juego(
         )
     }
 
-    // passCartaToMesa: Devuelve un nuevo Juego con la carta jugada en la mesa
-    fun passCartaToMesa(): Juego { // por cohesión esto debería recibir la 'Carta-Jugada' y el 'jugador-Objetivo' y usar el 'jugador-Activo'
-        // val jugadorActual = this.jugadorActivo ?: return this
-        val jugadorActual = jugadores[1]
-        var jugadorActualizado =
-            jugadorActual.jugarCarta() // debemos individualizar primero al jugador 'Activo' y al 'Objetivo'
-        val cartaJugada = jugadorActual.entregarCartaJugada()
-        // baraja actualizada y cartas extraidas
-        val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas((maxCartasEnMano - jugadorActualizado.mano.cartas.size))
-        // jugador recibe las cartas tomadas de la baraja
-        jugadorActualizado = jugadorActualizado.recibirCartas(nuevasCartasMano)
-        // actualizar jugadores para la UI
-        val jugadoresActualizados = jugadores.toMutableList()
-        jugadoresActualizados[1] = jugadorActualizado
-
-        return this.copy(
-            jugadores = jugadoresActualizados,
-            baraja = barajaActualizada
-        )
-    }
-
     fun tomarCartaJugada(): Carta {
-        val jugadorActivo = jugadores[1]
-        val cartaJugada = jugadorActivo.entregarCartaJugada()
+        val cartaJugada = jugadorActivo!!.entregarCartaJugada()
 
         return cartaJugada
     }

@@ -35,7 +35,7 @@ data class Mesa(
 
     fun calcularTurnosParaGanar(pilasCopia:Map<CartaColor, MutableList<Carta>>): Int {
         // Lógica para calcular el nuevo valor
-        var turnosParaGanar = 4 // Coloca tu lógica aquí
+        var turnosParaGanar = 4
         pilasCopia.forEach { (color, pila) ->
             pila.forEach { carta: Carta ->
                 turnosParaGanar += when (carta.tipo) {

@@ -66,7 +66,6 @@ fun ManoItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 items(mano.cartas) { carta: Carta ->
-                    val index = mano.cartas.indexOf(carta)
                     CartaItem(
                         carta = carta,
                         //seleccionada = selectedCartas[index],

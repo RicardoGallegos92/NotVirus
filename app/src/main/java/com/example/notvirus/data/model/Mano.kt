@@ -10,7 +10,7 @@ data class Mano(
         )
     }
 
-    // Devuelve las cartas seleccionadas y la 'Mano' actualizada
+    // Devuelve las 'Cartas-Seleccionadas' y la 'Mano' actualizada
     fun tomarCartasSeleccionadas():Pair<List<Carta>,Mano> {
         return Pair(
             cartas.filter { it.estaSeleccionada }
