@@ -1,14 +1,17 @@
 package com.example.notvirus.data.model
 
+import java.util.UUID
+
 data class Jugador(
     val nombre: String = "Player X", // nombre de Usuario
     val isActive: Boolean = false,
     val mano: Mano = Mano(),
     val mesa: Mesa = Mesa(),
+    val id:String = UUID.randomUUID().toString()
 ) {
     fun recibirCartasToMano(nuevasCartas: List<Carta>): Jugador {
         // Metodo para "recibir cartas" -> "agregar a la mano" y devolver el Jugador con la mano actualizada
-        println("Jugador.tomaCartas()")
+        println("Jugador.recibirCartasToMano()")
         val manoActualizada = mano.agregarCartas(nuevasCartas = nuevasCartas)
         return this.copy(
             mano = manoActualizada
@@ -20,6 +23,8 @@ data class Jugador(
         println("Jugador.descartarCartas()")
         // jugador separa las cartas a descartar y mantiene en mano las NO seleccionadas
         val (cartasSeleccionadas, manoActualizada) = mano.tomarCartasSeleccionadas()
+        println("cartasSeleccionadas.size: ${cartasSeleccionadas.size}")
+        println("manoActualizada.size: ${manoActualizada.cartas.size}")
         val jugadorActualizado = this.copy(
             mano = manoActualizada
         )
@@ -31,6 +36,7 @@ data class Jugador(
     }
 
     fun marcarCartaEnMano(carta: Carta): Jugador {
+        println("Jugador.marcarCartaEnMano()")
         val manoAct = mano.selectCarta(carta)
         return this.copy(
             mano = manoAct
@@ -38,7 +44,7 @@ data class Jugador(
     }
 
     fun agregaCartaToMesa(carta:Carta): Jugador{
-
+        println("Jugador.agregaCartaToMesa()")
         val mesaActualizada = mesa.agregarToPila(carta)
         return this.copy(
             mesa = mesaActualizada
@@ -90,6 +96,7 @@ data class Jugador(
     }
 
     fun entregarCartaJugada(): Carta {
+        println("Jugador.entregarCartaJugada()")
         val (cartas, _) = mano.tomarCartasSeleccionadas()
         val cartaJugada = cartas[0]
 

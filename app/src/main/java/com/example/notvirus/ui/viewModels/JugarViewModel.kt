@@ -107,7 +107,10 @@ class JugarViewModel(
     }
 
     fun countCartasSelected() {
+        // println("JugarVM.countCartasSelected()")
         var conteo = 0
+//        println("Cant. Jugadores: ${_uiState.value.juego.jugadores.size}")
+//        println("Cartas en Mano ${_uiState.value.juego.jugadores[1].nombre}: ${_uiState.value.juego.jugadores[1].mano.cartas.size}")
         for (i in 0..2) {
             if (_uiState.value.juego.jugadores[1].mano.cartas[i].estaSeleccionada) {
                 conteo++
