@@ -5,8 +5,8 @@ data class Juego(
     val baraja: Baraja,
     val pilaDescarte: PilaDescarte,
 
-    val jugadorActivo: Jugador?,
-    val jugadorGanador: Jugador?,
+    val jugadorActivoID: String?,
+    val jugadorGanadorID: String?,
 
     val maxCartasEnMano: Int,
 ) {
@@ -15,8 +15,8 @@ data class Juego(
         baraja = Baraja(),
         pilaDescarte = PilaDescarte(),
 
-        jugadorActivo = null,
-        jugadorGanador = null,
+        jugadorActivoID = null,
+        jugadorGanadorID = null,
 
         maxCartasEnMano = 3,
     )
@@ -31,12 +31,12 @@ data class Juego(
             jugador.recibirCartasToMano(cartasParaJugador) // <-- Pasa la lista de cartas
         }
 
-        val nuevoJugadorActivo = pasarTurno()
+        val nuevoJugadorActivoID = pasarTurno()
 
         return this.copy(
             jugadores = jugadoresConCartas,
             baraja = barajaActual, // <-- Baraja-Actualizada
-            jugadorActivo = jugadoresConCartas.filter{it.id == nuevoJugadorActivo.id}[0],
+            jugadorActivoID = nuevoJugadorActivoID,
         )
     }
 
@@ -59,26 +59,43 @@ data class Juego(
         println("Juego.jugarCarta()")
         val cartaJugada: Carta = tomarCartaJugada()
         // distinguir entre TRATAMIENTO y otras
-        when(cartaJugada.tipo){
+        when (cartaJugada.tipo) {
             CartaTipo.TRATAMIENTO -> {
                 // activar Efecto
-                // quitar 'Carta' de la 'Mano'
-                // enviar 'Carta' a 'PilaDescarte'
+
+                // quitar 'Carta' de la 'Mano' y enviar 'Carta' a 'PilaDescarte'
                 return descartarDesdeMano()
             }
-            else -> {
-                pasarCartaToMesa(
+
+            CartaTipo.ORGANO -> {
+                return pasarCartaToMesa(
                     cartaJugada = cartaJugada,
-                    jugadorObjetivo = pasarTurno() // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                    jugadorObjetivo = getJugadorActivo(jugadorActivoID!!) // (provisorio) -> se debe agregar funcion para seleccionar objetivo
                 )
             }
+
+            CartaTipo.MEDICINA -> {
+                return pasarCartaToMesa(
+                    cartaJugada = cartaJugada,
+                    jugadorObjetivo = getJugadorActivo(jugadorActivoID!!) // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                )
+            }
+
+            CartaTipo.VIRUS -> {
+                return pasarCartaToMesa(
+                    cartaJugada = cartaJugada,
+                    jugadorObjetivo = getJugadorActivo(pasarTurno()) // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                )
+            }
+
+            else -> {}
         }
-
         return this.copy(
-
+            // esto no debería ocurrir -> PlaceHolder
         )
     }
-    fun pasarCartaToMesa(cartaJugada: Carta, jugadorObjetivo:Jugador): Juego {
+
+    fun pasarCartaToMesa(cartaJugada: Carta, jugadorObjetivo: Jugador): Juego {
         println("Juego.pasarCartaToMesa()")
         // pasarCartaToMesa: Devuelve un 'Juego-Actualizado':
         // por cohesión esto debería recibir la 'cartaJugada' y el 'jugadorObjetivo' y usar el 'jugadorActivo'
@@ -86,18 +103,33 @@ data class Juego(
         // pasar la 'cartaJugada' a la mesa del 'jugadorObjetivo'
         val jugadorObjetivoActualizado = jugadorObjetivo.agregaCartaToMesa(cartaJugada)
         // quitar la 'cartaJugada' de la mano del 'jugadorActivo'
-        var (_,jugadorActivoActualizado) = jugadorActivo!!.descartarCartas()
+        var (_, jugadorActivoActualizado) = getJugadorActivo(jugadorActivoID!!).descartarCartas()
         // pedir 'cartaNueva' para la mano del 'jugadorActivo'
         val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas((maxCartasEnMano - jugadorActivoActualizado.mano.cartas.size))
         // pasar la 'cartaNueva' al 'jugadorActivo'
         jugadorActivoActualizado = jugadorActivoActualizado.recibirCartasToMano(nuevasCartasMano)
 
-        // actualizar jugadores Activo y Objetivo para la UI
-        val jugadoresActualizados = jugadores.map { jugador ->
-            when (jugador.id) {
-                jugadorActivo?.id -> jugadorActivoActualizado
-                jugadorObjetivo.id -> jugadorObjetivoActualizado
-                else -> jugador
+        var jugadoresActualizados: List<Jugador>
+
+        if (jugadorActivoID != jugadorObjetivo.id) {
+            // actualizar jugadores Activo y Objetivo para la UI
+            jugadoresActualizados = jugadores.map { jugador ->
+                when (jugador.id) {
+                    jugadorActivoID -> jugadorActivoActualizado // Mano Actualizada
+                    jugadorObjetivo.id -> jugadorObjetivoActualizado // Mesa Actualizada
+                    else -> jugador
+                }
+            }
+        }else{
+            jugadorActivoActualizado = jugadorActivoActualizado.copy(
+                mesa = jugadorObjetivoActualizado.mesa
+            )
+            // actualizar jugadores Activo y Objetivo para la UI
+            jugadoresActualizados = jugadores.map { jugador ->
+                when (jugador.id) {
+                    jugadorActivoID -> jugadorActivoActualizado // Mano y Mesa Actualizada
+                    else -> jugador
+                }
             }
         }
 
@@ -112,7 +144,7 @@ data class Juego(
 //        println("jugadorActivo!!.nombre: ${jugadorActivo!!.nombre}")
 //        println("-> mano.size: ${jugadorActivo!!.mano.cartas.size}")
         // no hace falta lógica extra, las cartas pasan de la mano a la pila
-        val (cartasDescartadas, jugadorActivoActualizado) = getJugadorActivo(jugadorActivo!!.id).descartarCartas()
+        val (cartasDescartadas, jugadorActivoActualizado) = getJugadorActivo(jugadorActivoID!!).descartarCartas()
         println("jugadorActivoActualizado: ${jugadorActivoActualizado.nombre} | Cartas Mano: ${jugadorActivoActualizado.mano.cartas.size}")
         // baraja actualizada y cartas extraidas
         val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas(cartasDescartadas.size)
@@ -121,10 +153,10 @@ data class Juego(
         println("jugadorConNuevasCartas: ${jugadorConNuevasCartas.nombre} | Cartas Mano: ${jugadorConNuevasCartas.mano.cartas.size}")
         // actualizar jugadores para la UI
         val jugadoresActualizados = jugadores.map { jugador ->
-            if (jugador.id == jugadorActivo.id){
+            if (jugador.id == jugadorActivoID) {
                 //println("Jugadores -> actualizado: ${jugadorConNuevasCartas.nombre} | Cartas Mano: ${jugadorConNuevasCartas.mano.cartas.size}")
                 jugadorConNuevasCartas
-            } else{
+            } else {
                 //println("Jugadores -> original: ${jugador.nombre} | Cartas Mano: ${jugador.mano.cartas.size}")
                 jugador
             }
@@ -139,7 +171,7 @@ data class Juego(
 
     fun marcarCarta(carta: Carta): Juego {
         println("Juego.marcarCarta()")
-    // cambia el estado "selecciona" de la carta entre "true" y "false"
+        // cambia el estado "selecciona" de la carta entre "true" y "false"
         val jugadorActualizado = jugadores[1].marcarCartaEnMano(carta) // cambiar a 'JugadorActivo'
         val jugadoresActualizados = jugadores.toMutableList()
         jugadoresActualizados[1] = jugadorActualizado
@@ -151,7 +183,7 @@ data class Juego(
 
     fun tomarCartaJugada(): Carta {
         println("Juego.tomarCartaJugada()")
-        val cartaJugada = jugadorActivo!!.entregarCartaJugada()
+        val cartaJugada = getJugadorActivo(jugadorActivoID!!).entregarCartaJugada()
 
         return cartaJugada
     }
@@ -177,20 +209,20 @@ data class Juego(
     }
 
     // cambiar jugador en turno (escalable)
-    fun pasarTurno(): Jugador {
+    fun pasarTurno(): String {
         println("Juego.pasarTurno()")
-        if (jugadorActivo == null) {
+        if (jugadorActivoID.isNullOrEmpty()) {
             // jugador inincial por defecto
-            return jugadores[1] // -> el player humano
+            return jugadores[1].id // -> el player humano
         } else {
-            val index = jugadores.indexOf(getJugadorActivo(jugadorActivo.id))
-            return jugadores[ (index + 1) % jugadores.size ]
+            val index = jugadores.indexOf(getJugadorActivo(jugadorActivoID))
+            return jugadores[(index + 1) % jugadores.size].id
         }
     }
 
-    fun getJugadorActivo(id:String):Jugador{
+    fun getJugadorActivo(id: String): Jugador {
         println("Juego.getJugadorActivo()")
-        return jugadores.filter{ jugador ->
+        return jugadores.filter { jugador ->
             jugador.id == id
         }[0]
     }
