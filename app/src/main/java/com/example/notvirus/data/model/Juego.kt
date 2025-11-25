@@ -68,24 +68,41 @@ data class Juego(
             }
 
             CartaTipo.ORGANO -> {
-                return pasarCartaToMesa(
-                    cartaJugada = cartaJugada,
-                    jugadorObjetivo = getJugadorActivo(jugadorActivoID!!) // (provisorio) -> se debe agregar funcion para seleccionar objetivo
-                )
+                val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID!!)
+                if (!jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)) {
+                    return pasarCartaToMesa(
+                        cartaJugada = cartaJugada,
+                        jugadorObjetivo = jugadorObjetivoDeTurno
+                    )
+                } else {
+                    println("Mensaje SnackBar -> no se puede jugar esta carta")
+                }
             }
 
             CartaTipo.MEDICINA -> {
-                return pasarCartaToMesa(
-                    cartaJugada = cartaJugada,
-                    jugadorObjetivo = getJugadorActivo(jugadorActivoID!!) // (provisorio) -> se debe agregar funcion para seleccionar objetivo
-                )
+                val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID!!)
+                if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)) {
+                    return pasarCartaToMesa(
+                        cartaJugada = cartaJugada,
+                        jugadorObjetivo = jugadorObjetivoDeTurno // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                    )
+                } else {
+                    println("Mensaje SnackBar -> no se puede jugar esta carta")
+                }
             }
 
             CartaTipo.VIRUS -> {
-                return pasarCartaToMesa(
-                    cartaJugada = cartaJugada,
-                    jugadorObjetivo = getJugadorActivo(pasarTurno()) // (provisorio) -> se debe agregar funcion para seleccionar objetivo
-                )
+                // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                val jugadorObjetivoDeTurno = getJugadorByID(pasarTurno())
+                if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)) {
+                    return pasarCartaToMesa(
+                        cartaJugada = cartaJugada,
+                        jugadorObjetivo = getJugadorByID(pasarTurno())
+                    )
+
+                } else {
+                    println("Mensaje SnackBar -> no se puede jugar esta carta")
+                }
             }
 
             else -> {}
@@ -103,7 +120,7 @@ data class Juego(
         // pasar la 'cartaJugada' a la mesa del 'jugadorObjetivo'
         val jugadorObjetivoActualizado = jugadorObjetivo.agregaCartaToMesa(cartaJugada)
         // quitar la 'cartaJugada' de la mano del 'jugadorActivo'
-        var (_, jugadorActivoActualizado) = getJugadorActivo(jugadorActivoID!!).descartarCartas()
+        var (_, jugadorActivoActualizado) = getJugadorByID(jugadorActivoID!!).descartarCartas()
         // pedir 'cartaNueva' para la mano del 'jugadorActivo'
         val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas((maxCartasEnMano - jugadorActivoActualizado.mano.cartas.size))
         // pasar la 'cartaNueva' al 'jugadorActivo'
@@ -120,7 +137,7 @@ data class Juego(
                     else -> jugador
                 }
             }
-        }else{
+        } else {
             jugadorActivoActualizado = jugadorActivoActualizado.copy(
                 mesa = jugadorObjetivoActualizado.mesa
             )
@@ -144,7 +161,7 @@ data class Juego(
 //        println("jugadorActivo!!.nombre: ${jugadorActivo!!.nombre}")
 //        println("-> mano.size: ${jugadorActivo!!.mano.cartas.size}")
         // no hace falta lógica extra, las cartas pasan de la mano a la pila
-        val (cartasDescartadas, jugadorActivoActualizado) = getJugadorActivo(jugadorActivoID!!).descartarCartas()
+        val (cartasDescartadas, jugadorActivoActualizado) = getJugadorByID(jugadorActivoID!!).descartarCartas()
         println("jugadorActivoActualizado: ${jugadorActivoActualizado.nombre} | Cartas Mano: ${jugadorActivoActualizado.mano.cartas.size}")
         // baraja actualizada y cartas extraidas
         val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas(cartasDescartadas.size)
@@ -183,7 +200,7 @@ data class Juego(
 
     fun tomarCartaJugada(): Carta {
         println("Juego.tomarCartaJugada()")
-        val cartaJugada = getJugadorActivo(jugadorActivoID!!).entregarCartaJugada()
+        val cartaJugada = getJugadorByID(jugadorActivoID!!).entregarCartaJugada()
 
         return cartaJugada
     }
@@ -215,13 +232,13 @@ data class Juego(
             // jugador inincial por defecto
             return jugadores[1].id // -> el player humano
         } else {
-            val index = jugadores.indexOf(getJugadorActivo(jugadorActivoID))
+            val index = jugadores.indexOf(getJugadorByID(jugadorActivoID))
             return jugadores[(index + 1) % jugadores.size].id
         }
     }
 
-    fun getJugadorActivo(id: String): Jugador {
-        println("Juego.getJugadorActivo()")
+    fun getJugadorByID(id: String): Jugador {
+        println("Juego.getJugadorByID()")
         return jugadores.filter { jugador ->
             jugador.id == id
         }[0]

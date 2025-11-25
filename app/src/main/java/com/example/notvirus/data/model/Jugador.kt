@@ -104,12 +104,12 @@ data class Jugador(
     }
 
 // ORGANO :Start
-    private fun existeOrgano(color: CartaColor): Boolean {
+    fun existeOrgano(color: CartaColor): Boolean {
         // verifica si la pila ya contiene un órgano
         return mesa.pilas[color]!!.any { it.tipo == CartaTipo.ORGANO }
     }
 
-    private fun addOrgano(cartaJugada: Carta): Mesa {
+    fun addOrgano(cartaJugada: Carta): Mesa {
         val mesaActualizada = if (!existeOrgano(cartaJugada.color)) {
             mesa.agregarToPila(cartaJugada)
         } else {
@@ -120,7 +120,7 @@ data class Jugador(
 
 // ORGANO :End
 // MEDICINA :Start
-    private fun existeMedicina(color: CartaColor, colorPila: CartaColor? = null): Boolean {
+    fun existeMedicina(color: CartaColor, colorPila: CartaColor? = null): Boolean {
         return if (colorPila != null) {
             mesa.pilas[colorPila]!!.any { it.tipo == CartaTipo.MEDICINA }
         } else {
@@ -128,7 +128,7 @@ data class Jugador(
         }
     }
 
-    private fun addMedicina(cartaJugada: Carta, colorPila: CartaColor? = null): Mesa {
+    fun addMedicina(cartaJugada: Carta, colorPila: CartaColor? = null): Mesa {
         val mesaActualizada = if (existeOrgano(cartaJugada.color)) {
             mesa.agregarToPila(cartaJugada, colorPila)
         } else {
@@ -139,7 +139,7 @@ data class Jugador(
 
 // MEDICINA :End
 // VIRUS:Start
-    private fun existeVirus(color: CartaColor, colorPila: CartaColor? = null): Boolean {
+    fun existeVirus(color: CartaColor, colorPila: CartaColor? = null): Boolean {
         return if (colorPila != null) {
             mesa.pilas[colorPila]!!.any { it.tipo == CartaTipo.VIRUS }
         } else {
@@ -147,7 +147,7 @@ data class Jugador(
         }
     }
 
-    private fun addVirus(cartaJugada: Carta): Mesa {
+    fun addVirus(cartaJugada: Carta): Mesa {
         val mesaActualizada = if (existeOrgano(cartaJugada.color)) {
             mesa.agregarToPila(cartaJugada)
         } else {
@@ -159,7 +159,7 @@ data class Jugador(
 // VIRUS:End
 /*
 // TRATAMIENTOS:Start
-    private fun playTratamiento(cartaJugada: Carta): Jugador {
+    fun playTratamiento(cartaJugada: Carta): Jugador {
         // tratamiento activa su efecto particular
         // va directo a la pila de descarte
         return this.copy(
