@@ -1,14 +1,13 @@
 package com.example.notvirus.data.model
 
-import androidx.compose.ui.graphics.Color
+import com.example.notvirus.R
 
-
-enum class CartaColor(val colorRGB: Color) {
-    BLANCO(Color(255, 255, 255)),
-    ROJO(Color(255, 0, 0)),
-    AZUL(Color(0, 0, 255)),
-    AMARILLO(Color(255, 255, 0)),
-    VERDE(Color(0, 255, 0)),
-    MULTICOLOR(Color(0, 0, 0)),
-    NULL(Color(0,0,0,0))
+enum class CartaColor(val id: Int) {
+    ROJO(R.color.carta_rojo),
+    AZUL(R.color.carta_azul),
+    AMARILLO(R.color.carta_amarillo),
+    VERDE(R.color.carta_verde),
+    MULTICOLOR(R.color.carta_multicolor),
+    TRATAMIENTO(R.color.carta_tratamiento),
+    NULL(R.color.sample),
 }

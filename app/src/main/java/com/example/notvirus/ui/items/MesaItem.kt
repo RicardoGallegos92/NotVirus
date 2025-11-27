@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.CartaColor
-import com.example.notvirus.data.model.CartaIcono
 import com.example.notvirus.data.model.CartaImagen
 import com.example.notvirus.data.model.CartaTipo
 import com.example.notvirus.data.model.Mesa
@@ -34,7 +33,6 @@ fun MesaItem(
     val cartaDefault: Carta = Carta(
         tipo = CartaTipo.NULL,
         color = CartaColor.NULL,
-        icono = CartaIcono.NULL,
         imagen = CartaImagen.NADA
     )
     Box(

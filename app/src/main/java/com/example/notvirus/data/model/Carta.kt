@@ -12,7 +12,6 @@ import java.util.UUID
 data class Carta(
     val tipo: CartaTipo,
     val color: CartaColor,
-    val icono: CartaIcono,
     val imagen: CartaImagen,
 
     val id: String = UUID.randomUUID().toString(),

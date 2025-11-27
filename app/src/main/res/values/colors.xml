@@ -13,6 +13,17 @@
     // RGB = 149,171,1
     <color name="virus_verde_oscuro">#FF95AB01</color>
 
+    <color name="carta_icono">#FFFFFFFF</color>
+
+    <color name="carta_borde">#FF000000</color>
+    <color name="carta_borde_seleccionado">#FFFFFFFF</color>
+    <color name="carta_amarillo">#FFD6A74C</color>
+    <color name="carta_azul">#FF3378C3</color>
+    <color name="carta_rojo">#FFAA372A</color>
+    <color name="carta_verde">#FF559550</color>
+    <color name="carta_tratamiento">#FF743491</color>
+    <color name="carta_multicolor">#FFA069A9</color>
+
     <color name="progreso">#FFFFFFFF</color>
     <color name="remarcar_texto">#80000000</color>
 

@@ -1,5 +1,6 @@
 package com.example.notvirus.ui.items
 
+import android.R.attr.contentDescription
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,13 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.notvirus.R
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.CartaColor
-import com.example.notvirus.data.model.CartaIcono
 import com.example.notvirus.data.model.CartaImagen
 import com.example.notvirus.data.model.CartaTipo
 
@@ -35,8 +38,7 @@ import com.example.notvirus.data.model.CartaTipo
 fun CartaItem(
     carta: Carta = Carta(
         tipo = CartaTipo.TRATAMIENTO,
-        color = CartaColor.BLANCO,
-        icono = CartaIcono.TRATAMIENTO,
+        color = CartaColor.NULL,
         imagen = CartaImagen.TRATAMIENTO_GUANTE_LATEX,
     ),
     //seleccionada: Boolean = false,
@@ -59,11 +61,15 @@ fun CartaItem(
         ) {
             Card(
                 modifier = Modifier
+                    .background(colorResource(carta.color.id))
                     .width(
-                        width = if (carta.esInmune) {
-                            ( anchoCarta *.8 ).dp
-                        } else {
                             anchoCarta.dp
+                    )
+                    .scale(
+                        scale = if (carta.estaSeleccionada) {
+                            1.05f
+                        } else {
+                            1f
                         }
                     )
                     .rotate(
@@ -77,9 +83,9 @@ fun CartaItem(
                     .border(
                         width = 2.dp,
                         color = if (carta.estaSeleccionada) {
-                            Color(255, 255, 255)
+                            colorResource(R.color.carta_borde_seleccionado)
                         } else {
-                            Color(0, 0, 0)
+                            colorResource(R.color.carta_borde)
                         },
                         shape = RoundedCornerShape(10.dp),
                     )
@@ -89,7 +95,8 @@ fun CartaItem(
             ) {
                 Column(
                     modifier = Modifier
-                        .background(color = carta.color.colorRGB)
+                        .background(colorResource(carta.color.id))
+                        .padding(4.dp)
                 ) {
                     // Arriba
                     Row(
@@ -99,10 +106,14 @@ fun CartaItem(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            imageVector = carta.icono.vector,
-                            tint = Color(0, 0, 0),
-                            contentDescription = "icono de la carta",
+                        MyIcon(
+                            iconID = carta.tipo.iconID,
+                            tintColor = if (carta.estaSeleccionada) {
+                                colorResource(R.color.carta_borde_seleccionado)
+                            } else {
+                                colorResource(R.color.carta_borde)
+                            },
+                            description = "icono de la carta",
                         )
                     }
                     // Centro
@@ -127,10 +138,14 @@ fun CartaItem(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            imageVector = carta.icono.vector,
-                            tint = Color(0, 0, 0),
-                            contentDescription = "icono de la carta",
+                        MyIcon(
+                            iconID = carta.tipo.iconID,
+                            tintColor = if (carta.estaSeleccionada) {
+                                colorResource(R.color.carta_borde_seleccionado)
+                            } else {
+                                colorResource(R.color.carta_borde)
+                            },
+                            description = "icono de la carta",
                         )
                     }
                 }
@@ -138,4 +153,17 @@ fun CartaItem(
         }
 
     }
+}
+
+@Composable
+fun MyIcon(
+    iconID: Int,
+    tintColor: Color,
+    description: String,
+) {
+    Icon(
+        painter = painterResource(iconID),
+        tint = tintColor,
+        contentDescription = description,
+    )
 }

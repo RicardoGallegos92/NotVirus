@@ -1,9 +1,12 @@
 package com.example.notvirus.ui.viewModels
 
+import android.util.Log.e
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.Juego
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,13 +47,13 @@ class JugarViewModel(
             }
             try {
                 val nuevoJuego = Juego()
-                val nuevaPartida = nuevoJuego.empezarJuego() // Devuelve un nuevo Juego
-                delay(1000) // <-- dar ilusion de carga
+                val nuevaPartida = async { nuevoJuego.empezarJuego() }.await()
+                delay(500) // <-- dar ilusion de carga
                 _uiState.update {
                     it.copy(
                         juego = nuevaPartida,
-                        isLoading = false,
                         isStarted = true,
+                        isLoading = false,
 
                         isPaused = false,
                         isOver = false,
@@ -59,7 +62,7 @@ class JugarViewModel(
                         activeBtnDiscardCards = false
                     )
                 }
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,

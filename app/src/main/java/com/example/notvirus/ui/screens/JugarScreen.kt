@@ -75,6 +75,13 @@ fun JugarScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
+            /*
+            // aplicar este truquete
+            when{
+                true -> {}
+                else -> {}
+            }
+            */
             if (isLoading) {
                 CircularProgressIndicator(
                     color = colorResource(R.color.progreso)
@@ -158,7 +165,7 @@ fun JugarScreen(
                     }
                 } else {
                     println("Error -> ${errorMsg}")
-                    MensajeError(errorMsg!!)
+                    MensajeError(errorMsg)
                 }
             }
         }

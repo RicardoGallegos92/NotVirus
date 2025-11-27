@@ -13,49 +13,34 @@ data class Baraja(
             repeat(5) {
                 cartas.add(
                     Carta(
-                        CartaTipo.ORGANO,
-                        CartaColor.ROJO,
-                        CartaIcono.CORAZON,
-                        CartaImagen.CORAZON
+                        CartaTipo.ORGANO, CartaColor.ROJO, CartaImagen.CORAZON
                     )
                 )
             }
             repeat(5) {
                 cartas.add(
                     Carta(
-                        CartaTipo.ORGANO,
-                        CartaColor.AZUL,
-                        CartaIcono.CEREBRO,
-                        CartaImagen.CEREBRO
+                        CartaTipo.ORGANO, CartaColor.AZUL, CartaImagen.CEREBRO
                     )
                 )
             }
             repeat(5) {
                 cartas.add(
                     Carta(
-                        CartaTipo.ORGANO,
-                        CartaColor.AMARILLO,
-                        CartaIcono.HUESO,
-                        CartaImagen.HUESO
+                        CartaTipo.ORGANO, CartaColor.AMARILLO, CartaImagen.HUESO
                     )
                 )
             }
             repeat(5) {
                 cartas.add(
                     Carta(
-                        CartaTipo.ORGANO,
-                        CartaColor.VERDE,
-                        CartaIcono.ESTOMAGO,
-                        CartaImagen.ESTOMAGO
+                        CartaTipo.ORGANO, CartaColor.VERDE, CartaImagen.ESTOMAGO
                     )
                 )
             }
             cartas.add(
                 Carta(
-                    CartaTipo.ORGANO,
-                    CartaColor.MULTICOLOR,
-                    CartaIcono.CUERPO,
-                    CartaImagen.CUERPO
+                    CartaTipo.ORGANO, CartaColor.MULTICOLOR, CartaImagen.CUERPO
                 )
             )
 
@@ -63,49 +48,34 @@ data class Baraja(
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.VIRUS,
-                        CartaColor.ROJO,
-                        CartaIcono.VIRUS,
-                        CartaImagen.VIRUS_ROJO
+                        CartaTipo.VIRUS, CartaColor.ROJO, CartaImagen.VIRUS_ROJO
                     )
                 )
             }
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.VIRUS,
-                        CartaColor.VERDE,
-                        CartaIcono.VIRUS,
-                        CartaImagen.VIRUS_VERDE
+                        CartaTipo.VIRUS, CartaColor.VERDE, CartaImagen.VIRUS_VERDE
                     )
                 )
             }
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.VIRUS,
-                        CartaColor.AZUL,
-                        CartaIcono.VIRUS,
-                        CartaImagen.VIRUS_AZUL
+                        CartaTipo.VIRUS, CartaColor.AZUL, CartaImagen.VIRUS_AZUL
                     )
                 )
             }
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.VIRUS,
-                        CartaColor.AMARILLO,
-                        CartaIcono.VIRUS,
-                        CartaImagen.VIRUS_AMARILLO
+                        CartaTipo.VIRUS, CartaColor.AMARILLO, CartaImagen.VIRUS_AMARILLO
                     )
                 )
             }
             cartas.add(
                 Carta(
-                    CartaTipo.VIRUS,
-                    CartaColor.MULTICOLOR,
-                    CartaIcono.VIRUS,
-                    CartaImagen.VIRUS_MULTICOLOR
+                    CartaTipo.VIRUS, CartaColor.MULTICOLOR, CartaImagen.VIRUS_MULTICOLOR
                 )
             )
 
@@ -113,50 +83,35 @@ data class Baraja(
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.MEDICINA,
-                        CartaColor.ROJO,
-                        CartaIcono.MEDICINA,
-                        CartaImagen.MEDICINA_ROJO
+                        CartaTipo.MEDICINA, CartaColor.ROJO, CartaImagen.MEDICINA_ROJO
                     )
                 )
             }
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.MEDICINA,
-                        CartaColor.VERDE,
-                        CartaIcono.MEDICINA,
-                        CartaImagen.MEDICINA_VERDE
+                        CartaTipo.MEDICINA, CartaColor.VERDE, CartaImagen.MEDICINA_VERDE
                     )
                 )
             }
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.MEDICINA,
-                        CartaColor.AZUL,
-                        CartaIcono.MEDICINA,
-                        CartaImagen.MEDICINA_AZUL
+                        CartaTipo.MEDICINA, CartaColor.AZUL, CartaImagen.MEDICINA_AZUL
                     )
                 )
             }
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.MEDICINA,
-                        CartaColor.AMARILLO,
-                        CartaIcono.MEDICINA,
-                        CartaImagen.MEDICINA_AMARILLO
+                        CartaTipo.MEDICINA, CartaColor.AMARILLO, CartaImagen.MEDICINA_AMARILLO
                     )
                 )
             }
             repeat(4) {
                 cartas.add(
                     Carta(
-                        CartaTipo.MEDICINA,
-                        CartaColor.MULTICOLOR,
-                        CartaIcono.MEDICINA,
-                        CartaImagen.MEDICINA_MULTICOLOR
+                        CartaTipo.MEDICINA, CartaColor.MULTICOLOR, CartaImagen.MEDICINA_MULTICOLOR
                     )
                 )
             }
@@ -165,10 +120,7 @@ data class Baraja(
             repeat(2) {
                 cartas.add(
                     Carta(
-                        CartaTipo.TRATAMIENTO,
-                        CartaColor.BLANCO,
-                        CartaIcono.TRATAMIENTO,
-                        CartaImagen.TRATAMIENTO_CONTAGIO
+                        CartaTipo.TRATAMIENTO, CartaColor.TRATAMIENTO, CartaImagen.TRATAMIENTO_CONTAGIO
                     )
                 )
             }
@@ -176,8 +128,7 @@ data class Baraja(
                 cartas.add(
                     Carta(
                         CartaTipo.TRATAMIENTO,
-                        CartaColor.BLANCO,
-                        CartaIcono.TRATAMIENTO,
+                        CartaColor.TRATAMIENTO,
                         CartaImagen.TRATAMIENTO_ROBO_ORGANO
                     )
                 )
@@ -186,8 +137,7 @@ data class Baraja(
                 cartas.add(
                     Carta(
                         CartaTipo.TRATAMIENTO,
-                        CartaColor.BLANCO,
-                        CartaIcono.TRATAMIENTO,
+                        CartaColor.TRATAMIENTO,
                         CartaImagen.TRATAMIENTO_TRANSPLANTE
                     )
                 )
@@ -196,8 +146,7 @@ data class Baraja(
                 cartas.add(
                     Carta(
                         CartaTipo.TRATAMIENTO,
-                        CartaColor.BLANCO,
-                        CartaIcono.TRATAMIENTO,
+                        CartaColor.TRATAMIENTO,
                         CartaImagen.TRATAMIENTO_ERROR_MEDICO
                     )
                 )
@@ -206,8 +155,7 @@ data class Baraja(
                 cartas.add(
                     Carta(
                         CartaTipo.TRATAMIENTO,
-                        CartaColor.BLANCO,
-                        CartaIcono.TRATAMIENTO,
+                        CartaColor.TRATAMIENTO,
                         CartaImagen.TRATAMIENTO_GUANTE_LATEX
                     )
                 )
@@ -232,7 +180,7 @@ data class Baraja(
 
     // Devuelve una nueva Baraja con las cartas del descarte reensambladas y barajadas
     fun agregarCartas(cartasParaAgregar: List<Carta>): Baraja {
-        var nuevoMazo = ( pila + cartasParaAgregar )
+        var nuevoMazo = (pila + cartasParaAgregar)
         return this.copy(
             pila = nuevoMazo
         )
