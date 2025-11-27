@@ -40,7 +40,36 @@ data class Juego(
         )
     }
 
-    fun hayGanador(): Pair<Boolean, Jugador?> {
+    fun usarTurno(
+        jugarCarta: Boolean = false,
+        descartarCarta: Boolean = false,
+    ): Juego {
+        var turno = this.copy()
+        when{
+            descartarCarta -> {
+                turno = turno.descartarDesdeMano()
+                turno = turno.llenarBaraja()
+            }
+            jugarCarta -> {
+                turno = turno.jugarCarta()
+                val (hayGanador, jugadorGanadorID) = turno.hayGanador()
+                turno = if (hayGanador){
+                    turno.copy(
+                        jugadorGanadorID = jugadorGanadorID
+                    )
+                }else{
+                    turno.llenarBaraja()
+                }
+            }
+        }
+
+        val jugadorProximoTurno = pasarTurno()
+        return turno.copy(
+            jugadorActivoID = jugadorActivoID
+        )
+    }
+
+    fun hayGanador(): Pair<Boolean, String?> {
         println("Juego.hayGanador()")
         // Lógica para determinar ganador
         // -> el jugador ganó si el conteo (turnosParaGanar) de su mesa es 0
@@ -51,7 +80,7 @@ data class Juego(
             // vacio -> no ganador
             Pair(false, null)
         } else {
-            Pair(true, jugadorGanador[0])
+            Pair(true, jugadorGanador[0].id)
         }
     }
 
@@ -69,7 +98,8 @@ data class Juego(
 
             CartaTipo.ORGANO -> {
                 val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID!!)
-                if (!jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)) {
+                if (!jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
+                    && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
                     return pasarCartaToMesa(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = jugadorObjetivoDeTurno
@@ -81,7 +111,8 @@ data class Juego(
 
             CartaTipo.MEDICINA -> {
                 val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID!!)
-                if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)) {
+                if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
+                    && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
                     return pasarCartaToMesa(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = jugadorObjetivoDeTurno // (provisorio) -> se debe agregar funcion para seleccionar objetivo
@@ -94,7 +125,8 @@ data class Juego(
             CartaTipo.VIRUS -> {
                 // (provisorio) -> se debe agregar funcion para seleccionar objetivo
                 val jugadorObjetivoDeTurno = getJugadorByID(pasarTurno())
-                if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)) {
+                if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
+                    && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
                     return pasarCartaToMesa(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = getJugadorByID(pasarTurno())

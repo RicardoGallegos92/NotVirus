@@ -91,7 +91,7 @@ fun JugarScreen(
                     color = colorResource(R.color.progreso)
                 )
             } else {
-                if (errorMsg == null) {
+                if ( errorMsg.isNullOrEmpty() ) {
                     if (isOver) {
                         MyColumn(
                             textos = listOf(

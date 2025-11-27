@@ -1,11 +1,9 @@
 package com.example.notvirus.ui.viewModels
 
-import android.util.Log.e
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.Juego
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -98,22 +96,27 @@ class JugarViewModel(
     fun jugarCarta() {
         viewModelScope.launch {
             _uiState.update {
-                var isOver = false
+                /*
                 var juegoAct = it.juego.jugarCarta()
-                val (hayGanador, jugadorGanador) = juegoAct.hayGanador()
+                val (hayGanador, jugadorGanadorID) = juegoAct.hayGanador()
                 if (hayGanador) {
                     // animacion del ganador se maneja en la pantalla
                     isOver = true
                     juegoAct = juegoAct.copy(
-                        jugadorGanadorID = jugadorGanador!!.id
+                        jugadorGanadorID = jugadorGanadorID!!
                     )
                 } else {
                     juegoAct = juegoAct.llenarBaraja()
                 }
+                */
+                //
+                val juegoActualizado = async { it.juego.usarTurno(jugarCarta = true) }.await()
+                val isOver = !juegoActualizado.jugadorGanadorID.isNullOrEmpty()
                 it.copy(
-                    juego = juegoAct,
+                    juego = juegoActualizado,
                     isOver = isOver,
                 )
+                //
             }
         }
         countCartasSelected()
@@ -122,9 +125,9 @@ class JugarViewModel(
     fun descartarCartas() {
         println("JugarVM.descartarCartas()")
         viewModelScope.launch {
+            //var juegoAct = async { _uiState.value.juego.descartarDesdeMano() }.await()
             _uiState.update {
-                var juegoAct = it.juego.descartarDesdeMano()
-                juegoAct = juegoAct.llenarBaraja()
+                var juegoAct = async { it.juego.usarTurno(descartarCarta = true) }.await()
                 it.copy(juego = juegoAct)
             }
         }
@@ -148,11 +151,15 @@ class JugarViewModel(
         var conteo = 0
 //        println("Cant. Jugadores: ${_uiState.value.juego.jugadores.size}")
 //        println("Cartas en Mano ${_uiState.value.juego.jugadores[1].nombre}: ${_uiState.value.juego.jugadores[1].mano.cartas.size}")
-        for (i in 0..2) {
-            if (_uiState.value.juego.jugadores[1].mano.cartas[i].estaSeleccionada) {
+//        val cartasEnMano = _uiState.value.juego.maxCartasEnMano
+        val mano = _uiState.value.juego.jugadores[1].mano.cartas
+
+        for (carta in mano) {
+            if (carta.estaSeleccionada) {
                 conteo++
             }
         }
+
         _uiState.update {
             it.copy(
                 cantCartasSelected = conteo
@@ -162,28 +169,32 @@ class JugarViewModel(
     }
 
     private fun activeButton() {
-        if (_uiState.value.cantCartasSelected == 0) {
-            _uiState.update {
-                it.copy(
-                    activeBtnPlayCard = false,
-                    activeBtnDiscardCards = false,
-                )
+        when (_uiState.value.cantCartasSelected) {
+            0 -> {
+                _uiState.update {
+                    it.copy(
+                        activeBtnPlayCard = false,
+                        activeBtnDiscardCards = false,
+                    )
+                }
             }
-        }
-        if (_uiState.value.cantCartasSelected == 1) {
-            _uiState.update {
-                it.copy(
-                    activeBtnPlayCard = true,
-                    activeBtnDiscardCards = true,
-                )
+
+            1 -> {
+                _uiState.update {
+                    it.copy(
+                        activeBtnPlayCard = true,
+                        activeBtnDiscardCards = true,
+                    )
+                }
             }
-        }
-        if (_uiState.value.cantCartasSelected > 1) {
-            _uiState.update {
-                it.copy(
-                    activeBtnPlayCard = false,
-                    activeBtnDiscardCards = true,
-                )
+
+            else -> {
+                _uiState.update {
+                    it.copy(
+                        activeBtnPlayCard = false,
+                        activeBtnDiscardCards = true,
+                    )
+                }
             }
         }
     }

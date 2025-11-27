@@ -7,5 +7,5 @@ enum class CartaTipo(val iconID: Int) {
     VIRUS(R.drawable.ic_virus),
     MEDICINA(R.drawable.ic_pill),
     TRATAMIENTO(R.drawable.ic_cross),
-    NULL(R.drawable.ic_null)
+    NULL(R.drawable.ic_transparent)
 }

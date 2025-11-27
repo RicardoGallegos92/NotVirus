@@ -4,11 +4,11 @@ import com.example.notvirus.R
 
 enum class CartaImagen(val id: Int) {
 // ORGANOS
-    CORAZON(R.drawable.corazon),
-    ESTOMAGO(R.drawable.estomago),
-    CEREBRO(R.drawable.cerebro),
-    HUESO(R.drawable.hueso),
-    CUERPO(R.drawable.cuerpo),
+    CORAZON(R.drawable.organo_corazon),
+    ESTOMAGO(R.drawable.organo_estomago),
+    CEREBRO(R.drawable.organo_cerebro),
+    HUESO(R.drawable.organo_hueso),
+    CUERPO(R.drawable.organo_cuerpo),
 
 // VIRUS
     VIRUS_ROJO(R.drawable.virus_rojo),
@@ -31,5 +31,5 @@ enum class CartaImagen(val id: Int) {
     TRATAMIENTO_ROBO_ORGANO(R.drawable.tratamiento_robo_organo),
     TRATAMIENTO_TRANSPLANTE(R.drawable.tratamiento_transplante),
 // VACIO
-    NADA(R.drawable.nada)
+    NADA(R.drawable.carta_reverso)
 }

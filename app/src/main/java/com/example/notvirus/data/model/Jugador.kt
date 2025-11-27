@@ -45,53 +45,12 @@ data class Jugador(
 
     fun agregaCartaToMesa(carta:Carta): Jugador{
         println("Jugador.agregaCartaToMesa()")
+        // jugador recibe la carta y la pasa a su mesa (pila indicada)
+        // solo si tiene menos de 3 cartas
+
         val mesaActualizada = mesa.agregarToPila(carta)
         return this.copy(
             mesa = mesaActualizada
-        )
-    }
-
-    // jugarCarta en desuso
-    fun jugarCarta(): Jugador {
-        // mover esta lógica a "Juego"
-        // qué carta se pretende jugar
-        val (cartas, manoActualizada) = mano.tomarCartasSeleccionadas()
-        val cartaSeleccionada = cartas[0]
-        var mesaAct: Mesa = this.mesa
-        var manoAct: Mano = this.mano
-        // ¿puede jugarse? - depende del tipo
-        when (cartaSeleccionada.tipo) {
-            CartaTipo.ORGANO ->
-                if (!existeOrgano(color = cartaSeleccionada.color)) {
-                    mesaAct = addOrgano(cartaJugada = cartaSeleccionada)
-                    manoAct = manoActualizada
-                } else {
-                    // lanzar mensaje (snackBar)
-                }
-
-            CartaTipo.VIRUS ->
-                if (existeOrgano(color = cartaSeleccionada.color)) {
-                    mesaAct = addVirus(cartaJugada = cartaSeleccionada)
-                    manoAct = manoActualizada
-                } else {
-                    // lanzar mensaje (snackBar)
-                }
-
-            CartaTipo.MEDICINA ->
-                if (existeOrgano(color = cartaSeleccionada.color)) {
-                    mesaAct = addMedicina(cartaJugada = cartaSeleccionada)
-                    manoAct = manoActualizada
-                } else {
-                    // lanzar mensaje (snackBar)
-                }
-
-            else -> {
-                println("Accion de carta no implementada")
-            }
-        }
-        return this.copy(
-            mesa = mesaAct,
-            mano = manoAct
         )
     }
 
@@ -101,6 +60,10 @@ data class Jugador(
         val cartaJugada = cartas[0]
 
         return cartaJugada
+    }
+
+    fun esInmune(color: CartaColor, colorPila: CartaColor? = null): Boolean{
+        return mesa.pilas[color]?.size == 3
     }
 
 // ORGANO :Start
