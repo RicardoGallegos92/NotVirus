@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.Juego
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -11,10 +12,12 @@ import kotlinx.coroutines.launch
 
 data class JugarUiState(
     // Tablero
+    val isLoading: Boolean = false,
+    val errorMsg: String? = null,
     val isStarted: Boolean = false,
     val isPaused: Boolean = false,
     val isOver: Boolean = false,
-    val juego: Juego,
+    val juego: Juego = Juego(),
 
     // Mano
     val cantCartasSelected: Int = 0,
@@ -25,17 +28,45 @@ data class JugarUiState(
 class JugarViewModel(
 //    private val partidaGuardada: JugarUiState? = null,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(value = JugarUiState(juego = Juego()))
+    private val _uiState = MutableStateFlow(value = JugarUiState())
     val uiState: StateFlow<JugarUiState> = _uiState
+
+    init {
+        startJuego()
+    }
 
     fun startJuego() {
         viewModelScope.launch {
             _uiState.update {
-                val nuevoJuego = it.juego.empezarJuego() // Devuelve un nuevo Juego
                 it.copy(
-                    juego = nuevoJuego,
-                    isStarted = true
+                    isLoading = true,
                 )
+            }
+            try {
+                val nuevoJuego = Juego()
+                val nuevaPartida = nuevoJuego.empezarJuego() // Devuelve un nuevo Juego
+                delay(1000) // <-- dar ilusion de carga
+                _uiState.update {
+                    it.copy(
+                        juego = nuevaPartida,
+                        isLoading = false,
+                        isStarted = true,
+
+                        isPaused = false,
+                        isOver = false,
+                        cantCartasSelected = 0,
+                        activeBtnPlayCard = false,
+                        activeBtnDiscardCards = false
+                    )
+                }
+            } catch (e: Exception){
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isStarted = false,
+                        errorMsg = e.message,
+                    )
+                }
             }
         }
     }
@@ -66,10 +97,13 @@ class JugarViewModel(
             _uiState.update {
                 var isOver = false
                 var juegoAct = it.juego.jugarCarta()
-                if (it.juego.hayGanador().first) {
+                val (hayGanador, jugadorGanador) = juegoAct.hayGanador()
+                if (hayGanador) {
                     // animacion del ganador se maneja en la pantalla
                     isOver = true
-                    // it.juego.jugadorActivo -> Ganador !!
+                    juegoAct = juegoAct.copy(
+                        jugadorGanadorID = jugadorGanador!!.id
+                    )
                 } else {
                     juegoAct = juegoAct.llenarBaraja()
                 }

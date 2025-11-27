@@ -7,4 +7,18 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    // RGB = 184,189,24
+    <color name="virus_verde_claro">#FFB8BD18</color>
+    // RGB = 149,171,1
+    <color name="virus_verde_oscuro">#FF95AB01</color>
+
+    <color name="progreso">#FFFFFFFF</color>
+    <color name="remarcar_texto">#80000000</color>
+
+    <color name="mesa">#FF35654D</color>
+    <color name="zona_cpu">#FF034694</color>
+    <color name="zona_central">#00000000</color>
+    <color name="zona_jugador">#FF808000</color>
+    <color name="sample">#80000000</color>
 </resources>

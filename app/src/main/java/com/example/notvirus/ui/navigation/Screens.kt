@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 object Login
 
 @Serializable
+object Usuario
+
+@Serializable
 object Jugar
 
 @Serializable
