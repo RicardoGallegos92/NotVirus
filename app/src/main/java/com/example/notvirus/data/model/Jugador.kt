@@ -22,9 +22,10 @@ data class Jugador(
         // Metodo para "descartar cartas" y devolver el Jugador con la mano actualizada
         println("Jugador.descartarCartas()")
         // jugador separa las cartas a descartar y mantiene en mano las NO seleccionadas
-        val (cartasSeleccionadas, manoActualizada) = mano.tomarCartasSeleccionadas()
-        println("cartasSeleccionadas.size: ${cartasSeleccionadas.size}")
-        println("manoActualizada.size: ${manoActualizada.cartas.size}")
+        val cartasSeleccionadas = mano.tomarCartasSeleccionadas()
+        val manoActualizada = mano.quitarCartasSeleccionadas()
+//        println("cartasSeleccionadas.size: ${cartasSeleccionadas.size}")
+//        println("manoActualizada.size: ${manoActualizada.cartas.size}")
         val jugadorActualizado = this.copy(
             mano = manoActualizada
         )
@@ -37,7 +38,7 @@ data class Jugador(
 
     fun marcarCartaEnMano(carta: Carta): Jugador {
         println("Jugador.marcarCartaEnMano()")
-        val manoAct = mano.selectCarta(carta)
+        val manoAct = mano.seleccionarCarta(carta)
         return this.copy(
             mano = manoAct
         )
@@ -52,18 +53,19 @@ data class Jugador(
         return this.copy(
             mesa = mesaActualizada
         )
+
     }
 
     fun entregarCartaJugada(): Carta {
         println("Jugador.entregarCartaJugada()")
-        val (cartas, _) = mano.tomarCartasSeleccionadas()
+        val cartas = mano.tomarCartasSeleccionadas()
         val cartaJugada = cartas[0]
 
         return cartaJugada
     }
 
     fun esInmune(color: CartaColor, colorPila: CartaColor? = null): Boolean{
-        return mesa.pilas[color]?.size == 3
+        return mesa.pilas[color]?.any { it.esInmune } == true
     }
 
 // ORGANO :Start

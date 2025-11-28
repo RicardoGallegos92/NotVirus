@@ -63,10 +63,23 @@ data class Juego(
             }
         }
 
-        val jugadorProximoTurno = pasarTurno()
+        val cartaJugada = cartaFueJugada(turno.getJugadorByID(jugadorActivoID!!).mano)
+//      val jugadorProximoTurno = if (cartaJugada){
+//      false fuerza que no haya cambio de turno hasta que haya una IA
+        val jugadorProximoTurno = if (false){
+            pasarTurno() // debe ocurrir -> solo si la jugada es exitosa
+        }else{
+            jugadorActivoID
+        }
+
         return turno.copy(
-            jugadorActivoID = jugadorActivoID
+            jugadorActivoID = jugadorProximoTurno,
         )
+    }
+
+    fun cartaFueJugada(mano: Mano):Boolean{
+        val manoPrevia = this.getJugadorByID(jugadorActivoID!!).mano
+        return mano == manoPrevia
     }
 
     fun hayGanador(): Pair<Boolean, String?> {
@@ -87,20 +100,21 @@ data class Juego(
     fun jugarCarta(): Juego {
         println("Juego.jugarCarta()")
         val cartaJugada: Carta = tomarCartaJugada()
-        // distinguir entre TRATAMIENTO y otras
+        // distinguir entre CartaTipo
+        var juegoActualizado = this.copy()
         when (cartaJugada.tipo) {
             CartaTipo.TRATAMIENTO -> {
-                // activar Efecto
+                // activar Efecto del TRATAMIENTO
 
                 // quitar 'Carta' de la 'Mano' y enviar 'Carta' a 'PilaDescarte'
-                return descartarDesdeMano()
+                juegoActualizado = descartarDesdeMano()
             }
 
             CartaTipo.ORGANO -> {
                 val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID!!)
                 if (!jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
                     && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
-                    return pasarCartaToMesa(
+                    juegoActualizado = pasarCartaToMesa(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = jugadorObjetivoDeTurno
                     )
@@ -113,7 +127,7 @@ data class Juego(
                 val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID!!)
                 if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
                     && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
-                    return pasarCartaToMesa(
+                    juegoActualizado = pasarCartaToMesa(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = jugadorObjetivoDeTurno // (provisorio) -> se debe agregar funcion para seleccionar objetivo
                     )
@@ -127,7 +141,7 @@ data class Juego(
                 val jugadorObjetivoDeTurno = getJugadorByID(pasarTurno())
                 if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
                     && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
-                    return pasarCartaToMesa(
+                    juegoActualizado = pasarCartaToMesa(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = getJugadorByID(pasarTurno())
                     )
@@ -136,12 +150,10 @@ data class Juego(
                     println("Mensaje SnackBar -> no se puede jugar esta carta")
                 }
             }
-
-            else -> {}
+            else -> { println("Mensaje SnackBar -> Carta Jugada noo posee un TIPO") }
         }
-        return this.copy(
-            // esto no debería ocurrir -> PlaceHolder
-        )
+
+        return juegoActualizado
     }
 
     fun pasarCartaToMesa(cartaJugada: Carta, jugadorObjetivo: Jugador): Juego {

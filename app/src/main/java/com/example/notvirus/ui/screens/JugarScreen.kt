@@ -221,7 +221,7 @@ fun ZonaCentral(
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         // baraja
-        PilaDeCartas(
+        PilaDeCartasItem(
             texto = "Baraja",
             cantidadCartas = juego.baraja.pila.size,
         )
@@ -230,7 +230,7 @@ fun ZonaCentral(
         Button(onClick = { juegoViewModel.pauseJuego() })
         { Text(text = "Pausar") }
         // pila descarte
-        PilaDeCartas(
+        PilaDeCartasItem(
             texto = "Descarte",
             cantidadCartas = juego.pilaDescarte.pila.size,
         )
@@ -279,7 +279,7 @@ fun ZonaJugadorAbajo(
 }
 
 @Composable
-fun PilaDeCartas(
+fun PilaDeCartasItem(
     texto: String = "Nombre Pila",
     cantidadCartas: Int = 30,
 ) {

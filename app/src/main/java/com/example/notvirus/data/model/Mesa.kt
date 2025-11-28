@@ -8,6 +8,13 @@ data class Mesa(
         CartaColor.VERDE to mutableListOf(),
         CartaColor.MULTICOLOR to mutableListOf(),
     ),
+    val pilasB: List<PilaDeCartas> = listOf(
+        PilaDeCartas(CartaColor.AMARILLO),
+        PilaDeCartas(CartaColor.AZUL),
+        PilaDeCartas(CartaColor.ROJO),
+        PilaDeCartas(CartaColor.VERDE),
+        PilaDeCartas(CartaColor.MULTICOLOR),
+    ),
     val turnosParaGanar: Int = 4, // int = [ 0, 4 ]
 ) {
     // Devuelve nueva instancia de Mesa
@@ -76,6 +83,14 @@ data class Mesa(
         )
     }
 
+    fun vaciarPila(cartasParaQuitar: List<Carta>, colorPila: CartaColor): Mesa {
+        val pilasCopia = pilas.toMutableMap()
+        pilasCopia[colorPila]!!.removeAll(cartasParaQuitar)
+        return this.copy(
+            pilas = pilasCopia,
+            turnosParaGanar = calcularTurnosParaGanar(pilasCopia = pilasCopia)
+        )
+    }
     fun calcularTurnosParaGanar(pilasCopia:Map<CartaColor, MutableList<Carta>>): Int {
         // Lógica para calcular el nuevo valor
         var turnosParaGanar = 4
