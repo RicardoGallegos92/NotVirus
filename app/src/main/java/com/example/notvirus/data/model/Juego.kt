@@ -5,8 +5,8 @@ data class Juego(
     val baraja: Baraja,
     val pilaDescarte: PilaDescarte,
 
-    val jugadorActivoID: String?,
-    val jugadorGanadorID: String?,
+    val jugadorActivoID: String,
+    val jugadorGanadorID: String,
 
     val maxCartasEnMano: Int,
 ) {
@@ -15,15 +15,17 @@ data class Juego(
         baraja = Baraja(),
         pilaDescarte = PilaDescarte(),
 
-        jugadorActivoID = null,
-        jugadorGanadorID = null,
+        jugadorActivoID = "",
+        jugadorGanadorID = "",
 
         maxCartasEnMano = 3,
     )
 
-    // empezarJuego: Devuelve un nuevo Juego con manos repartidas y primer jugador activo
+    /**
+     * @return Devuelve un nuevo Juego con manos repartidas y primer jugador activo
+     */
     fun empezarJuego(): Juego {
-        println("Juego.empezarJuego()")
+//        println("Juego.empezarJuego()")
         var barajaActual = baraja // Mantén un registro de la baraja actualizada
         val jugadoresConCartas = jugadores.map { jugador ->
             val (cartasParaJugador, nuevaBaraja) = barajaActual.pedirCartas(maxCartasEnMano) // <-- solicitar cartas para la mano
@@ -40,68 +42,120 @@ data class Juego(
         )
     }
 
-    fun usarTurno(
-        jugarCarta: Boolean = false,
-        descartarCarta: Boolean = false,
-    ): Juego {
-        var turno = this.copy()
-        when{
-            descartarCarta -> {
-                turno = turno.descartarDesdeMano()
-                turno = turno.llenarBaraja()
-            }
-            jugarCarta -> {
-                turno = turno.jugarCarta()
-                val (hayGanador, jugadorGanadorID) = turno.hayGanador()
-                turno = if (hayGanador){
-                    turno.copy(
-                        jugadorGanadorID = jugadorGanadorID
-                    )
-                }else{
-                    turno.llenarBaraja()
+    /** Ciclo lógico del turno
+     * @return Juego con el turno finalizado
+     */
+    fun usarTurno(jugarCarta: Boolean = false, descartarCarta: Boolean = false): Juego {
+        try {
+            var turno = this.copy()
+            when {
+                descartarCarta -> {
+                    // Descartar 'n' cartas
+                    turno = turno.descartarDesdeMano()
+                    println("CARTAS DESCARTADAS: FINISHED")
+                }
+
+                jugarCarta -> {
+                    // val jugadorObjetivo = seleccionarJugadorObjetivo()
+                    // Jugar 1 carta
+                    turno = turno.jugarCarta()
+
+                    // PilaDeColor -> ( inmunizarla || descartarla )
+                    turno = turno.revisarEstadosMesa()
+
+                    turno = turno.hayGanador()
+                    println("CARTA JUGADA: FINISHED")
                 }
             }
-        }
+            // verificamos la baraja antes de robar carta
+            turno = turno.llenarBaraja(
+                maxCartasEnMano - getJugadorByID(jugadorActivoID).mano.cartas.size
+            )
+            // Robar para completar la mano
+            turno = turno.llenarManoJugadorActivo()
 
-        val cartaJugada = cartaFueJugada(turno.getJugadorByID(jugadorActivoID!!).mano)
-//      val jugadorProximoTurno = if (cartaJugada){
+            // Fin del Turno
+
+            /// -> Cambio de Jugador
+//            val cartaSeJugo = cartaFueJugada(turno.getJugadorByID(jugadorActivoID).mano)
+//            val jugadorProximoTurno = if (cartaSeJugo){
 //      false fuerza que no haya cambio de turno hasta que haya una IA
-        val jugadorProximoTurno = if (false){
-            pasarTurno() // debe ocurrir -> solo si la jugada es exitosa
-        }else{
-            jugadorActivoID
+            val jugadorProximoTurno = if (false) {
+                pasarTurno() // debe ocurrir -> solo si la jugada es exitosa
+            } else {
+                jugadorActivoID
+            }
+
+            return turno.copy(
+                jugadorActivoID = jugadorProximoTurno,
+            )
+        } catch (e: Exception) {
+            println("HUBO ERROR")
+            println(e.message)
+            return this.copy()
+        }
+    }
+
+    fun revisarEstadosMesa(jugadorObjetivo: Jugador? = null):Juego{
+        var cartasParaDescartar : List<Carta> = emptyList()
+        val jugadoresAct = this.jugadores.map{jugador ->
+            val pilasActuales = jugador.mesa.pilas.map{ pila: PilaDeColor ->
+                when (pila.estado){
+                    PilaEstado.DESCARTAR -> {
+                        cartasParaDescartar = pila.tomarCartasTodo()
+                        pila.quitarCartasTodo()
+                    }
+                    PilaEstado.DEJAR_SOLO_ORGANO -> {
+                        cartasParaDescartar = pila.tomarCartasExcepto(CartaTipo.ORGANO)
+                        pila.quitarCartasExcepto(CartaTipo.ORGANO)
+                    }
+                    PilaEstado.INMUNIZAR -> {
+                        pila.inmunizar()
+                    }
+                    else -> { pila }
+                    /*
+                    /* hacen nada */
+                    PilaEstado.INMUNE -> {}
+                    PilaEstado.CON_ORGANO -> {}
+                    PilaEstado.VACIO -> {}
+                    */
+                }
+            }
+
+            val mesaActual = jugador.mesa.copy(
+                pilas = pilasActuales
+            )
+
+            jugador.copy(
+                mesa = mesaActual
+            )
+        }
+        var pilaDescarteAct = this.pilaDescarte.copy()
+        if (cartasParaDescartar.isNotEmpty()){
+            pilaDescarteAct = this.pilaDescarte.agregarCartas(cartasParaDescartar)
+
         }
 
-        return turno.copy(
-            jugadorActivoID = jugadorProximoTurno,
+        return this.copy(
+            jugadores = jugadoresAct,
+            pilaDescarte = pilaDescarteAct,
         )
     }
 
-    fun cartaFueJugada(mano: Mano):Boolean{
-        val manoPrevia = this.getJugadorByID(jugadorActivoID!!).mano
-        return mano == manoPrevia
-    }
-
-    fun hayGanador(): Pair<Boolean, String?> {
-        println("Juego.hayGanador()")
-        // Lógica para determinar ganador
-        // -> el jugador ganó si el conteo (turnosParaGanar) de su mesa es 0
-        val jugadorGanador = jugadores.filter { jugador: Jugador ->
-            jugador.mesa.turnosParaGanar == 0
-        }
-        return if (jugadorGanador.isEmpty()) {
-            // vacio -> no ganador
-            Pair(false, null)
-        } else {
-            Pair(true, jugadorGanador[0].id)
-        }
-    }
-
-    fun jugarCarta(): Juego {
+    /** toma carta que jugará el 'Jugador-Activo'
+     * -> pasar carta al jugadorObjetivo -> jugador lo manda a su mesa
+     * -> actualizar estado de la pila en la mesa
+     *  @return Juego con la carta aplicada
+     */
+    fun jugarCarta(jugadorObjetivo: Jugador? = null): Juego {
         println("Juego.jugarCarta()")
+        // Juego toma la carta jugada
         val cartaJugada: Carta = tomarCartaJugada()
+        // retiramos la carta de la mano del 'Jugado-Activo'
+        var juegoActualizado = quitarCartaJugada()
+
+
         // distinguir entre CartaTipo
-        var juegoActualizado = this.copy()
         when (cartaJugada.tipo) {
             CartaTipo.TRATAMIENTO -> {
                 // activar Efecto del TRATAMIENTO
@@ -111,168 +165,206 @@ data class Juego(
             }
 
             CartaTipo.ORGANO -> {
-                val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID!!)
+                val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID) /// mesa propia
+
                 if (!jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
-                    && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
-                    juegoActualizado = pasarCartaToMesa(
+                    && !jugadorObjetivoDeTurno.esPilaInmune(color = cartaJugada.color)
+                ) {
+                    juegoActualizado = juegoActualizado.pasarCartaToMesa(
                         cartaJugada = cartaJugada,
-                        jugadorObjetivo = jugadorObjetivoDeTurno
+                        jugadorObjetivo = jugadorObjetivoDeTurno,
+                        colorObjetivo = cartaJugada.color
                     )
                 } else {
-                    println("Mensaje SnackBar -> no se puede jugar esta carta")
+                    throw JugadaInvalida()
                 }
             }
 
             CartaTipo.MEDICINA -> {
-                val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID!!)
+                val jugadorObjetivoDeTurno = getJugadorByID(jugadorActivoID) // mesa propia
+
                 if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
-                    && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
+                    && !jugadorObjetivoDeTurno.esPilaInmune(color = cartaJugada.color)
+                ) {
                     juegoActualizado = pasarCartaToMesa(
                         cartaJugada = cartaJugada,
-                        jugadorObjetivo = jugadorObjetivoDeTurno // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                        jugadorObjetivo = jugadorObjetivoDeTurno, // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                        colorObjetivo = cartaJugada.color
                     )
                 } else {
-                    println("Mensaje SnackBar -> no se puede jugar esta carta")
+                    throw JugadaInvalida()
                 }
             }
 
             CartaTipo.VIRUS -> {
                 // (provisorio) -> se debe agregar funcion para seleccionar objetivo
-                val jugadorObjetivoDeTurno = getJugadorByID(pasarTurno())
+                val jugadorObjetivoDeTurno = getJugadorByID(pasarTurno()) // jugador contrario
+
                 if (jugadorObjetivoDeTurno.existeOrgano(color = cartaJugada.color)
-                    && !jugadorObjetivoDeTurno.esInmune(color = cartaJugada.color)) {
+                    && !jugadorObjetivoDeTurno.esPilaInmune(color = cartaJugada.color)
+                ) {
                     juegoActualizado = pasarCartaToMesa(
                         cartaJugada = cartaJugada,
-                        jugadorObjetivo = getJugadorByID(pasarTurno())
+                        jugadorObjetivo = getJugadorByID(pasarTurno()),
+                        colorObjetivo = cartaJugada.color
                     )
-
                 } else {
-                    println("Mensaje SnackBar -> no se puede jugar esta carta")
+                    throw JugadaInvalida()
                 }
             }
-            else -> { println("Mensaje SnackBar -> Carta Jugada noo posee un TIPO") }
-        }
 
-        return juegoActualizado
-    }
-
-    fun pasarCartaToMesa(cartaJugada: Carta, jugadorObjetivo: Jugador): Juego {
-        println("Juego.pasarCartaToMesa()")
-        // pasarCartaToMesa: Devuelve un 'Juego-Actualizado':
-        // por cohesión esto debería recibir la 'cartaJugada' y el 'jugadorObjetivo' y usar el 'jugadorActivo'
-
-        // pasar la 'cartaJugada' a la mesa del 'jugadorObjetivo'
-        val jugadorObjetivoActualizado = jugadorObjetivo.agregaCartaToMesa(cartaJugada)
-        // quitar la 'cartaJugada' de la mano del 'jugadorActivo'
-        var (_, jugadorActivoActualizado) = getJugadorByID(jugadorActivoID!!).descartarCartas()
-        // pedir 'cartaNueva' para la mano del 'jugadorActivo'
-        val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas((maxCartasEnMano - jugadorActivoActualizado.mano.cartas.size))
-        // pasar la 'cartaNueva' al 'jugadorActivo'
-        jugadorActivoActualizado = jugadorActivoActualizado.recibirCartasToMano(nuevasCartasMano)
-
-        var jugadoresActualizados: List<Jugador>
-
-        if (jugadorActivoID != jugadorObjetivo.id) {
-            // actualizar jugadores Activo y Objetivo para la UI
-            jugadoresActualizados = jugadores.map { jugador ->
-                when (jugador.id) {
-                    jugadorActivoID -> jugadorActivoActualizado // Mano Actualizada
-                    jugadorObjetivo.id -> jugadorObjetivoActualizado // Mesa Actualizada
-                    else -> jugador
-                }
-            }
-        } else {
-            jugadorActivoActualizado = jugadorActivoActualizado.copy(
-                mesa = jugadorObjetivoActualizado.mesa
-            )
-            // actualizar jugadores Activo y Objetivo para la UI
-            jugadoresActualizados = jugadores.map { jugador ->
-                when (jugador.id) {
-                    jugadorActivoID -> jugadorActivoActualizado // Mano y Mesa Actualizada
-                    else -> jugador
-                }
+            else -> {
+                println("Mensaje SnackBar -> Carta Jugada no posee un TIPO")
             }
         }
 
-        return this.copy(
-            jugadores = jugadoresActualizados,
-            baraja = barajaActualizada
+
+        // actualizamos el estado de toda la Mesa tras insertar carta
+        return juegoActualizado.copy(
+            jugadores = juegoActualizado.jugadores.map { jugador ->
+                jugador.actualizarEstadoMesa()
+            }
         )
     }
 
-    fun descartarDesdeMano(): Juego {
-        println("Juego.descartarDesdeMano()")
-//        println("jugadorActivo!!.nombre: ${jugadorActivo!!.nombre}")
-//        println("-> mano.size: ${jugadorActivo!!.mano.cartas.size}")
-        // no hace falta lógica extra, las cartas pasan de la mano a la pila
-        val (cartasDescartadas, jugadorActivoActualizado) = getJugadorByID(jugadorActivoID!!).descartarCartas()
-        println("jugadorActivoActualizado: ${jugadorActivoActualizado.nombre} | Cartas Mano: ${jugadorActivoActualizado.mano.cartas.size}")
-        // baraja actualizada y cartas extraidas
-        val (nuevasCartasMano, barajaActualizada) = baraja.pedirCartas(cartasDescartadas.size)
-        // jugador recibe las cartas tomadas de la baraja
-        val jugadorConNuevasCartas = jugadorActivoActualizado.recibirCartasToMano(nuevasCartasMano)
-        println("jugadorConNuevasCartas: ${jugadorConNuevasCartas.nombre} | Cartas Mano: ${jugadorConNuevasCartas.mano.cartas.size}")
-        // actualizar jugadores para la UI
-        val jugadoresActualizados = jugadores.map { jugador ->
-            if (jugador.id == jugadorActivoID) {
-                //println("Jugadores -> actualizado: ${jugadorConNuevasCartas.nombre} | Cartas Mano: ${jugadorConNuevasCartas.mano.cartas.size}")
-                jugadorConNuevasCartas
-            } else {
-                //println("Jugadores -> original: ${jugador.nombre} | Cartas Mano: ${jugador.mano.cartas.size}")
-                jugador
+    /**
+     * @return id del jugador Objetivo
+     */
+    fun seleccionarJugadorObjetivo(): String {
+        // insertar magia
+        // return jugadorSeleccionado.id
+        return getJugadorByID(pasarTurno()).id
+    }
+
+    /**
+     * @param cartaJugada Carta que se pasará a la mesa del jugador
+     * @param jugadorObjetivo Jugador que recibe la Carta
+     * @param colorObjetivo color de la Pila donde se debe agregar la cartaJugada
+     * @return Juego con cartaJugada agregada a Mesa del jugadorObjetivo
+     */
+    fun pasarCartaToMesa(
+        cartaJugada: Carta,
+        jugadorObjetivo: Jugador,
+        colorObjetivo: CartaColor,
+    ): Juego {
+        println("Juego.pasarCartaToMesa()")
+        // pasar la 'cartaJugada' a la mesa del 'jugadorObjetivo'
+        val jugadorObjetivoActualizado = jugadorObjetivo.agregaCartaToMesa(
+            carta = cartaJugada,
+            // falta funcion para seleccionar la 'PilaObjetivo'
+            colorPilaObjetivo = colorObjetivo
+        )
+
+        val jugadoresActualizados = this.jugadores.map { jugador ->
+            when (jugador.id) {
+                jugadorObjetivo.id -> jugadorObjetivoActualizado // Mesa Actualizada
+                else -> jugador
             }
         }
 
         return this.copy(
             jugadores = jugadoresActualizados,
+        )
+    }
+
+    /**
+     * @return jugadorActivo con Mano incompleta y las cartas descartadas ya en la 'Pila de Descarte'
+     */
+    fun descartarDesdeMano(): Juego {
+//        println("Juego.descartarDesdeMano()")
+        // tomamos las cartas seleccionadas del Jugador-Activo
+        val cartasDescartadas = getJugadorByID(jugadorActivoID).entregarCartasSeleccionadas()
+        // quitamos las cartas seleccionadas de la mano del Jugador-Activo
+        val jugadorActivoActualizado = getJugadorByID(jugadorActivoID).quitarCartasSeleccionadas()
+        return this.copy(
+            // actualizamos la lista de jugadores
+            jugadores = this.jugadores.map { jugador ->
+                if (jugador.id == jugadorActivoActualizado.id) {
+                    jugadorActivoActualizado
+                } else {
+                    jugador
+                }
+            },
+            // enviamos las cartas seleccionadas para descartar a la 'Pila de Descarte'
             pilaDescarte = pilaDescarte.agregarCartas(cartasDescartadas),
+        )
+    }
+
+    /**
+     * @return Jugador-Activo con mano llena
+     */
+    fun llenarManoJugadorActivo(): Juego {
+        println("Juego.llenarManoJugadorActivo()")
+        val jugadorManoIncompleta = getJugadorByID(this.jugadorActivoID)
+        val (nuevasCartasToMano, barajaActualizada) = baraja.pedirCartas((maxCartasEnMano - jugadorManoIncompleta.mano.cartas.size))
+
+        val jugadorManoLlena = jugadorManoIncompleta.recibirCartasToMano(nuevasCartasToMano)
+
+        return this.copy(
+            jugadores = this.jugadores.map { jugador ->
+                if (jugador.id == jugadorManoLlena.id) {
+                    jugadorManoLlena
+                } else {
+                    jugador
+                }
+            },
             baraja = barajaActualizada,
         )
     }
 
-    fun marcarCarta(carta: Carta): Juego {
-        println("Juego.marcarCarta()")
-        // cambia el estado "selecciona" de la carta entre "true" y "false"
-        val jugadorActualizado = jugadores[1].marcarCartaEnMano(carta) // cambiar a 'JugadorActivo'
-        val jugadoresActualizados = jugadores.toMutableList()
-        jugadoresActualizados[1] = jugadorActualizado
+    /** toma la carta seleccionada del 'Jugador-Activo'
+     * @return Carta que el 'Jugador-Activo' tiene seleccionada en la Mano
+     */
+    fun tomarCartaJugada(): Carta {
+        println("Juego.tomarCartaJugada()")
+        return getJugadorByID(jugadorActivoID).entregarCartaJugada()
+    }
 
+    /** quita de la mano del 'Jugador-Activo' la carta seleccionada para jugar
+     * @return Juego con el 'Jugador-Activo' sin la carta jugada
+     */
+    fun quitarCartaJugada(): Juego {
+        val jugadorActualizado = getJugadorByID(jugadorActivoID).quitarCartaJugada()
         return this.copy(
-            jugadores = jugadoresActualizados
+            jugadores = this.jugadores.map { jugador ->
+                if (jugador.id == jugadorActualizado.id) {
+                    jugadorActualizado
+                } else {
+                    jugador
+                }
+            }
         )
     }
 
-    fun tomarCartaJugada(): Carta {
-        println("Juego.tomarCartaJugada()")
-        val cartaJugada = getJugadorByID(jugadorActivoID!!).entregarCartaJugada()
-
-        return cartaJugada
-    }
-
-    fun llenarBaraja(): Juego {
-        //println("Juego.llenarBaraja()")
-        if (baraja.pila.size < maxCartasEnMano) {
+    /**
+     * @return Baraja con suficientes cartas para robar
+     */
+    fun llenarBaraja(cartasNecesarias: Int = maxCartasEnMano): Juego {
+        println("Juego.llenarBaraja()")
+        if (baraja.pila.size < cartasNecesarias) {
             val (cartasPila, pilaDescarteActualizada) = pilaDescarte.tomarTodasLasCartas()
-            val cartasPilaMutable = cartasPila.map { carta: Carta ->
+            val cartasParaAgregar = cartasPila.map { carta: Carta ->
                 carta.copy(
                     estaSeleccionada = false,
                     esInmune = false,
                 )
             }
             return this.copy(
-                baraja = baraja.agregarCartas(cartasPilaMutable),
+                baraja = baraja.agregarCartas(cartasParaAgregar).revolver(),
                 pilaDescarte = pilaDescarteActualizada
             )
         } else {
             //println("Juego.llenarBaraja() : else -> return")
-            return this
+            return this.copy()
         }
     }
 
-    // cambiar jugador en turno (escalable)
+    /** cambiar jugador en turno
+     * @return id del nuevo jugador en turno
+     */
     fun pasarTurno(): String {
-        println("Juego.pasarTurno()")
-        if (jugadorActivoID.isNullOrEmpty()) {
+//        println("Juego.pasarTurno()")
+        if (jugadorActivoID.isEmpty()) {
             // jugador inincial por defecto
             return jugadores[1].id // -> el player humano
         } else {
@@ -282,9 +374,51 @@ data class Juego(
     }
 
     fun getJugadorByID(id: String): Jugador {
-        println("Juego.getJugadorByID()")
-        return jugadores.filter { jugador ->
+//        println("Juego.getJugadorByID()")
+        return this.jugadores.filter { jugador ->
             jugador.id == id
         }[0]
+    }
+
+    fun cartaFueJugada(mano: Mano): Boolean {
+        // awa
+        val manoPrevia = this.getJugadorByID(jugadorActivoID).mano
+        return mano == manoPrevia
+    }
+
+    fun marcarCarta(carta: Carta): Juego {
+//        println("Juego.marcarCarta()")
+        // cambia el estado "selecciona" de la carta entre "true" y "false"
+        val jugadorActualizado = getJugadorByID(this.jugadorActivoID).marcarCartaEnMano(carta)
+
+        return this.copy(
+            jugadores = this.jugadores.map { jugador ->
+                if (jugador.id == jugadorActualizado.id) {
+                    jugadorActualizado
+                } else {
+                    jugador
+                }
+            }
+        )
+    }
+
+    /**
+     * Verifica si el jugadorActivo ganó en su turno
+     */
+    fun hayGanador(): Juego {
+        println("Juego.hayGanador()")
+        // Lógica para determinar ganador
+        // -> el jugador ganó si el conteo (turnosParaGanar) de su mesa es 0
+        val jugadorGanador = jugadores.filter { jugador: Jugador ->
+            jugador.mesa.turnosParaGanar == 0
+        }
+
+        return this.copy(
+            jugadorGanadorID = if (jugadorGanador.isNotEmpty()) {
+                jugadorGanador[0].id
+            } else {
+                ""
+            }
+        )
     }
 }

@@ -10,7 +10,8 @@ data class Jugador(
     val id:String = UUID.randomUUID().toString()
 ) {
     fun recibirCartasToMano(nuevasCartas: List<Carta>): Jugador {
-        // Metodo para "recibir cartas" -> "agregar a la mano" y devolver el Jugador con la mano actualizada
+        // Metodo para "recibir cartas"
+        /// -> "agregar a la mano" y devolver el Jugador con la mano actualizada
         println("Jugador.recibirCartasToMano()")
         val manoActualizada = mano.agregarCartas(nuevasCartas = nuevasCartas)
         return this.copy(
@@ -18,24 +19,36 @@ data class Jugador(
         )
     }
 
-    fun descartarCartas(): Pair<List<Carta>, Jugador> {
-        // Metodo para "descartar cartas" y devolver el Jugador con la mano actualizada
-        println("Jugador.descartarCartas()")
-        // jugador separa las cartas a descartar y mantiene en mano las NO seleccionadas
-        val cartasSeleccionadas = mano.tomarCartasSeleccionadas()
-        val manoActualizada = mano.quitarCartasSeleccionadas()
-//        println("cartasSeleccionadas.size: ${cartasSeleccionadas.size}")
-//        println("manoActualizada.size: ${manoActualizada.cartas.size}")
-        val jugadorActualizado = this.copy(
+    /** @return Jugador sin las cartas seleccionadas
+    */
+    fun quitarCartasSeleccionadas():Jugador{
+        println("Jugador.quitarCartasSeleccionadas()")
+        val manoActualizada = this.mano.quitarCartasSeleccionadas()
+        return this.copy(
             mano = manoActualizada
-        )
-        // jugador pasa las cartas para descartar
-        return Pair(
-            cartasSeleccionadas,
-            jugadorActualizado,
         )
     }
 
+    /** quita la carta seleccionada de la Mano del Jugador
+     * @return Jugador con la mano sin la carta Seleccionada
+     */
+    fun quitarCartaJugada():Jugador{
+        val manoActualizada = this.mano.quitarCartasSeleccionadas()
+        return this.copy(
+            mano = manoActualizada
+        )
+    }
+
+    /**
+     * @return Lista con las cartas 'seleccionadas'
+     */
+    fun entregarCartasSeleccionadas():List<Carta>{
+        return this.mano.tomarCartasSeleccionadas()
+    }
+
+    /**
+     * @return Jugador Marca/Desmarca una Carta
+     */
     fun marcarCartaEnMano(carta: Carta): Jugador {
         println("Jugador.marcarCartaEnMano()")
         val manoAct = mano.seleccionarCarta(carta)
@@ -44,16 +57,16 @@ data class Jugador(
         )
     }
 
-    fun agregaCartaToMesa(carta:Carta): Jugador{
+    /**
+     * @param carta carta que recibe el jugador para agregar a su Mesa
+     * @param colorPilaObjetivo color de la Pila donde se ubicará la carta
+     * @return jugador con la carta agregada a la Mesa
+     */
+    fun agregaCartaToMesa(carta:Carta, colorPilaObjetivo: CartaColor): Jugador{
         println("Jugador.agregaCartaToMesa()")
-        // jugador recibe la carta y la pasa a su mesa (pila indicada)
-        // solo si tiene menos de 3 cartas
-
-        val mesaActualizada = mesa.agregarToPila(carta)
         return this.copy(
-            mesa = mesaActualizada
+            mesa = this.mesa.agregarCarta(carta, colorPilaObjetivo)
         )
-
     }
 
     fun entregarCartaJugada(): Carta {
@@ -64,73 +77,27 @@ data class Jugador(
         return cartaJugada
     }
 
-    fun esInmune(color: CartaColor, colorPila: CartaColor? = null): Boolean{
-        return mesa.pilas[color]?.any { it.esInmune } == true
-    }
-
-// ORGANO :Start
-    fun existeOrgano(color: CartaColor): Boolean {
-        // verifica si la pila ya contiene un órgano
-        return mesa.pilas[color]!!.any { it.tipo == CartaTipo.ORGANO }
-    }
-
-    fun addOrgano(cartaJugada: Carta): Mesa {
-        val mesaActualizada = if (!existeOrgano(cartaJugada.color)) {
-            mesa.agregarToPila(cartaJugada)
-        } else {
-            mesa
-        }
-        return mesaActualizada
-    }
-
-// ORGANO :End
-// MEDICINA :Start
-    fun existeMedicina(color: CartaColor, colorPila: CartaColor? = null): Boolean {
-        return if (colorPila != null) {
-            mesa.pilas[colorPila]!!.any { it.tipo == CartaTipo.MEDICINA }
-        } else {
-            mesa.pilas[color]!!.any { it.tipo == CartaTipo.MEDICINA }
-        }
-    }
-
-    fun addMedicina(cartaJugada: Carta, colorPila: CartaColor? = null): Mesa {
-        val mesaActualizada = if (existeOrgano(cartaJugada.color)) {
-            mesa.agregarToPila(cartaJugada, colorPila)
-        } else {
-            mesa
-        }
-        return mesaActualizada
-    }
-
-// MEDICINA :End
-// VIRUS:Start
-    fun existeVirus(color: CartaColor, colorPila: CartaColor? = null): Boolean {
-        return if (colorPila != null) {
-            mesa.pilas[colorPila]!!.any { it.tipo == CartaTipo.VIRUS }
-        } else {
-            mesa.pilas[color]!!.any { it.tipo == CartaTipo.VIRUS }
-        }
-    }
-
-    fun addVirus(cartaJugada: Carta): Mesa {
-        val mesaActualizada = if (existeOrgano(cartaJugada.color)) {
-            mesa.agregarToPila(cartaJugada)
-        } else {
-            mesa
-        }
-        return mesaActualizada
-    }
-
-// VIRUS:End
-/*
-// TRATAMIENTOS:Start
-    fun playTratamiento(cartaJugada: Carta): Jugador {
-        // tratamiento activa su efecto particular
-        // va directo a la pila de descarte
+    /** actualiza el estado de todas las pilas de la Mesa
+     * @return Jugador con su Mesa actualizada
+     */
+    fun actualizarEstadoMesa():Jugador{
         return this.copy(
-
+            mesa = this.mesa.actualizarEstadoPilas()
         )
     }
-// TRATAMIENTOS:End
-*/
+
+    fun inmunizarPilaEnMesa(color: CartaColor): Jugador{
+        return this.copy(
+            mesa = this.mesa.inmunizarPila(color)
+        )
+    }
+
+    fun esPilaInmune(color: CartaColor): Boolean{
+        return ( this.mesa.getPilaDeColor(color).estado == PilaEstado.INMUNE )
+    }
+
+    fun existeOrgano(color: CartaColor): Boolean {
+    // verifica si la pila ya contiene un órgano
+        return ( this.mesa.getPilaDeColor(color).estado == PilaEstado.CON_ORGANO)
+    }
 }

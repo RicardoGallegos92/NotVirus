@@ -1,100 +1,93 @@
 package com.example.notvirus.data.model
 
+import kotlin.collections.filter
+
 data class Mesa(
-    val pilas: Map<CartaColor, MutableList<Carta>> = mapOf(
-        CartaColor.AMARILLO to mutableListOf(),
-        CartaColor.AZUL to mutableListOf(),
-        CartaColor.ROJO to mutableListOf(),
-        CartaColor.VERDE to mutableListOf(),
-        CartaColor.MULTICOLOR to mutableListOf(),
-    ),
-    val pilasB: List<PilaDeCartas> = listOf(
-        PilaDeCartas(CartaColor.AMARILLO),
-        PilaDeCartas(CartaColor.AZUL),
-        PilaDeCartas(CartaColor.ROJO),
-        PilaDeCartas(CartaColor.VERDE),
-        PilaDeCartas(CartaColor.MULTICOLOR),
+    val pilas: List<PilaDeColor> = listOf(
+        PilaDeColor(CartaColor.AMARILLO),
+        PilaDeColor(CartaColor.AZUL),
+        PilaDeColor(CartaColor.ROJO),
+        PilaDeColor(CartaColor.VERDE),
+        PilaDeColor(CartaColor.MULTICOLOR),
     ),
     val turnosParaGanar: Int = 4, // int = [ 0, 4 ]
+    val maxCartasEnPila: Int = 3,
 ) {
-    // Devuelve nueva instancia de Mesa
-    fun agregarToPila(nuevaCarta: Carta, colorPila: CartaColor? = null): Mesa {
-        val pilasCopia = pilas.toMutableMap()
-        // pregunta enfocada en el uso de MULTICOLOR
-        // me indican una pila donde colocar la carta
-        val color = colorPila ?: nuevaCarta.color
+    // Devuelve una copia actualizada de Mesa
+    fun agregarCarta(nuevaCarta: Carta, colorPilaObjetivo: CartaColor): Mesa {
+        println("Mesa.agregarCarta()")
+        var mesaAct = this.copy(
+            pilas = this.pilas.map { pila: PilaDeColor ->
+                if (pila.color == colorPilaObjetivo) {
+                    pila.agregarCarta(nuevaCarta)
+                } else {
+                    pila
+                }
+            },
+        )
+        mesaAct = mesaAct.actualizarEstadoPilas()
 
-        if(pilasCopia[color]?.size == 3){
-            return this.copy()
-        }
+        return mesaAct
+    }
 
-        pilasCopia[color]?.add(nuevaCarta)
-        // tiene la pila 3 cartas
-        if(pilasCopia[color]?.size == 3){
-            pilasCopia[color] = revisarPila(pilasCopia[color]!!)
-        }
-
+    /**
+     * @param color color de la pila que se debe inmunizar
+     * @return Mesa con la pila indicada Inmunizada
+     */
+    fun inmunizarPila( color: CartaColor ): Mesa {
         return this.copy(
-            pilas = pilasCopia,
-            turnosParaGanar = calcularTurnosParaGanar(pilasCopia = pilasCopia)
-        )
-    }
-
-    fun revisarPila(pila: MutableList<Carta>):MutableList<Carta>{
-        var pilaRevisada : MutableList<Carta> = mutableListOf()
-        val virus = pila.filter{
-            it.tipo == CartaTipo.VIRUS
-        }
-        val medicinas = pila.filter{
-            it.tipo == CartaTipo.MEDICINA
-        }
-
-        if(virus.size == 2){
-            pilaRevisada = pila.filter{
-                it.tipo == CartaTipo.ORGANO
-            }.toMutableList()
-            // aquí hay que ver porque los virus se tienen que ir a descarte
-        }else if(medicinas.size == 2){
-            pilaRevisada = inmunizarPila(pila)
-        }
-        return pilaRevisada
-    }
-
-    fun inmunizarPila(pila: MutableList<Carta>):MutableList<Carta>{
-        val cartaInmune = pila.last().copy(
-            esInmune = true
-        )
-        val pilaInmunizada = pila.map{ carta:Carta ->
-            if( carta.id == cartaInmune.id){
-                cartaInmune
-            }else{
-                carta
+            pilas = this.pilas.map{ pila: PilaDeColor ->
+                if (pila.color == color){
+                    pila.inmunizar()
+                }else{
+                    pila
+                }
             }
-        }.toMutableList()
-        return pilaInmunizada
-    }
-
-    fun quitarDePila(cartasParaQuitar: List<Carta>, colorPila: CartaColor): Mesa {
-        val pilasCopia = pilas.toMutableMap()
-        pilasCopia[colorPila]!!.removeAll(cartasParaQuitar)
-        return this.copy(
-            pilas = pilasCopia,
-            turnosParaGanar = calcularTurnosParaGanar(pilasCopia = pilasCopia)
         )
     }
 
-    fun vaciarPila(cartasParaQuitar: List<Carta>, colorPila: CartaColor): Mesa {
-        val pilasCopia = pilas.toMutableMap()
-        pilasCopia[colorPila]!!.removeAll(cartasParaQuitar)
+    fun tomarCartasDePila(colorPila: CartaColor): List<Carta> {
+        var pilaAct = this.getPilaDeColor(colorPila)
+        var cartasTomadas = when(pilaAct.estado){
+            PilaEstado.DEJAR_SOLO_ORGANO -> { pilaAct.tomarCartasExcepto(CartaTipo.ORGANO) }
+            PilaEstado.DESCARTAR -> { pilaAct.tomarCartasTodo() }
+            else -> { emptyList() }
+        }
+        return cartasTomadas
+    }
+
+    fun getPilaDeColor(color: CartaColor): PilaDeColor{
+        return this.pilas.filter { pila: PilaDeColor -> pila.color == color }[0]
+    }
+
+    fun vaciarPila(colorPila: CartaColor): Mesa {
+        var mesaAct = this.copy(
+            pilas = this.pilas.map { pila: PilaDeColor ->
+                if (pila.color == colorPila) {
+                    pila.vaciarPila()
+                } else {
+                    pila
+                }
+            }
+        )
+
+        return mesaAct.actualizarEstadoPilas()
+    }
+
+    fun actualizarEstadoPilas():Mesa{
         return this.copy(
-            pilas = pilasCopia,
-            turnosParaGanar = calcularTurnosParaGanar(pilasCopia = pilasCopia)
+            pilas = this.pilas.map { pila: PilaDeColor ->
+                pila.actualizarEstado()
+            }
+            ,
+            turnosParaGanar = this.calcularTurnosParaGanar()
         )
     }
-    fun calcularTurnosParaGanar(pilasCopia:Map<CartaColor, MutableList<Carta>>): Int {
+
+    fun calcularTurnosParaGanar(): Int {
         // Lógica para calcular el nuevo valor
         var turnosParaGanar = 4
-        pilasCopia.forEach { (color, pila) ->
+        this.pilas.forEach { (_, pila, _) ->
             pila.forEach { carta: Carta ->
                 turnosParaGanar += when (carta.tipo) {
                     CartaTipo.ORGANO -> { -1 }

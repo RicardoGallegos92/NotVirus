@@ -10,13 +10,18 @@ data class Mano(
         )
     }
 
-    // Devuelve las 'Cartas-Seleccionadas'
+    /** @return Devuelve las Cartas 'Seleccionadas'
+     *
+     */
     fun tomarCartasSeleccionadas(): List<Carta> {
         return this.cartas.filter { it.estaSeleccionada }
     }
 
-    // Devuelve una nueva Mano sin las cartas seleccionadas
+    /**
+     * @return Devuelve la Mano sin las cartas seleccionadas
+    */
     fun quitarCartasSeleccionadas(): Mano {
+        println("Mano.quitarCartasSeleccionadas()")
         val nuevaMano = this.cartas.filter { !it.estaSeleccionada }
         return this.copy(
             cartas = nuevaMano

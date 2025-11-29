@@ -48,7 +48,7 @@ fun MesaItem(
             horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            mesa.pilas.forEach { (_, pila) ->
+            mesa.pilas.forEach { (_, pila, _) ->
                     Column(
                         modifier = Modifier
                             .wrapContentSize(),

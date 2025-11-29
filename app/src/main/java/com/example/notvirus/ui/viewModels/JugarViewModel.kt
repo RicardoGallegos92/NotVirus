@@ -36,6 +36,7 @@ class JugarViewModel(
         startJuego()
     }
 
+    // USUARIO
     fun startJuego() {
         viewModelScope.launch {
             _uiState.update {
@@ -93,30 +94,16 @@ class JugarViewModel(
         }
     }
 
+    // TURNO
     fun jugarCarta() {
         viewModelScope.launch {
             _uiState.update {
-                /*
-                var juegoAct = it.juego.jugarCarta()
-                val (hayGanador, jugadorGanadorID) = juegoAct.hayGanador()
-                if (hayGanador) {
-                    // animacion del ganador se maneja en la pantalla
-                    isOver = true
-                    juegoAct = juegoAct.copy(
-                        jugadorGanadorID = jugadorGanadorID!!
-                    )
-                } else {
-                    juegoAct = juegoAct.llenarBaraja()
-                }
-                */
-                //
                 val juegoActualizado = async { it.juego.usarTurno(jugarCarta = true) }.await()
-                val isOver = !juegoActualizado.jugadorGanadorID.isNullOrEmpty()
+                val isOver = juegoActualizado.jugadorGanadorID.isNotEmpty()
                 it.copy(
                     juego = juegoActualizado,
                     isOver = isOver,
                 )
-                //
             }
         }
         countCartasSelected()
@@ -125,22 +112,24 @@ class JugarViewModel(
     fun descartarCartas() {
         println("JugarVM.descartarCartas()")
         viewModelScope.launch {
-            //var juegoAct = async { _uiState.value.juego.descartarDesdeMano() }.await()
             _uiState.update {
                 var juegoAct = async { it.juego.usarTurno(descartarCarta = true) }.await()
-                it.copy(juego = juegoAct)
+                it.copy(
+                    juego = juegoAct,
+                )
             }
         }
         countCartasSelected()
     }
 
     // MANO
-
     fun clickedCard(carta: Carta) {
         viewModelScope.launch {
             _uiState.update {
                 val nuevoJuego = it.juego.marcarCarta(carta) // devuelve un nuevo Juego
-                it.copy(juego = nuevoJuego)
+                it.copy(
+                    juego = nuevoJuego
+                )
             }
         }
         countCartasSelected()
@@ -149,9 +138,6 @@ class JugarViewModel(
     fun countCartasSelected() {
         // println("JugarVM.countCartasSelected()")
         var conteo = 0
-//        println("Cant. Jugadores: ${_uiState.value.juego.jugadores.size}")
-//        println("Cartas en Mano ${_uiState.value.juego.jugadores[1].nombre}: ${_uiState.value.juego.jugadores[1].mano.cartas.size}")
-//        val cartasEnMano = _uiState.value.juego.maxCartasEnMano
         val mano = _uiState.value.juego.jugadores[1].mano.cartas
 
         for (carta in mano) {

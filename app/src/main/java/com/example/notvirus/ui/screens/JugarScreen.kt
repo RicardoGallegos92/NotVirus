@@ -95,7 +95,7 @@ fun JugarScreen(
                     if (isOver) {
                         MyColumn(
                             textos = listOf(
-                                "Ganador: ${juego.getJugadorByID(juego.jugadorActivoID!!).nombre}",
+                                "Ganador: ${juego.getJugadorByID(juego.jugadorActivoID).nombre}",
                                 stringResource(R.string.juego_ganador),
                             )
                         )
@@ -220,7 +220,7 @@ fun ZonaCentral(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        // baraja
+        // Baraja
         PilaDeCartasItem(
             texto = "Baraja",
             cantidadCartas = juego.baraja.pila.size,
@@ -229,7 +229,7 @@ fun ZonaCentral(
         // boton de Pausa
         Button(onClick = { juegoViewModel.pauseJuego() })
         { Text(text = "Pausar") }
-        // pila descarte
+        // Pila descarte
         PilaDeCartasItem(
             texto = "Descarte",
             cantidadCartas = juego.pilaDescarte.pila.size,

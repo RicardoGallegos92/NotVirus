@@ -178,7 +178,9 @@ data class Baraja(
         )
     }
 
-    // Devuelve una nueva Baraja con las cartas del descarte reensambladas y barajadas
+    /**
+     * @return Devuelve una nueva Baraja con las cartas agregadas
+     */
     fun agregarCartas(cartasParaAgregar: List<Carta>): Baraja {
         var nuevoMazo = (pila + cartasParaAgregar)
         return this.copy(
@@ -186,7 +188,9 @@ data class Baraja(
         )
     }
 
-    // Devuelve una baraja revuelta
+    /**
+     * @return Devuelve una baraja revuelta 10 veces
+     */
     fun revolver(): Baraja {
         var cartas = this.pila.toMutableList()
         repeat(10) { cartas.shuffle() }
