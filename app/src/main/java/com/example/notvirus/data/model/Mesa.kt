@@ -15,7 +15,7 @@ data class Mesa(
 ) {
     // Devuelve una copia actualizada de Mesa
     fun agregarCarta(nuevaCarta: Carta, colorPilaObjetivo: CartaColor): Mesa {
-        println("Mesa.agregarCarta()")
+//        println("Mesa.agregarCarta()")
         var mesaAct = this.copy(
             pilas = this.pilas.map { pila: PilaDeColor ->
                 if (pila.color == colorPilaObjetivo) {
@@ -25,7 +25,7 @@ data class Mesa(
                 }
             },
         )
-        mesaAct = mesaAct.actualizarEstadoPilas()
+        mesaAct = mesaAct.actualizar()
 
         return mesaAct
     }
@@ -34,12 +34,12 @@ data class Mesa(
      * @param color color de la pila que se debe inmunizar
      * @return Mesa con la pila indicada Inmunizada
      */
-    fun inmunizarPila( color: CartaColor ): Mesa {
+    fun inmunizarPila(color: CartaColor): Mesa {
         return this.copy(
-            pilas = this.pilas.map{ pila: PilaDeColor ->
-                if (pila.color == color){
+            pilas = this.pilas.map { pila: PilaDeColor ->
+                if (pila.color == color) {
                     pila.inmunizar()
-                }else{
+                } else {
                     pila
                 }
             }
@@ -48,22 +48,78 @@ data class Mesa(
 
     fun tomarCartasDePila(colorPila: CartaColor): List<Carta> {
         var pilaAct = this.getPilaDeColor(colorPila)
-        var cartasTomadas = when(pilaAct.estado){
-            PilaEstado.DEJAR_SOLO_ORGANO -> { pilaAct.tomarCartasExcepto(CartaTipo.ORGANO) }
-            PilaEstado.DESCARTAR -> { pilaAct.tomarCartasTodo() }
-            else -> { emptyList() }
+
+        var cartasTomadas = when (pilaAct.estado) {
+            PilaEstado.DEJAR_SOLO_ORGANO -> {
+                pilaAct.tomarCartasExcepto(CartaTipo.ORGANO)
+            }
+
+            PilaEstado.DESCARTAR -> {
+                pilaAct.tomarCartasTodo()
+            }
+
+            else -> {
+                emptyList()
+            }
         }
         return cartasTomadas
     }
 
-    fun getPilaDeColor(color: CartaColor): PilaDeColor{
-        return this.pilas.filter { pila: PilaDeColor -> pila.color == color }[0]
+    /**
+     * @return Lista de cartas marcadas para Descartar
+     */
+    fun tomarCartasDePilasSegunEstado(): List<Carta> {
+        val cartasParaDescarte: MutableList<Carta> = mutableListOf()
+
+        this.pilas.map { pila: PilaDeColor ->
+            cartasParaDescarte.addAll(
+                when (pila.estado) {
+                    PilaEstado.DEJAR_SOLO_ORGANO -> { pila.tomarCartasExcepto(CartaTipo.ORGANO) }
+                    PilaEstado.DESCARTAR -> { pila.tomarCartasTodo() }
+                    else -> { emptyList() }
+                }
+            )
+        }
+        return cartasParaDescarte
     }
 
-    fun vaciarPila(colorPila: CartaColor): Mesa {
+    /**
+     * @return Mesa sin la Lista de cartas marcadas para Descartar
+     */
+    fun quitarCartasDePilasSegunEstado(): Mesa {
+        return this.copy(
+            pilas = this.pilas.map { pila: PilaDeColor ->
+                when (pila.estado) {
+                    PilaEstado.DEJAR_SOLO_ORGANO -> {
+                        pila.quitarCartasExcepto(CartaTipo.ORGANO)
+                    }
+
+                    PilaEstado.DESCARTAR -> {
+                        pila.vaciarPila()
+                    }
+
+                    else -> {
+                        pila
+                    }
+                }
+            }
+        )
+    }
+
+    /** Asumiendo que siempre habrá al menos 1 de cada color
+     * @param color color de la pila que se pide
+     * @return PilaDeColor con el color indicado
+     */
+    fun getPilaDeColor(color: CartaColor): PilaDeColor {
+        return this.pilas.filter { pila: PilaDeColor ->
+            pila.color == color
+        }[0]
+    }
+
+    fun vaciarPila(color: CartaColor): Mesa {
         var mesaAct = this.copy(
             pilas = this.pilas.map { pila: PilaDeColor ->
-                if (pila.color == colorPila) {
+                if (pila.color == color) {
                     pila.vaciarPila()
                 } else {
                     pila
@@ -71,31 +127,34 @@ data class Mesa(
             }
         )
 
-        return mesaAct.actualizarEstadoPilas()
+        return mesaAct.actualizar()
     }
 
-    fun actualizarEstadoPilas():Mesa{
+    /**
+     * @return el estado de la Pila con el [color] indicado
+     */
+    fun getEstadoPila(color: CartaColor): PilaEstado {
+        return getPilaDeColor(color = color).estado
+    }
+
+    fun actualizar(): Mesa {
         return this.copy(
             pilas = this.pilas.map { pila: PilaDeColor ->
                 pila.actualizarEstado()
-            }
-            ,
+            },
             turnosParaGanar = this.calcularTurnosParaGanar()
         )
     }
 
+    /** Calcula la menor cantidad de turno posibles para que el jugador gane la partida
+     * basado unicamente en las cartas de la Mesa
+     * @return cantidad de jugadas minimas
+     */
     fun calcularTurnosParaGanar(): Int {
         // Lógica para calcular el nuevo valor
         var turnosParaGanar = 4
-        this.pilas.forEach { (_, pila, _) ->
-            pila.forEach { carta: Carta ->
-                turnosParaGanar += when (carta.tipo) {
-                    CartaTipo.ORGANO -> { -1 }
-                    CartaTipo.VIRUS -> { 1 }
-//                    CartaTipo.MEDICINA -> { 0 } // NO mueve el contador
-                    else -> { 0 }
-                }
-            }
+        this.pilas.forEach { pila: PilaDeColor ->
+            turnosParaGanar += pila.sumaDePila()
         }
         return turnosParaGanar
     }

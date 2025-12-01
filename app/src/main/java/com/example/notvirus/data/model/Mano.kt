@@ -6,12 +6,12 @@ data class Mano(
     // Devuelve una nueva Mano con las cartas añadidas
     fun agregarCartas(nuevasCartas: List<Carta>): Mano {
         return this.copy(
-            cartas = ( this.cartas + nuevasCartas )
+            cartas = (this.cartas + nuevasCartas)
         )
     }
 
-    /** @return Devuelve las Cartas 'Seleccionadas'
-     *
+    /**
+     * @return Devuelve las Cartas 'Seleccionadas'
      */
     fun tomarCartasSeleccionadas(): List<Carta> {
         return this.cartas.filter { it.estaSeleccionada }
@@ -19,29 +19,28 @@ data class Mano(
 
     /**
      * @return Devuelve la Mano sin las cartas seleccionadas
-    */
+     */
     fun quitarCartasSeleccionadas(): Mano {
-        println("Mano.quitarCartasSeleccionadas()")
-        val nuevaMano = this.cartas.filter { !it.estaSeleccionada }
-        return this.copy(
-            cartas = nuevaMano
+//        println("Mano.quitarCartasSeleccionadas()")
+        val manoNueva = this.copy(
+            cartas = this.cartas.filter { !it.estaSeleccionada }
         )
+//        println("Mano se va con ${manoNueva.cartas.size} cartas")
+        return manoNueva
     }
 
     // Devuelve una nueva Mano con una carta marcada como seleccionada
     fun seleccionarCarta(cartaElegida: Carta): Mano {
-        val cartasActualizadas = this.cartas.map { carta ->
-            if (carta.id == cartaElegida.id) { // Comparar por ID único
-                carta.copy(
-                    estaSeleccionada = !carta.estaSeleccionada
-                )
-            } else {
-                carta
-            }
-        }
-
         return this.copy(
-            cartas = cartasActualizadas
+            cartas = this.cartas.map { carta: Carta ->
+                if (carta.id == cartaElegida.id) { // Comparar por ID único
+                    carta.copy(
+                        estaSeleccionada = !carta.estaSeleccionada
+                    )
+                } else {
+                    carta
+                }
+            }
         )
     }
 }

@@ -12,7 +12,7 @@ data class Jugador(
     fun recibirCartasToMano(nuevasCartas: List<Carta>): Jugador {
         // Metodo para "recibir cartas"
         /// -> "agregar a la mano" y devolver el Jugador con la mano actualizada
-        println("Jugador.recibirCartasToMano()")
+//        println("Jugador.recibirCartasToMano()")
         val manoActualizada = mano.agregarCartas(nuevasCartas = nuevasCartas)
         return this.copy(
             mano = manoActualizada
@@ -22,10 +22,9 @@ data class Jugador(
     /** @return Jugador sin las cartas seleccionadas
     */
     fun quitarCartasSeleccionadas():Jugador{
-        println("Jugador.quitarCartasSeleccionadas()")
-        val manoActualizada = this.mano.quitarCartasSeleccionadas()
+//        println("Jugador.quitarCartasSeleccionadas()")
         return this.copy(
-            mano = manoActualizada
+            mano = this.mano.quitarCartasSeleccionadas()
         )
     }
 
@@ -33,9 +32,8 @@ data class Jugador(
      * @return Jugador con la mano sin la carta Seleccionada
      */
     fun quitarCartaJugada():Jugador{
-        val manoActualizada = this.mano.quitarCartasSeleccionadas()
         return this.copy(
-            mano = manoActualizada
+            mano = this.mano.quitarCartasSeleccionadas()
         )
     }
 
@@ -50,10 +48,9 @@ data class Jugador(
      * @return Jugador Marca/Desmarca una Carta
      */
     fun marcarCartaEnMano(carta: Carta): Jugador {
-        println("Jugador.marcarCartaEnMano()")
-        val manoAct = mano.seleccionarCarta(carta)
+//        println("Jugador.marcarCartaEnMano()")
         return this.copy(
-            mano = manoAct
+            mano = this.mano.seleccionarCarta(carta)
         )
     }
 
@@ -63,14 +60,17 @@ data class Jugador(
      * @return jugador con la carta agregada a la Mesa
      */
     fun agregaCartaToMesa(carta:Carta, colorPilaObjetivo: CartaColor): Jugador{
-        println("Jugador.agregaCartaToMesa()")
+//        println("Jugador.agregaCartaToMesa()")
         return this.copy(
             mesa = this.mesa.agregarCarta(carta, colorPilaObjetivo)
         )
     }
 
+    /**
+     * @return [Carta] seleccionada que el 'Jugador-Activo' tiene en la mano
+     */
     fun entregarCartaJugada(): Carta {
-        println("Jugador.entregarCartaJugada()")
+//        println("Jugador.entregarCartaJugada()")
         val cartas = mano.tomarCartasSeleccionadas()
         val cartaJugada = cartas[0]
 
@@ -82,22 +82,87 @@ data class Jugador(
      */
     fun actualizarEstadoMesa():Jugador{
         return this.copy(
-            mesa = this.mesa.actualizarEstadoPilas()
+            mesa = this.mesa.actualizar()
         )
     }
 
-    fun inmunizarPilaEnMesa(color: CartaColor): Jugador{
+    fun inmunizarPila(color: CartaColor): Jugador{
         return this.copy(
             mesa = this.mesa.inmunizarPila(color)
         )
     }
 
-    fun esPilaInmune(color: CartaColor): Boolean{
-        return ( this.mesa.getPilaDeColor(color).estado == PilaEstado.INMUNE )
+    /**
+     * @param color color de la PilaDeColor que se revisa
+     * @return [true] -> la pila de color indicado es INMUNE
+     * @return [false] -> la pila de color indicado NO es INMUNE
+     */
+    fun esPilaInmune(colorPila: CartaColor): Boolean{
+        return ( this.getEstadoPila(colorPila) == PilaEstado.INMUNE )
     }
 
-    fun existeOrgano(color: CartaColor): Boolean {
+    /**
+     * @return el estado de la Pila con el [color] indicado
+     */
+    fun getEstadoPila(colorPila: CartaColor): PilaEstado {
+        return this.mesa.getEstadoPila(colorPila)
+    }
+
+    /**
+     * @param color color de la PilaDeColor que se revisa
+     * @return [true] -> la pila de color indicado tiene un ORGANO
+     * @return [false] -> la pila de color indicado NO tiene un ORGANO
+     */
+    fun existeOrgano(colorPila: CartaColor): Boolean {
     // verifica si la pila ya contiene un órgano
-        return ( this.mesa.getPilaDeColor(color).estado == PilaEstado.CON_ORGANO)
+        return ( this.mesa.getPilaDeColor(colorPila).estado == PilaEstado.CON_ORGANO)
+    }
+
+    fun getPilaDeColor(color: CartaColor): PilaDeColor{
+        return this.mesa.getPilaDeColor(color)
+    }
+
+    fun getTurnosParaGanar(): Int{
+        return this.mesa.turnosParaGanar
+    }
+
+    /**
+     * @return Lista de cartas para Descartar
+     */
+    fun tomarCartasSegunEstadoMesa():List<Carta>{
+        return this.mesa.tomarCartasDePilasSegunEstado()
+    }
+
+    /**
+     * @return Jugador con las cartas señaladas removidas de su Mesa
+     */
+    fun accionarEstadosMesa():Jugador{
+        val mesaAct: Mesa = this.mesa.copy(
+            pilas = this.mesa.pilas.map{ pila: PilaDeColor ->
+                when(pila.estado){
+                    PilaEstado.INMUNIZAR -> { pila.inmunizar() }
+
+                    else -> { pila }
+                }
+            }
+        )
+
+        return this.copy(
+            mesa = mesaAct.quitarCartasDePilasSegunEstado()
+        )
+    }
+
+    fun getCantCartasEnMano():Int{
+        return this.mano.cartas.size
+    }
+
+    /**
+     * @return [true] si la pila de color indicado tiene el estado solicitado
+     */
+    fun isPilaConEstado(
+        colorPila: CartaColor,
+        estado: PilaEstado,
+    ): Boolean {
+        return (this.getEstadoPila(colorPila) == estado)
     }
 }

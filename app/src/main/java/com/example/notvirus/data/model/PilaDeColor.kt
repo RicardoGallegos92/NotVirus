@@ -11,10 +11,16 @@ data class PilaDeColor(
         )
     }
 
+    /**
+     * @return Lista de cartas que difieren del Tipo indicado
+     */
     fun tomarCartasExcepto(tipo: CartaTipo): List<Carta> {
         return pila.filter { it.tipo != tipo }
     }
 
+    /**
+     * @return Pila sin las cartas del Tipo indicado
+     */
     fun quitarCartasExcepto(tipo: CartaTipo): PilaDeColor {
         return this.copy(
             pila = this.pila.filter { it.tipo != tipo }
@@ -25,12 +31,9 @@ data class PilaDeColor(
         return this.pila
     }
 
-    fun quitarCartasTodo(): PilaDeColor{
-        return this.copy(
-            pila = emptyList()
-        )
-    }
-
+    /**
+     * @return una copia de la [PilaDeColor] :[pila] -> empltyList()
+     */
     fun vaciarPila(): PilaDeColor {
         return this.copy(
             pila = emptyList()
@@ -46,7 +49,7 @@ data class PilaDeColor(
             return this
         }
 
-        println("Pila.actualizarEstado()")
+//        println("Pila.actualizarEstado()")
         var listaCartas = this.pila
 
         val organos =listaCartas.filter {
@@ -77,10 +80,12 @@ data class PilaDeColor(
         )
     }
 
-    /** cambia su estado a INMUNE
-     * @return Pila con estado INMUNE
+    /** Cambia el atributo 'esInmune' de todas las [Carta] en la [pila].
+     * Cambia [estado] a INMUNE
+     * @return PilaDeColor con [estado] = INMUNE
      */
     fun inmunizar(): PilaDeColor {
+        println("PilaDeColor: ${this.color} ha sido Inmunizada")
         return this.copy(
             pila = pila.map { carta: Carta ->
                 carta.copy(
@@ -90,6 +95,20 @@ data class PilaDeColor(
             ,
             estado = PilaEstado.INMUNE
         )
+    }
+
+    fun sumaDePila():Int{
+        var conteo:Int = 0
+
+        this.pila.forEach { carta:Carta ->
+            conteo += when (carta.tipo) {
+                CartaTipo.ORGANO -> { -1 }
+                CartaTipo.VIRUS -> { 1 }
+// CartaTipo.MEDICINA // -> NO mueve el contador
+                else -> { 0 }
+            }
+        }
+        return conteo
     }
 
 }

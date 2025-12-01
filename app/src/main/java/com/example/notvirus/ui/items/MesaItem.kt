@@ -1,6 +1,7 @@
 package com.example.notvirus.ui.items
 
 import android.R.attr.text
+import android.util.Log
 import android.util.Log.i
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -55,8 +56,10 @@ fun MesaItem(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        val carta:Carta = pila.lastOrNull() ?: cartaDefault
+                        println(carta.toString())
                         CartaItem(
-                            carta = pila.lastOrNull() ?: cartaDefault,
+                            carta = carta,
                             anchoCarta = 70,
                         )
                         Text( text = pila.size.toString() )
