@@ -22,8 +22,8 @@ fun ManoItem(
     mano: Mano = Mano(),
     viewModel: JugarViewModel,
     useButtons: Boolean = false,
-    activeBtnPlayCard: Boolean,
-    activeBtnDiscardCards: Boolean,
+    activeBtnPlayCard: Boolean = false,
+    activeBtnDiscardCards: Boolean = false,
 ) {
     Box(
         modifier = Modifier

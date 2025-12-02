@@ -99,10 +99,9 @@ class JugarViewModel(
         viewModelScope.launch {
             _uiState.update {
                 val juegoActualizado = async { it.juego.usarTurno(jugarCarta = true) }.await()
-                val isOver = juegoActualizado.jugadorGanadorID.isNotEmpty()
                 it.copy(
                     juego = juegoActualizado,
-                    isOver = isOver,
+                    isOver = juegoActualizado.jugadorGanadorID.isNotEmpty(),
                 )
             }
         }
@@ -110,12 +109,11 @@ class JugarViewModel(
     }
 
     fun descartarCartas() {
-        println("JugarVM.descartarCartas()")
+//        println("JugarVM.descartarCartas()")
         viewModelScope.launch {
             _uiState.update {
-                var juegoAct = async { it.juego.usarTurno(descartarCarta = true) }.await()
                 it.copy(
-                    juego = juegoAct,
+                    juego = it.juego.usarTurno(descartarCarta = true),
                 )
             }
         }
@@ -138,19 +136,22 @@ class JugarViewModel(
     fun countCartasSelected() {
         // println("JugarVM.countCartasSelected()")
         var conteo = 0
-        val mano = _uiState.value.juego.jugadores[1].mano.cartas
-
-        for (carta in mano) {
-            if (carta.estaSeleccionada) {
-                conteo++
-            }
-        }
-
         _uiState.update {
+            //val mano = _uiState.value.juego.jugadores[1].mano.cartas
+
+            val mano = it.juego.getJugadorByID(it.juego.jugadorActivoID).mano.cartas
+
+            for (carta in mano) {
+                if (carta.estaSeleccionada) {
+                    conteo++
+                }
+            }
+
             it.copy(
                 cantCartasSelected = conteo
             )
         }
+        println("Cartas seleccionadas: ${_uiState.value.cantCartasSelected}")
         activeButton()
     }
 

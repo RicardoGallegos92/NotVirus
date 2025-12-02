@@ -17,7 +17,6 @@ import com.example.notvirus.data.model.Mano
 fun ManoItemCPU(
     mano: Mano = Mano(),
 ) {
-
     Box(
         modifier = Modifier
             .fillMaxWidth()

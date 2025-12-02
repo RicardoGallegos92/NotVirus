@@ -2,42 +2,50 @@ package com.example.notvirus.data.model
 
 data class PilaDeColor(
     val color: CartaColor,
-    val pila: List<Carta> = emptyList(),
+    val cartas: List<Carta> = emptyList(),
     val estado: PilaEstado = PilaEstado.VACIO,
 ) {
     fun agregarCarta(carta: Carta): PilaDeColor {
-        return this.copy(
-            pila = ( this.pila + carta )
+        val a = this.copy(
+            cartas = ( this.cartas + carta )
         )
+        return a.actualizarEstado()
     }
 
     /**
      * @return Lista de cartas que difieren del Tipo indicado
      */
     fun tomarCartasExcepto(tipo: CartaTipo): List<Carta> {
-        return pila.filter { it.tipo != tipo }
+        return this.cartas.filter { it.tipo != tipo }
     }
 
     /**
-     * @return Pila sin las cartas del Tipo indicado
+     * @return Pila solo con las cartas del Tipo indicado
      */
     fun quitarCartasExcepto(tipo: CartaTipo): PilaDeColor {
-        return this.copy(
-            pila = this.pila.filter { it.tipo != tipo }
+        var a = this.copy(
+            cartas = this.cartas.filter { it.tipo == tipo }
         )
-    }
+        a = a.actualizarEstado()
 
-    fun tomarCartasTodo(): List<Carta> {
-        return this.pila
+        return a
     }
 
     /**
-     * @return una copia de la [PilaDeColor] :[pila] -> empltyList()
+     * @return Lista de Cartas
+     */
+    fun tomarCartasTodo(): List<Carta> {
+        return this.cartas
+    }
+
+    /**
+     * @return una copia de la [PilaDeColor] :[cartas] -> empltyList()
      */
     fun vaciarPila(): PilaDeColor {
-        return this.copy(
-            pila = emptyList()
+        val a =this.copy(
+            cartas = emptyList()
         )
+        return a.actualizarEstado()
     }
 
     /** actualiza el estado de la Pila según las cartas que contiene
@@ -50,20 +58,13 @@ data class PilaDeColor(
         }
 
 //        println("Pila.actualizarEstado()")
-        var listaCartas = this.pila
+        val listaCartas = this.cartas
 
-        val organos =listaCartas.filter {
-            it.tipo == CartaTipo.ORGANO
-        }
+        val organos = listaCartas.filter { it.tipo == CartaTipo.ORGANO }
+        val virus = listaCartas.filter { it.tipo == CartaTipo.VIRUS }
+        val medicinas = listaCartas.filter { it.tipo == CartaTipo.MEDICINA }
 
-        val virus = listaCartas.filter {
-            it.tipo == CartaTipo.VIRUS
-        }
-        val medicinas = listaCartas.filter {
-            it.tipo == CartaTipo.MEDICINA
-        }
-
-        return this.copy(
+         val a = this.copy(
             estado = when {
                 (virus.size == 2) -> { PilaEstado.DESCARTAR }
                 (medicinas.size == 2) -> { PilaEstado.INMUNIZAR }
@@ -78,16 +79,22 @@ data class PilaDeColor(
                 }
             }
         )
+        /*
+        if (a.estado != PilaEstado.VACIO){
+            println("Pila-${a.color} -> estado: ${a.estado}")
+        }
+        */
+        return a
     }
 
-    /** Cambia el atributo 'esInmune' de todas las [Carta] en la [pila].
+    /** Cambia el atributo 'esInmune' de todas las [Carta] en la [cartas].
      * Cambia [estado] a INMUNE
      * @return PilaDeColor con [estado] = INMUNE
      */
     fun inmunizar(): PilaDeColor {
         println("PilaDeColor: ${this.color} ha sido Inmunizada")
         return this.copy(
-            pila = pila.map { carta: Carta ->
+            cartas = this.cartas.map { carta: Carta ->
                 carta.copy(
                     esInmune = true,
                 )
@@ -100,7 +107,7 @@ data class PilaDeColor(
     fun sumaDePila():Int{
         var conteo:Int = 0
 
-        this.pila.forEach { carta:Carta ->
+        this.cartas.forEach { carta:Carta ->
             conteo += when (carta.tipo) {
                 CartaTipo.ORGANO -> { -1 }
                 CartaTipo.VIRUS -> { 1 }

@@ -95,7 +95,7 @@ fun JugarScreen(
                     if (isOver) {
                         MyColumn(
                             textos = listOf(
-                                "Ganador: ${juego.getJugadorByID(juego.jugadorActivoID).nombre}",
+                                "Ganador: ${juego.getJugadorByID(juego.jugadorGanadorID).nombre}",
                                 stringResource(R.string.juego_ganador),
                             )
                         )
@@ -128,6 +128,10 @@ fun JugarScreen(
                             ) {
                                 ZonaJugadorArriba(
                                     jugador = juego.jugadores[0],
+                                    viewModel = juegoViewModel,
+                                    activeBtns = ( juego.jugadorActivoID == juego.jugadores[0].id ),
+                                    activeBtnPlayCard = uiState.activeBtnPlayCard,
+                                    activeBtnDiscardCards = uiState.activeBtnDiscardCards,
                                 )
                             }
                             Column(
@@ -157,6 +161,7 @@ fun JugarScreen(
                                     jugador = juego.jugadores[1],
                                     viewModel = juegoViewModel,
                                     uiState = uiState,
+                                    activeBtns = ( juego.jugadorActivoID == juego.jugadores[1].id ),
                                     activeBtnPlayCard = uiState.activeBtnPlayCard,
                                     activeBtnDiscardCards = uiState.activeBtnDiscardCards,
                                 )
@@ -180,6 +185,10 @@ fun MensajeError(error: String) {
 @Composable
 fun ZonaJugadorArriba(
     jugador: Jugador,
+    viewModel: JugarViewModel,
+    activeBtns:Boolean,
+    activeBtnPlayCard: Boolean,
+    activeBtnDiscardCards: Boolean,
 ) {
     Column(
         modifier = Modifier
@@ -195,7 +204,13 @@ fun ZonaJugadorArriba(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            ManoItemCPU(mano = jugador.mano)
+            ManoItem(
+                mano = jugador.mano,
+                viewModel = viewModel,
+                useButtons = activeBtns,
+                activeBtnPlayCard = activeBtnPlayCard,
+                activeBtnDiscardCards = activeBtnDiscardCards,
+            )
         }
         Row(
             // Jugador CPU - Mesa
@@ -243,6 +258,7 @@ fun ZonaJugadorAbajo(
     jugador: Jugador,
     viewModel: JugarViewModel,
     uiState: JugarUiState,
+    activeBtns:Boolean,
     activeBtnPlayCard: Boolean,
     activeBtnDiscardCards: Boolean,
 ) {
@@ -270,7 +286,7 @@ fun ZonaJugadorAbajo(
             ManoItem(
                 mano = jugador.mano,
                 viewModel = viewModel,
-                useButtons = true,
+                useButtons = activeBtns,
                 activeBtnPlayCard = activeBtnPlayCard,
                 activeBtnDiscardCards = activeBtnDiscardCards,
             )

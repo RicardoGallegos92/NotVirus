@@ -76,22 +76,23 @@ data class Jugador(
 
         return cartaJugada
     }
-
+/*
     /** actualiza el estado de todas las pilas de la Mesa
      * @return Jugador con su Mesa actualizada
      */
     fun actualizarEstadoMesa():Jugador{
         return this.copy(
-            mesa = this.mesa.actualizar()
+            mesa = this.mesa.actualizarEstados()
         )
     }
-
+*/
+/*
     fun inmunizarPila(color: CartaColor): Jugador{
         return this.copy(
             mesa = this.mesa.inmunizarPila(color)
         )
     }
-
+*/
     /**
      * @param color color de la PilaDeColor que se revisa
      * @return [true] -> la pila de color indicado es INMUNE
@@ -137,18 +138,8 @@ data class Jugador(
      * @return Jugador con las cartas señaladas removidas de su Mesa
      */
     fun accionarEstadosMesa():Jugador{
-        val mesaAct: Mesa = this.mesa.copy(
-            pilas = this.mesa.pilas.map{ pila: PilaDeColor ->
-                when(pila.estado){
-                    PilaEstado.INMUNIZAR -> { pila.inmunizar() }
-
-                    else -> { pila }
-                }
-            }
-        )
-
         return this.copy(
-            mesa = mesaAct.quitarCartasDePilasSegunEstado()
+            mesa = this.mesa.accionarEstados()
         )
     }
 

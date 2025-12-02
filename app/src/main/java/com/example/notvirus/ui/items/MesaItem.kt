@@ -1,8 +1,5 @@
 package com.example.notvirus.ui.items
 
-import android.R.attr.text
-import android.util.Log
-import android.util.Log.i
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +20,7 @@ import com.example.notvirus.data.model.CartaColor
 import com.example.notvirus.data.model.CartaImagen
 import com.example.notvirus.data.model.CartaTipo
 import com.example.notvirus.data.model.Mesa
+import com.example.notvirus.data.model.PilaDeColor
 
 @Preview
 @Composable
@@ -49,20 +45,20 @@ fun MesaItem(
             horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            mesa.pilas.forEach { (_, pila, _) ->
+            mesa.pilas.forEach { pila: PilaDeColor ->
                     Column(
                         modifier = Modifier
                             .wrapContentSize(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        val carta:Carta = pila.lastOrNull() ?: cartaDefault
-                        println(carta.toString())
+                        val carta:Carta = pila.cartas.lastOrNull() ?: cartaDefault
+//                        println(carta.toString())
                         CartaItem(
                             carta = carta,
                             anchoCarta = 70,
                         )
-                        Text( text = pila.size.toString() )
+                        Text( text = pila.cartas.size.toString() )
                     }
             }
         }

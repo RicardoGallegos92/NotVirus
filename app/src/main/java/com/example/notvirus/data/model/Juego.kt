@@ -52,7 +52,7 @@ data class Juego(
                 descartarCarta -> {
                     // Descartar 'n' cartas
                     turno = turno.descartarDesdeMano()
-                    println("CARTAS DESCARTADAS: FINISHED")
+                    //println("CARTAS DESCARTADAS: FINISHED")
                 }
 
                 jugarCarta -> {
@@ -60,17 +60,11 @@ data class Juego(
                     // Jugar 1 carta
                     turno = turno.jugarCarta()
 
-                    // PilaDeColor.estado -> ( inmunizarla || descartarla )
-                    turno = turno.actualizarEstadosMesas()
-
-                    // PilaDeColor -> ( inmunizarla || descartarla )
+                    // PilaDeColor.estado -> ( Inmune || Vacio || Con_Organo )
                     turno = turno.accionarEstadosMesas()
 
-                    //
-                    turno = turno.actualizarEstadosMesas()
-
+                    // verificar si ya ganó
                     turno = turno.setGanador()
-
                 }
             }
 
@@ -83,20 +77,8 @@ data class Juego(
             turno = turno.llenarManoJugadorActivo()
 
             // Fin del Turno
-
-            /// -> Cambio de Jugador
-//            val cartaSeJugo = cartaFueJugada(turno.getJugadorByID(jugadorActivoID).mano)
-//            val jugadorProximoTurno = if (cartaSeJugo){
-//      false fuerza que no haya cambio de turno hasta que haya una IA
-            val jugadorProximoTurno = if (false) {
-                pasarTurno() // debe ocurrir -> solo si la jugada es exitosa
-            } else {
-                println("Se mantiene 'Jugador-Activo'")
-                jugadorActivoID
-            }
-
             return turno.copy(
-                jugadorActivoID = jugadorProximoTurno,
+                jugadorActivoID = turno.pasarTurno() // jugadorProximoTurno,
             )
         } catch (e: Exception) {
             println("HUBO ERROR")
@@ -110,7 +92,7 @@ data class Juego(
             "Jugador-Activo: llega con ${getJugadorByID(jugadorActivoID).getCantCartasEnMano()} cartas"
         )
     }
-
+/*
     fun actualizarEstadosMesas(): Juego {
         return this.copy(
             jugadores = this.jugadores.map { jugador: Jugador ->
@@ -118,16 +100,20 @@ data class Juego(
             }
         )
     }
+*/
 
     /**
      * Revisa los estados de las pilas en la Mesa para tomar acciones
      * @return Juego con Mesas accionadas
      */
     fun accionarEstadosMesas(): Juego {
-        var cartasParaDescartar: MutableList<Carta> = mutableListOf()
+        println("Juego->accionarEstadosMesas()")
+        val cartasParaDescartar: MutableList<Carta> = mutableListOf()
 
         val jugadoresAct = this.jugadores.map { jugador ->
-            cartasParaDescartar.addAll(jugador.tomarCartasSegunEstadoMesa())
+            // deben ser todos los jugadores
+            // ya que pueden jugarse cartas en cualquier Mesa
+            cartasParaDescartar.addAll(jugador.tomarCartasSegunEstadoMesa() )
             jugador.accionarEstadosMesa()
         }
 
@@ -135,7 +121,6 @@ data class Juego(
         // descartamos si se dió el caso
         if (cartasParaDescartar.isNotEmpty()) {
             pilaDescarteAct = this.pilaDescarte.agregarCartas(cartasParaDescartar)
-
         }
 
         return this.copy(
@@ -150,7 +135,7 @@ data class Juego(
      *  @return Juego con la carta aplicada
      */
     fun jugarCarta(jugadorObjetivo: Jugador? = null): Juego {
-//        println("Juego.jugarCarta()")
+        println("Juego->jugarCarta()")
         // Juego toma la carta jugada
         val cartaJugada: Carta = this.tomarCartaJugada()
         // retiramos la carta de la mano del 'Jugado-Activo'
@@ -176,7 +161,7 @@ data class Juego(
                         colorObjetivo = cartaJugada.color
                     )
                 } else {
-                    throw JugadaInvalida()
+                    throw PilaConOrgano()
                 }
             }
 
@@ -191,7 +176,7 @@ data class Juego(
                         colorObjetivo = cartaJugada.color
                     )
                 } else {
-                    throw JugadaInvalida()
+                    throw PilaSinOrgano()
                 }
             }
 
@@ -207,12 +192,12 @@ data class Juego(
                         colorObjetivo = cartaJugada.color
                     )
                 } else {
-                    throw JugadaInvalida()
+                    throw PilaSinOrgano()
                 }
             }
 
             else -> {
-                println("Mensaje SnackBar -> Carta Jugada no posee un TIPO")
+                throw CartaSinTipo()
             }
         }
 
@@ -385,12 +370,6 @@ data class Juego(
         return this.jugadores.filter { jugador ->
             jugador.id == id
         }[0]
-    }
-
-    fun cartaFueJugada(mano: Mano): Boolean {
-        // awa
-        val manoPrevia = this.getJugadorByID(jugadorActivoID).mano
-        return mano == manoPrevia
     }
 
     fun marcarCarta(carta: Carta): Juego {
