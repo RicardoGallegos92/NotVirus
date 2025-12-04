@@ -5,11 +5,13 @@ data class PilaDeColor(
     val cartas: List<Carta> = emptyList(),
     val estado: PilaEstado = PilaEstado.VACIO,
 ) {
+    /**
+     * @return Pila con la [Carta] agregada y el [estado] actualizado
+     */
     fun agregarCarta(carta: Carta): PilaDeColor {
-        val a = this.copy(
+        return this.copy(
             cartas = ( this.cartas + carta )
-        )
-        return a.actualizarEstado()
+        ).actualizarEstado()
     }
 
     /**
@@ -42,10 +44,9 @@ data class PilaDeColor(
      * @return una copia de la [PilaDeColor] :[cartas] -> empltyList()
      */
     fun vaciarPila(): PilaDeColor {
-        val a =this.copy(
+        return this.copy(
             cartas = emptyList()
-        )
-        return a.actualizarEstado()
+        ).actualizarEstado()
     }
 
     /** actualiza el estado de la Pila según las cartas que contiene
@@ -56,7 +57,6 @@ data class PilaDeColor(
             // si ya es INMUNE no es necesario hacer algo
             return this
         }
-
 //        println("Pila.actualizarEstado()")
         val listaCartas = this.cartas
 
@@ -64,7 +64,7 @@ data class PilaDeColor(
         val virus = listaCartas.filter { it.tipo == CartaTipo.VIRUS }
         val medicinas = listaCartas.filter { it.tipo == CartaTipo.MEDICINA }
 
-         val a = this.copy(
+         return this.copy(
             estado = when {
                 (virus.size == 2) -> { PilaEstado.DESCARTAR }
                 (medicinas.size == 2) -> { PilaEstado.INMUNIZAR }
@@ -79,12 +79,6 @@ data class PilaDeColor(
                 }
             }
         )
-        /*
-        if (a.estado != PilaEstado.VACIO){
-            println("Pila-${a.color} -> estado: ${a.estado}")
-        }
-        */
-        return a
     }
 
     /** Cambia el atributo 'esInmune' de todas las [Carta] en la [cartas].
@@ -104,14 +98,17 @@ data class PilaDeColor(
         )
     }
 
+    /**
+     * @return indicador de avance a la victoria
+     */
     fun sumaDePila():Int{
         var conteo:Int = 0
 
-        this.cartas.forEach { carta:Carta ->
+        this.cartas.forEach { carta: Carta ->
             conteo += when (carta.tipo) {
                 CartaTipo.ORGANO -> { -1 }
                 CartaTipo.VIRUS -> { 1 }
-// CartaTipo.MEDICINA // -> NO mueve el contador
+//              CartaTipo.MEDICINA // -> NO mueve el contador
                 else -> { 0 }
             }
         }

@@ -22,18 +22,18 @@ data class Mano(
      */
     fun quitarCartasSeleccionadas(): Mano {
 //        println("Mano.quitarCartasSeleccionadas()")
-        val manoNueva = this.copy(
-            cartas = this.cartas.filter { !it.estaSeleccionada }
-        )
+        val manoNueva = this.copy( cartas = this.cartas.filter { !it.estaSeleccionada } )
 //        println("Mano se va con ${manoNueva.cartas.size} cartas")
         return manoNueva
     }
 
-    // Devuelve una nueva Mano con una carta marcada como seleccionada
-    fun seleccionarCarta(cartaElegida: Carta): Mano {
+    /** @return Mano con una carta marcada como seleccionada
+     *
+     */
+    fun seleccionarCarta(cartaID: String): Mano {
         return this.copy(
             cartas = this.cartas.map { carta: Carta ->
-                if (carta.id == cartaElegida.id) { // Comparar por ID único
+                if (carta.id == cartaID) { // Comparar por ID único
                     carta.copy(
                         estaSeleccionada = !carta.estaSeleccionada
                     )
@@ -42,5 +42,13 @@ data class Mano(
                 }
             }
         )
+    }
+
+    fun getCartaByID(cartaID: String): Carta{
+        val carta =  this.cartas.filter { it.id == cartaID }
+        if (carta.isEmpty()){
+            throw CartaNoEnMano()
+        }
+        return carta[0]
     }
 }

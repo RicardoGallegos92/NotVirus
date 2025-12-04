@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.notvirus.ui.screens.ConfiguracionScreen
+import com.example.notvirus.ui.screens.ElegirDificultadScreen
 import com.example.notvirus.ui.screens.JugarScreen
 import com.example.notvirus.ui.screens.LoginScreen
 import com.example.notvirus.ui.screens.UsuarioScreen
@@ -22,7 +23,7 @@ fun Navigation(
 
     NavHost(
         navController = navController,
-        startDestination = Usuario
+        startDestination = Jugar
     ) {
         composable<Login> {
             // llamada a la Screen
@@ -33,13 +34,20 @@ fun Navigation(
         composable<Usuario>{
             UsuarioScreen(
                 innerPadding = innerPadding,
-                navigateToJuego = { navController.navigate(Jugar) },
+                navigateToPvCom = { navController.navigate(ElegirDificultad) },
+                navigateToPvP = { navController.navigate(Jugar) }
+            )
+        }
+        composable<ElegirDificultad>{
+            ElegirDificultadScreen(
+                innerPadding = innerPadding,
+                navigateNext = { navController.navigate(Jugar) },
             )
         }
         composable<Jugar> {
             JugarScreen(
                 innerPadding = innerPadding,
-                onNavigateBack = { navController.navigateUp() },
+                navigateToInicio = { navController.navigate(Usuario) },
             )
         }
         composable<Configuracion> {

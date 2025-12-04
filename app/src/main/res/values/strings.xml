@@ -7,7 +7,8 @@
     <string name="to_pantalla_Login">Login</string>
     <string name="to_pantalla_Configuracion">Configuracion</string>
 
-    <string name="juego_edicion">Single Player Edition</string>
+
+    <string name="juego_edicion">Local PvP Edition</string>
     <string name="juego_iniciar">Iniciar Partida</string>
     <string name="juego_pausar">Pausar Partida</string>
     <string name="juego_terminar">Terminar Partida</string>
@@ -16,4 +17,17 @@
 
     <string name="juego_ganador">¡que pro!</string>
     <string name="juego_perdedor">será para la próxima</string>
+
+    <string name="btn_pausa">Pausar</string>
+    <string name="btn_continuar">Continuar</string>
+    <string name="btn_salir">Salir</string>
+
+    <string name="seleccion_1player">P vs Cpu</string>
+    <string name="seleccion_2player">P vs P</string>
+
+    <string name="seleccion_facil">Fácil</string>
+    <string name="seleccion_medio">Medio</string>
+    <string name="seleccion_dificil">Dificil</string>
+    <string name="seleccion_competitivo">Competitivo</string>
+    <string name="seleccion_tutorial">Tutorial</string>
 </resources>

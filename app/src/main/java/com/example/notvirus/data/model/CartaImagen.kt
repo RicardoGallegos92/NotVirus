@@ -29,7 +29,7 @@ enum class CartaImagen(val id: Int) {
     TRATAMIENTO_ERROR_MEDICO(R.drawable.tratamiento_error_medico),
     TRATAMIENTO_GUANTE_LATEX(R.drawable.tratamiento_guante_latex),
     TRATAMIENTO_ROBO_ORGANO(R.drawable.tratamiento_robo_organo),
-    TRATAMIENTO_TRANSPLANTE(R.drawable.tratamiento_transplante),
+    TRATAMIENTO_TRASPLANTE(R.drawable.tratamiento_trasplante),
 // VACIO
     NADA(R.drawable.carta_reverso)
 }

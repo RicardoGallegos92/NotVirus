@@ -9,6 +9,9 @@ object Login
 object Usuario
 
 @Serializable
+object ElegirDificultad
+
+@Serializable
 object Jugar
 
 @Serializable

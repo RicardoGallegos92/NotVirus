@@ -26,7 +26,7 @@ data class Juego(
      */
     fun empezarJuego(): Juego {
 //        println("Juego.empezarJuego()")
-        var barajaActual = baraja // Mantén un registro de la baraja actualizada
+        var barajaActual = this.baraja.copy() // Mantén un registro de la baraja actualizada
         val jugadoresConCartas = jugadores.map { jugador ->
             val (cartasParaJugador, nuevaBaraja) = barajaActual.pedirCartas(maxCartasEnMano) // <-- solicitar cartas para la mano
             barajaActual = nuevaBaraja // Actualiza la baraja para el siguiente jugador
@@ -152,12 +152,12 @@ data class Juego(
 
             CartaTipo.ORGANO -> {
                 // Mesa propia
-                val jugadorObjetivoDeTurno = juegoActualizado.getJugadorByID(jugadorActivoID)
+                val jugadorObjetivo = juegoActualizado.getJugadorByID(jugadorActivoID)
 
-                if ( jugadorObjetivoDeTurno.isPilaConEstado(cartaJugada.color, PilaEstado.VACIO) ) {
+                if ( jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.VACIO) ) {
                     juegoActualizado = juegoActualizado.pasarCartaToMesaJugador(
                         cartaJugada = cartaJugada,
-                        jugadorObjetivo = jugadorObjetivoDeTurno,
+                        jugadorObjetivo = jugadorObjetivo,
                         colorObjetivo = cartaJugada.color
                     )
                 } else {
@@ -166,13 +166,13 @@ data class Juego(
             }
 
             CartaTipo.MEDICINA -> {
-                val jugadorObjetivoDeTurno =
+                val jugadorObjetivo =
                     juegoActualizado.getJugadorByID(jugadorActivoID) // mesa propia
 
-                if( jugadorObjetivoDeTurno.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO) ) {
+                if( jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO) ) {
                     juegoActualizado = juegoActualizado.pasarCartaToMesaJugador(
                         cartaJugada = cartaJugada,
-                        jugadorObjetivo = jugadorObjetivoDeTurno, // (provisorio) -> se debe agregar funcion para seleccionar objetivo
+                        jugadorObjetivo = jugadorObjetivo, // (provisorio) -> se debe agregar funcion para seleccionar objetivo
                         colorObjetivo = cartaJugada.color
                     )
                 } else {
@@ -183,12 +183,12 @@ data class Juego(
             CartaTipo.VIRUS -> {
                 // jugador contrario
                 // (provisorio) -> se debe agregar funcion para seleccionar objetivo
-                val jugadorObjetivoDeTurno = juegoActualizado.getJugadorByID(pasarTurno())
+                val jugadorObjetivo = juegoActualizado.getJugadorByID(pasarTurno())
 
-                if( jugadorObjetivoDeTurno.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO) ) {
+                if( jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO) ) {
                     juegoActualizado = juegoActualizado.pasarCartaToMesaJugador(
                         cartaJugada = cartaJugada,
-                        jugadorObjetivo = getJugadorByID(pasarTurno()),
+                        jugadorObjetivo = jugadorObjetivo,
                         colorObjetivo = cartaJugada.color
                     )
                 } else {
@@ -207,10 +207,10 @@ data class Juego(
     /**
      * @return id del jugador Objetivo
      */
-    fun seleccionarJugadorObjetivo(): String {
+    fun seleccionarJugadorObjetivoId(): Jugador {
         // insertar magia
         // return jugadorSeleccionado.id
-        return getJugadorByID(pasarTurno()).id
+        return getJugadorByID(pasarTurno())
     }
 
     /**
@@ -225,17 +225,12 @@ data class Juego(
         colorObjetivo: CartaColor,
     ): Juego {
 //        println("Juego.pasarCartaToMesaJugador()")
-        ///     this.cantCartasEnManoJugadorActivo()
-        //  println("J-Objetivo: ${jugadorObjetivo.getCantCartasEnMano()}")
-
         // pasar la 'cartaJugada' a la mesa del 'jugadorObjetivo'
         val jugadorObjetivoActualizado = jugadorObjetivo.agregaCartaToMesa(
             carta = cartaJugada,
             // falta funcion para seleccionar la 'PilaObjetivo'
             colorPilaObjetivo = colorObjetivo
         )
-
-//        println("J-ObjetivoActualizado: ${jugadorObjetivoActualizado.getCantCartasEnMano()}")
 
         return this.copy(
             jugadores = this.jugadores.map { jugador ->
@@ -344,10 +339,10 @@ data class Juego(
             }
             return this.copy(
                 baraja = baraja.agregarCartas(cartasParaAgregar).revolver(),
-                pilaDescarte = pilaDescarteActualizada
+                pilaDescarte = pilaDescarteActualizada,
             )
         } else {
-            return this.copy()
+            return this
         }
     }
 
@@ -372,10 +367,10 @@ data class Juego(
         }[0]
     }
 
-    fun marcarCarta(carta: Carta): Juego {
+    fun marcarCarta(cartaID: String): Juego {
 //        println("Juego.marcarCarta()")
         // cambia el estado "selecciona" de la carta entre "true" y "false"
-        val jugadorActualizado = getJugadorByID(this.jugadorActivoID).marcarCartaEnMano(carta)
+        val jugadorActualizado = getJugadorByID(this.jugadorActivoID).marcarCartaEnMano(cartaID)
 
         return this.copy(
             jugadores = this.jugadores.map { jugador ->
@@ -393,7 +388,6 @@ data class Juego(
      */
     fun setGanador(): Juego {
 ///        println("Juego.setGanador()")
-        // Lógica para determinar ganador
         // -> el jugador ganó si el conteo (turnosParaGanar) de su mesa es 0
         return this.copy(
             jugadorGanadorID = if (getJugadorByID(jugadorActivoID).getTurnosParaGanar() == 0) {
@@ -402,5 +396,13 @@ data class Juego(
                 ""
             }
         )
+    }
+
+    fun getBarajaSize():Int{
+        return this.baraja.getSize()
+    }
+
+    fun getDescarteSize():Int{
+        return this.pilaDescarte.getSize()
     }
 }

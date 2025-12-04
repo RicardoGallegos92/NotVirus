@@ -2,6 +2,7 @@ package com.example.notvirus.ui.screens
 
 import android.R.attr.onClick
 import android.R.attr.text
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,21 +38,25 @@ import com.example.notvirus.R
 import com.example.notvirus.data.model.Carta
 import com.example.notvirus.ui.items.CartaItem
 import com.example.notvirus.ui.items.ManoItem
-import com.example.notvirus.ui.items.ManoItemCPU
 import com.example.notvirus.ui.items.MesaItem
 import com.example.notvirus.ui.viewModels.JugarViewModel
 import com.example.notvirus.BuildConfig
 import com.example.notvirus.data.model.Juego
 import com.example.notvirus.data.model.Jugador
 import com.example.notvirus.data.model.Mesa
+import com.example.notvirus.ui.components.BtnSeleccion
 import com.example.notvirus.ui.components.MyColumn
+import com.example.notvirus.ui.items.ManoItemEnemy
 import com.example.notvirus.ui.viewModels.JugarUiState
 
+const val TAG: String = "JugarScreen"
 @Composable
 fun JugarScreen(
     innerPadding: PaddingValues,
-    onNavigateBack: () -> Unit,
+    navigateToInicio: () -> Unit,
     juegoViewModel: JugarViewModel = viewModel(),
+    useBot: Boolean = false,
+    dificulty: Int = 0,
 ) {
     // aplicar viewModel
     val uiState by juegoViewModel.uiState.collectAsStateWithLifecycle()
@@ -64,8 +69,10 @@ fun JugarScreen(
 
     Box(
         modifier = Modifier
-            .padding(paddingValues = innerPadding)
-            .fillMaxSize(),
+            .padding()
+            .fillMaxSize()
+            .padding(innerPadding)
+        ,
     ) {
         Column(
             // TABLERO / Pantalla completa
@@ -99,22 +106,21 @@ fun JugarScreen(
                                 stringResource(R.string.juego_ganador),
                             )
                         )
-                        Button(
+                        BtnSeleccion(
                             onClick = { juegoViewModel.startJuego() },
-                        ) {
-                            Text(text = stringResource(R.string.juego_iniciar))
-                        }
-                        Button(
-                            onClick = onNavigateBack,
-                        ) {
-                            Text(text = stringResource(R.string.to_pantalla_Inicio))
-                        }
+                            texto = stringResource(R.string.juego_iniciar),
+                        )
+
+                        BtnSeleccion(
+                            onClick = { navigateToInicio() },
+                            texto = stringResource(R.string.btn_salir),
+                        )
                     } else {
                         if (isPaused) {
                             MenuPausa(
-                                linkVolver = onNavigateBack,
-                                actionPausar = { juegoViewModel.unPauseJuego() },
-                                actionContinuar = { juegoViewModel.startJuego() },
+                                actionSalir = { navigateToInicio() },
+                                actionContinuar = { juegoViewModel.unPauseJuego() },
+                                actionReiniciar = { juegoViewModel.startJuego() },
                             )
                         } else {
                             Column(
@@ -169,7 +175,7 @@ fun JugarScreen(
                         }
                     }
                 } else {
-                    println("Error -> ${errorMsg}")
+                    Log.e(TAG,"Error -> ${errorMsg}")
                     MensajeError(errorMsg)
                 }
             }
@@ -204,6 +210,8 @@ fun ZonaJugadorArriba(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
+//            ManoItemEnemy()
+//            /*
             ManoItem(
                 mano = jugador.mano,
                 viewModel = viewModel,
@@ -211,6 +219,7 @@ fun ZonaJugadorArriba(
                 activeBtnPlayCard = activeBtnPlayCard,
                 activeBtnDiscardCards = activeBtnDiscardCards,
             )
+//            */
         }
         Row(
             // Jugador CPU - Mesa
@@ -238,18 +247,20 @@ fun ZonaCentral(
         // Baraja
         PilaDeCartasItem(
             texto = "Baraja",
-            cantidadCartas = juego.baraja.pila.size,
+            cantidadCartas = juego.getBarajaSize()
         )
-        println("Baraja: ${juego.baraja.pila.size}")
+        Log.i(TAG,"Baraja: ${juego.baraja.pila.size}")
         // boton de Pausa
-        Button(onClick = { juegoViewModel.pauseJuego() })
-        { Text(text = "Pausar") }
+        BtnSeleccion(
+            texto = stringResource(R.string.btn_pausa),
+            onClick = { juegoViewModel.pauseJuego() },
+        )
         // Pila descarte
         PilaDeCartasItem(
             texto = "Descarte",
-            cantidadCartas = juego.pilaDescarte.pila.size,
+            cantidadCartas = juego.getDescarteSize(),
         )
-        println("Descarte: ${juego.pilaDescarte.pila.size}")
+        Log.i(TAG,"Descarte: ${juego.pilaDescarte.pila.size}")
     }
 }
 
@@ -280,7 +291,9 @@ fun ZonaJugadorAbajo(
         Row(
             // Jugador Humano - Mano
             modifier = Modifier
+                .padding(0.dp)
                 .fillMaxWidth()
+                .padding(0.dp)
                 .weight(1f),
         ) {
             ManoItem(
@@ -346,25 +359,21 @@ fun PilaDeCartasItem(
 @Composable
 fun MenuPausa(
     linkVolver: () -> Unit = {},
-    actionPausar: () -> Unit = { },
     actionContinuar: () -> Unit = { },
+    actionReiniciar: () -> Unit = { },
+    actionSalir: () -> Unit = {}
 ) {
-    Button(
-        onClick = { linkVolver() },
-    ) {
-        Text(text = stringResource(R.string.to_pantalla_Inicio))
-    }
     // boton de UnPause
-    Button(
-        onClick = { actionPausar() }
-    ) {
-        Text(text = stringResource(R.string.juego_continuar))
-    }
-    Button(
-        modifier = Modifier
-            .background(color = Color(255, 0, 0)),
-        onClick = { actionContinuar() }
-    ) {
-        Text(text = stringResource(R.string.juego_reiniciar))
-    }
+    BtnSeleccion(
+        onClick = { actionContinuar() },
+        texto = stringResource(R.string.juego_continuar),
+    )
+    BtnSeleccion(
+        onClick = { actionReiniciar() },
+        texto = stringResource(R.string.juego_reiniciar),
+    )
+    BtnSeleccion(
+        onClick = { actionSalir() },
+        texto = stringResource(R.string.btn_salir),
+    )
 }

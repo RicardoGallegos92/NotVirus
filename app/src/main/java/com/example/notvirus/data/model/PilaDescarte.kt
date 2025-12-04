@@ -32,4 +32,8 @@ data class PilaDescarte(
             pila.size
         )
     }
+
+    fun getSize():Int{
+        return this.pila.size
+    }
 }

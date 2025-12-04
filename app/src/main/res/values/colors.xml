@@ -27,6 +27,8 @@
     <color name="progreso">#FFFFFFFF</color>
     <color name="remarcar_texto">#80000000</color>
 
+    <color name="menu_btn_seleccion">#80000000</color>
+
     <color name="mesa">#FF35654D</color>
     <color name="zona_cpu">#FF034694</color>
     <color name="zona_central">#00000000</color>

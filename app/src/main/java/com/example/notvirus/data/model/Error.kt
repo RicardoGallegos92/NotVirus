@@ -9,3 +9,7 @@ class CartaSinTipo(message: String = "Carta Jugada no posee un TIPO"): Exception
 class PilaConOrgano(message: String = "Pila ya tiene un ORGANO"): Exception(message)
 
 class PilaSinOrgano(message: String = "Pila NO tiene un ORGANO"): Exception(message)
+
+class CartaNoEnMano(message: String = "Carta NO presente en Mano"): Exception(message)
+
+class CartaNoEnMesa(message: String = "Carta NO presente en Mesa"): Exception(message)

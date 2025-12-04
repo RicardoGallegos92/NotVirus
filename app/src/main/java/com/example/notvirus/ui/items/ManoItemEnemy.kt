@@ -11,12 +11,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.notvirus.data.model.Carta
+import com.example.notvirus.data.model.CartaColor
+import com.example.notvirus.data.model.CartaImagen
+import com.example.notvirus.data.model.CartaTipo
 import com.example.notvirus.data.model.Mano
 
 @Composable
-fun ManoItemCPU(
-    mano: Mano = Mano(),
+fun ManoItemEnemy(
 ) {
+    val cartaDefault: Carta = Carta(
+        tipo = CartaTipo.NULL,
+        color = CartaColor.NULL,
+        imagen = CartaImagen.NADA
+    )
+    val cartas = listOf<Carta>(
+        cartaDefault,
+        cartaDefault,
+        cartaDefault,
+    )
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,7 +46,7 @@ fun ManoItemCPU(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                items(mano.cartas) { carta: Carta ->
+                items(cartas) { carta: Carta ->
                     CartaItem(
                         carta = carta,
                     )

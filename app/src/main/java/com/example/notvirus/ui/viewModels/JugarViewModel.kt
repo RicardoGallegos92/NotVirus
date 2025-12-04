@@ -121,10 +121,10 @@ class JugarViewModel(
     }
 
     // MANO
-    fun clickedCard(carta: Carta) {
+    fun clickedCard(cartaID: String) {
         viewModelScope.launch {
             _uiState.update {
-                val nuevoJuego = it.juego.marcarCarta(carta) // devuelve un nuevo Juego
+                val nuevoJuego = it.juego.marcarCarta(cartaID) // devuelve un nuevo Juego
                 it.copy(
                     juego = nuevoJuego
                 )

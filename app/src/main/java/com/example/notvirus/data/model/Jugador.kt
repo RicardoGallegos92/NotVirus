@@ -47,10 +47,10 @@ data class Jugador(
     /**
      * @return Jugador Marca/Desmarca una Carta
      */
-    fun marcarCartaEnMano(carta: Carta): Jugador {
+    fun marcarCartaEnMano(cartaID: String): Jugador {
 //        println("Jugador.marcarCartaEnMano()")
         return this.copy(
-            mano = this.mano.seleccionarCarta(carta)
+            mano = this.mano.seleccionarCarta(cartaID)
         )
     }
 
@@ -76,51 +76,12 @@ data class Jugador(
 
         return cartaJugada
     }
-/*
-    /** actualiza el estado de todas las pilas de la Mesa
-     * @return Jugador con su Mesa actualizada
-     */
-    fun actualizarEstadoMesa():Jugador{
-        return this.copy(
-            mesa = this.mesa.actualizarEstados()
-        )
-    }
-*/
-/*
-    fun inmunizarPila(color: CartaColor): Jugador{
-        return this.copy(
-            mesa = this.mesa.inmunizarPila(color)
-        )
-    }
-*/
-    /**
-     * @param color color de la PilaDeColor que se revisa
-     * @return [true] -> la pila de color indicado es INMUNE
-     * @return [false] -> la pila de color indicado NO es INMUNE
-     */
-    fun esPilaInmune(colorPila: CartaColor): Boolean{
-        return ( this.getEstadoPila(colorPila) == PilaEstado.INMUNE )
-    }
 
     /**
      * @return el estado de la Pila con el [color] indicado
      */
     fun getEstadoPila(colorPila: CartaColor): PilaEstado {
         return this.mesa.getEstadoPila(colorPila)
-    }
-
-    /**
-     * @param color color de la PilaDeColor que se revisa
-     * @return [true] -> la pila de color indicado tiene un ORGANO
-     * @return [false] -> la pila de color indicado NO tiene un ORGANO
-     */
-    fun existeOrgano(colorPila: CartaColor): Boolean {
-    // verifica si la pila ya contiene un órgano
-        return ( this.mesa.getPilaDeColor(colorPila).estado == PilaEstado.CON_ORGANO)
-    }
-
-    fun getPilaDeColor(color: CartaColor): PilaDeColor{
-        return this.mesa.getPilaDeColor(color)
     }
 
     fun getTurnosParaGanar(): Int{
@@ -150,10 +111,11 @@ data class Jugador(
     /**
      * @return [true] si la pila de color indicado tiene el estado solicitado
      */
-    fun isPilaConEstado(
-        colorPila: CartaColor,
-        estado: PilaEstado,
-    ): Boolean {
+    fun isPilaConEstado(colorPila: CartaColor, estado: PilaEstado): Boolean {
         return (this.getEstadoPila(colorPila) == estado)
+    }
+
+    fun getCartaManoByID(id: String):Carta{
+        return this.mano.getCartaByID(id)
     }
 }
