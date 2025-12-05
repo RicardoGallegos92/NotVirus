@@ -1,5 +1,6 @@
 package com.example.notvirus.ui.navigation
 
+import com.example.notvirus.data.model.Bot
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,7 +13,12 @@ object Usuario
 object ElegirDificultad
 
 @Serializable
-object Jugar
+data class Jugar1Player(
+    val bot: Bot,
+)
+
+@Serializable
+object Jugar2Player
 
 @Serializable
 object Configuracion

@@ -14,6 +14,7 @@
     <string name="juego_terminar">Terminar Partida</string>
     <string name="juego_continuar">Continuar Partida</string>
     <string name="juego_reiniciar">Reiniciar Partida</string>
+    <string name="juego_cambiarBot">Cambiar Dificultad</string>
 
     <string name="juego_ganador">¡que pro!</string>
     <string name="juego_perdedor">será para la próxima</string>

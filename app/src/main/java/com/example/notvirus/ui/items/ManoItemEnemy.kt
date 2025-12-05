@@ -14,7 +14,6 @@ import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.CartaColor
 import com.example.notvirus.data.model.CartaImagen
 import com.example.notvirus.data.model.CartaTipo
-import com.example.notvirus.data.model.Mano
 
 @Composable
 fun ManoItemEnemy(

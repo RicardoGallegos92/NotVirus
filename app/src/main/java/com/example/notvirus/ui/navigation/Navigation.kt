@@ -5,9 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.notvirus.data.model.Bot
 import com.example.notvirus.ui.screens.ConfiguracionScreen
 import com.example.notvirus.ui.screens.ElegirDificultadScreen
-import com.example.notvirus.ui.screens.JugarScreen
+import com.example.notvirus.ui.screens.Jugar1PlayerScreen
+import com.example.notvirus.ui.screens.Jugar2PlayerScreen
 import com.example.notvirus.ui.screens.LoginScreen
 import com.example.notvirus.ui.screens.UsuarioScreen
 
@@ -17,13 +20,13 @@ navController.navigate( "nombre pantalla aquí" ) // <-- ir a una Screen especif
  */
 @Composable
 fun Navigation(
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
 ) {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = Jugar
+        startDestination = Usuario,    // <-- Aquí va el punto de entrada a la app
     ) {
         composable<Login> {
             // llamada a la Screen
@@ -31,21 +34,37 @@ fun Navigation(
                 innerPadding = innerPadding,
             )
         }
-        composable<Usuario>{
+        composable<Usuario> {
             UsuarioScreen(
                 innerPadding = innerPadding,
                 navigateToPvCom = { navController.navigate(ElegirDificultad) },
-                navigateToPvP = { navController.navigate(Jugar) }
+                navigateToPvP = { navController.navigate(Jugar2Player) }
             )
         }
-        composable<ElegirDificultad>{
+        composable<ElegirDificultad> {
             ElegirDificultadScreen(
                 innerPadding = innerPadding,
-                navigateNext = { navController.navigate(Jugar) },
+                navigateBack = { navController.navigateUp() },
+                navigateNext = { bot ->
+                    navController.navigate(
+                        Jugar1Player(
+                            bot = bot,
+                        )
+                    )
+                },
             )
         }
-        composable<Jugar> {
-            JugarScreen(
+        composable<Jugar1Player> { backStackEntry ->
+            val data = backStackEntry.toRoute<Jugar1Player>()
+            Jugar1PlayerScreen(
+                innerPadding = innerPadding,
+                navigateToInicio = {  navController.navigate(Usuario) },
+                navigateBack = { navController.navigateUp() },
+                bot = data.bot
+            )
+        }
+        composable<Jugar2Player> {
+            Jugar2PlayerScreen(
                 innerPadding = innerPadding,
                 navigateToInicio = { navController.navigate(Usuario) },
             )

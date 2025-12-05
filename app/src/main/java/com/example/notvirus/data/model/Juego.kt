@@ -1,6 +1,9 @@
 package com.example.notvirus.data.model
 
+import android.util.Log
+
 data class Juego(
+    val bot: Bot? = null,
     val jugadores: List<Jugador>,
     val baraja: Baraja,
     val pilaDescarte: PilaDescarte,
@@ -92,15 +95,15 @@ data class Juego(
             "Jugador-Activo: llega con ${getJugadorByID(jugadorActivoID).getCantCartasEnMano()} cartas"
         )
     }
-/*
-    fun actualizarEstadosMesas(): Juego {
-        return this.copy(
-            jugadores = this.jugadores.map { jugador: Jugador ->
-                jugador.actualizarEstadoMesa()
-            }
-        )
-    }
-*/
+    /*
+        fun actualizarEstadosMesas(): Juego {
+            return this.copy(
+                jugadores = this.jugadores.map { jugador: Jugador ->
+                    jugador.actualizarEstadoMesa()
+                }
+            )
+        }
+    */
 
     /**
      * Revisa los estados de las pilas en la Mesa para tomar acciones
@@ -113,7 +116,7 @@ data class Juego(
         val jugadoresAct = this.jugadores.map { jugador ->
             // deben ser todos los jugadores
             // ya que pueden jugarse cartas en cualquier Mesa
-            cartasParaDescartar.addAll(jugador.tomarCartasSegunEstadoMesa() )
+            cartasParaDescartar.addAll(jugador.tomarCartasSegunEstadoMesa())
             jugador.accionarEstadosMesa()
         }
 
@@ -154,7 +157,7 @@ data class Juego(
                 // Mesa propia
                 val jugadorObjetivo = juegoActualizado.getJugadorByID(jugadorActivoID)
 
-                if ( jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.VACIO) ) {
+                if (jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.VACIO)) {
                     juegoActualizado = juegoActualizado.pasarCartaToMesaJugador(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = jugadorObjetivo,
@@ -169,7 +172,7 @@ data class Juego(
                 val jugadorObjetivo =
                     juegoActualizado.getJugadorByID(jugadorActivoID) // mesa propia
 
-                if( jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO) ) {
+                if (jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO)) {
                     juegoActualizado = juegoActualizado.pasarCartaToMesaJugador(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = jugadorObjetivo, // (provisorio) -> se debe agregar funcion para seleccionar objetivo
@@ -185,7 +188,7 @@ data class Juego(
                 // (provisorio) -> se debe agregar funcion para seleccionar objetivo
                 val jugadorObjetivo = juegoActualizado.getJugadorByID(pasarTurno())
 
-                if( jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO) ) {
+                if (jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO)) {
                     juegoActualizado = juegoActualizado.pasarCartaToMesaJugador(
                         cartaJugada = cartaJugada,
                         jugadorObjetivo = jugadorObjetivo,
@@ -398,11 +401,45 @@ data class Juego(
         )
     }
 
-    fun getBarajaSize():Int{
+    fun getBarajaSize(): Int {
         return this.baraja.getSize()
     }
 
-    fun getDescarteSize():Int{
+    fun getDescarteSize(): Int {
         return this.pilaDescarte.getSize()
+    }
+
+    fun turnoIA(): Juego {
+        try {
+            for (i in 0..10) {
+                this.bot?.let {
+                    val cartaID = it.play(this.getJugadorByID(this.jugadorActivoID), i)
+                    // marcar la carta
+                    this.marcarCarta(cartaID)
+
+                    val juegoNuevo = this.usarTurno(jugarCarta = true)
+
+                    // true => la jugada falló
+                    if (juegoNuevo == this) {
+                        // desmarcar la carta
+                        this.marcarCarta(cartaID)
+                    } else {
+                        return juegoNuevo
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            this.bot?.let {
+                for (i in 0..3) {
+                    val cartaID = it.play(this.getJugadorByID(this.jugadorActivoID), i)
+                    // marcar la carta
+                    this.marcarCarta(cartaID)
+                }
+                val juegoNuevo = this.usarTurno(descartarCarta = true)
+                return juegoNuevo
+            }
+        }
+        Log.w("Juego", "No debíese haber pasado por aquí, WTF!")
+        return this.copy()
     }
 }

@@ -27,20 +27,21 @@ import com.example.notvirus.ui.components.VirusGradienteFondo
 @Composable
 fun UsuarioScreen(
     innerPadding: PaddingValues = PaddingValues(0.dp),
-    navigateToPvP: () -> Unit = {},
     navigateToPvCom: () -> Unit = {},
+    navigateToPvP: () -> Unit = {},
     navigateBack: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
+            .padding(0.dp)
             .fillMaxSize()
             .background(
                 brush = VirusGradienteFondo
             )
+            .padding(innerPadding)
     )
     Column(
         modifier = Modifier
-            .padding(innerPadding)
             .background(color = Color.Transparent)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,7 +56,6 @@ fun UsuarioScreen(
         BtnSeleccion(
             onClick = { navigateToPvCom() },
             texto = stringResource(R.string.seleccion_1player),
-            enabled = false,
         )
         BtnSeleccion(
             onClick = { navigateToPvP() },
