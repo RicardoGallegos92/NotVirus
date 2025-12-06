@@ -1,34 +1,35 @@
 <resources>
+// Info APP
     <string name="app_name">NotVirus</string>
-    <string name="app_estado">Pre-Alfa</string>
-
-    <string name="to_pantalla_Inicio">Inicio</string>
+    <string name="app_estado">Alfa</string>
+    <string name="app_edicion">Local PvP Edition</string>
+// Direcciones
+    <string name="to_pantalla_Inicio">Pantalla de Inicio</string>
     <string name="to_pantalla_Juego">Tablero de Juego</string>
     <string name="to_pantalla_Login">Login</string>
-    <string name="to_pantalla_Configuracion">Configuracion</string>
-
-
-    <string name="juego_edicion">Local PvP Edition</string>
+    <string name="to_pantalla_Configuracion">Configuración</string>
+//
     <string name="juego_iniciar">Iniciar Partida</string>
+// Menu Pausa
     <string name="juego_pausar">Pausar Partida</string>
     <string name="juego_terminar">Terminar Partida</string>
     <string name="juego_continuar">Continuar Partida</string>
     <string name="juego_reiniciar">Reiniciar Partida</string>
     <string name="juego_cambiarBot">Cambiar Dificultad</string>
-
-    <string name="juego_ganador">¡que pro!</string>
-    <string name="juego_perdedor">será para la próxima</string>
-
+// Mensaje Victoria
+    <string name="juego_ganador">¡Que Pro!</string>
+    <string name="juego_perdedor">Será para la próxima</string>
+// Botones
     <string name="btn_pausa">Pausar</string>
     <string name="btn_continuar">Continuar</string>
     <string name="btn_salir">Salir</string>
-
+// Menu Tipo de Juego
     <string name="seleccion_1player">P vs Cpu</string>
     <string name="seleccion_2player">P vs P</string>
-
+// Menu Dificultad
     <string name="seleccion_facil">Fácil</string>
     <string name="seleccion_medio">Medio</string>
-    <string name="seleccion_dificil">Dificil</string>
+    <string name="seleccion_dificil">Difícil</string>
     <string name="seleccion_competitivo">Competitivo</string>
     <string name="seleccion_tutorial">Tutorial</string>
 </resources>

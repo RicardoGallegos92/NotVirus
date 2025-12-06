@@ -2,7 +2,6 @@ package com.example.notvirus.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notvirus.data.model.Carta
 import com.example.notvirus.data.model.Juego
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -36,7 +35,7 @@ class JugarViewModel(
         startJuego()
     }
 
-    // USUARIO
+// USUARIO
     fun startJuego() {
         viewModelScope.launch {
             _uiState.update {
@@ -47,7 +46,7 @@ class JugarViewModel(
             try {
                 val nuevoJuego = Juego()
                 val nuevaPartida = async { nuevoJuego.empezarJuego() }.await()
-                delay(500) // <-- dar ilusion de carga
+                delay(800) // <-- dar ilusion de carga
                 _uiState.update {
                     it.copy(
                         juego = nuevaPartida,
@@ -94,7 +93,7 @@ class JugarViewModel(
         }
     }
 
-    // TURNO
+// TURNO
     fun jugarCarta() {
         viewModelScope.launch {
             _uiState.update {
@@ -120,7 +119,18 @@ class JugarViewModel(
         countCartasSelected()
     }
 
-    // MANO
+    fun jugadaBot(juego: Juego){
+        viewModelScope.launch{
+            delay(1000)
+            _uiState.update {
+                it.copy(
+                    juego = juego
+                )
+            }
+        }
+    }
+
+// MANO
     fun clickedCard(cartaID: String) {
         viewModelScope.launch {
             _uiState.update {
@@ -182,6 +192,25 @@ class JugarViewModel(
                         activeBtnDiscardCards = true,
                     )
                 }
+            }
+        }
+    }
+// UI
+    fun resetUI(){
+        viewModelScope.launch{
+            _uiState.update {
+                it.copy(
+                    juego = Juego(),
+                    isStarted = true,
+                    isLoading = false,
+
+                    errorMsg = null,
+                    isPaused = false,
+                    isOver = false,
+                    cantCartasSelected = 0,
+                    activeBtnPlayCard = false,
+                    activeBtnDiscardCards = false
+                )
             }
         }
     }

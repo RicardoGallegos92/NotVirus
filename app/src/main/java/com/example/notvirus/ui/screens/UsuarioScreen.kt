@@ -51,7 +51,7 @@ fun UsuarioScreen(
             modifier = Modifier
                 .background(colorResource(R.color.remarcar_texto))
             ,
-            text = stringResource(R.string.juego_edicion)
+            text = stringResource(R.string.app_edicion)
         )
         BtnSeleccion(
             onClick = { navigateToPvCom() },

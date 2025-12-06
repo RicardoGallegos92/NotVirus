@@ -1,17 +1,19 @@
 package com.example.notvirus.data.model
 
+import android.util.Log
+import android.util.Log.e
+
 /** Nombre Clave:
  * Comportamiento:
  * ->
  */
 
-
-enum class Bot(val play: (Jugador, Int) -> String) {
-    COPO({ jugador, int -> copo(jugador, int) }),
-    MANU({ jugador, int -> manu(jugador, int) }),
-    NICO({ jugador, int -> nico(jugador, int) }),
-    FENA({ jugador, int -> fena(jugador, int) }),
-    SANSON({ jugador, int -> sanson(jugador, int) }),
+enum class Bot(val play: (Juego) -> Juego) {
+    COPO({ juego -> copo(juego) }),
+    MANU({ juego -> manu(juego) }),
+    NICO({ juego -> nico(juego) }),
+    FENA({ juego -> fena(juego) }),
+    SANSON({ juego -> sanson(juego) }),
 }
 
 /** Nombre Clave: Copo
@@ -20,11 +22,44 @@ enum class Bot(val play: (Jugador, Int) -> String) {
  * -> si ninguna puede ser jugada
  *   => Descarta la Mano completa
  */
-fun copo(jugador: Jugador, intento: Int): String {
-    if(intento == 3){
-        throw ImposibleJugarCarta()
+fun copo(juego: Juego): Juego {
+    val TAG = "Bot COPO"
+    val jugadorActivo = juego.getJugadorByID(juego.jugadorActivoID)
+    try {
+        for (index in 0..3) {
+            if (index == 3) {
+                throw ImposibleJugarCarta()
+            }
+            Log.i(TAG, "intento de jugar carta: ${index+1}")
+            val cartaID = jugadorActivo.getCartaManoByIndex(index).id
+            // marcar la carta
+            Log.i(TAG, "${jugadorActivo.getCartaManoByID(cartaID).tipo}/${jugadorActivo.getCartaManoByID(cartaID).color}")
+            val juegoPrevio = juego.marcarCarta(cartaID)
+
+            val juegoNuevo = juegoPrevio.usarTurno(jugarCarta = true)
+
+            if (juegoNuevo != juegoPrevio) {
+                return juegoNuevo
+            } else {
+                // true => la jugada falló
+                // desmarcar la carta
+                juego.marcarCarta(cartaID)
+            }
+        }
+    } catch (e: Exception) {
+        Log.i(TAG, e.message.toString())
+        var juegoNuevo: Juego = juego.copy()
+        for (index in 0..2) {
+            val cartaID = jugadorActivo.getCartaManoByIndex(index).id
+            // marcar la carta
+            juegoNuevo = juegoNuevo.marcarCarta(cartaID)
+        }
+        Log.i(TAG, "Se decarta Mano completa")
+        juegoNuevo = juegoNuevo.usarTurno(descartarCarta = true)
+        return juegoNuevo
     }
-    return  jugador.mano.cartas.elementAt(intento).id
+    Log.w(TAG, "No debíese haber pasado por aquí, WTF!")
+    return juego
 }
 
 /** Nombre Clave: Manu
@@ -33,8 +68,8 @@ fun copo(jugador: Jugador, intento: Int): String {
  * -> Organo
  * -> Medicina
  */
-fun manu(jugador: Jugador, intento: Int): String {
-    return ""
+fun manu(juego: Juego): Juego {
+    return juego
 }
 
 /** Nombre Clave: Nico
@@ -43,8 +78,8 @@ fun manu(jugador: Jugador, intento: Int): String {
  * -> Virus
  * -> Organo
  */
-fun nico(jugador: Jugador, intento: Int): String {
-    return ""
+fun nico(juego: Juego): Juego {
+    return juego
 }
 
 /** Nombre Clave: Feña
@@ -54,8 +89,8 @@ fun nico(jugador: Jugador, intento: Int): String {
  * -> Medicina
  * -> Virus
  */
-fun fena(jugador: Jugador, intento: Int): String {
-    return ""
+fun fena(juego: Juego): Juego {
+    return juego
 }
 
 /** Nombre Clave: Sanson
@@ -66,6 +101,6 @@ fun fena(jugador: Jugador, intento: Int): String {
  * -> 4 -> Organo, Medicina, Guante_Latex
  * -> 5 -> Descartar Mano
  */
-fun sanson(jugador: Jugador, intento: Int): String {
-    return ""
+fun sanson(juego: Juego): Juego {
+    return juego
 }

@@ -20,8 +20,8 @@ data class Jugador(
     }
 
     /** @return Jugador sin las cartas seleccionadas
-    */
-    fun quitarCartasSeleccionadas():Jugador{
+     */
+    fun quitarCartasSeleccionadas(): Jugador {
 //        println("Jugador.quitarCartasSeleccionadas()")
         return this.copy(
             mano = this.mano.quitarCartasSeleccionadas()
@@ -31,7 +31,7 @@ data class Jugador(
     /** quita la carta seleccionada de la Mano del Jugador
      * @return Jugador con la mano sin la carta Seleccionada
      */
-    fun quitarCartaJugada():Jugador{
+    fun quitarCartaJugada(): Jugador {
         return this.copy(
             mano = this.mano.quitarCartasSeleccionadas()
         )
@@ -40,7 +40,7 @@ data class Jugador(
     /**
      * @return Lista con las cartas 'seleccionadas'
      */
-    fun entregarCartasSeleccionadas():List<Carta>{
+    fun entregarCartasSeleccionadas(): List<Carta> {
         return this.mano.tomarCartasSeleccionadas()
     }
 
@@ -59,7 +59,7 @@ data class Jugador(
      * @param colorPilaObjetivo color de la Pila donde se ubicará la carta
      * @return jugador con la carta agregada a la Mesa
      */
-    fun agregaCartaToMesa(carta:Carta, colorPilaObjetivo: CartaColor): Jugador{
+    fun agregaCartaToMesa(carta: Carta, colorPilaObjetivo: CartaColor): Jugador {
 //        println("Jugador.agregaCartaToMesa()")
         return this.copy(
             mesa = this.mesa.agregarCarta(carta, colorPilaObjetivo)
@@ -84,27 +84,27 @@ data class Jugador(
         return this.mesa.getEstadoPila(colorPila)
     }
 
-    fun getTurnosParaGanar(): Int{
+    fun getTurnosParaGanar(): Int {
         return this.mesa.turnosParaGanar
     }
 
     /**
      * @return Lista de cartas para Descartar
      */
-    fun tomarCartasSegunEstadoMesa():List<Carta>{
+    fun tomarCartasSegunEstadoMesa(): List<Carta> {
         return this.mesa.tomarCartasDePilasSegunEstado()
     }
 
     /**
      * @return Jugador con las cartas señaladas removidas de su Mesa
      */
-    fun accionarEstadosMesa():Jugador{
+    fun accionarEstadosMesa(): Jugador {
         return this.copy(
             mesa = this.mesa.accionarEstados()
         )
     }
 
-    fun getCantCartasEnMano():Int{
+    fun getCantCartasEnMano(): Int {
         return this.mano.cartas.size
     }
 
@@ -115,7 +115,11 @@ data class Jugador(
         return (this.getEstadoPila(colorPila) == estado)
     }
 
-    fun getCartaManoByID(id: String):Carta{
+    fun getCartaManoByID(id: String): Carta {
         return this.mano.getCartaByID(id)
+    }
+
+    fun getCartaManoByIndex(index: Int):Carta{
+        return this.mano.getCartaByIndex(index)
     }
 }

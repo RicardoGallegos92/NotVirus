@@ -3,7 +3,6 @@ package com.example.notvirus.data.model
 import android.util.Log
 
 data class Juego(
-    val bot: Bot? = null,
     val jugadores: List<Jugador>,
     val baraja: Baraja,
     val pilaDescarte: PilaDescarte,
@@ -49,6 +48,7 @@ data class Juego(
      * @return Juego con el turno finalizado
      */
     fun usarTurno(jugarCarta: Boolean = false, descartarCarta: Boolean = false): Juego {
+        val TAG = "Juego -> usarTurno()"
         try {
             var turno = this.copy()
             when {
@@ -84,15 +84,16 @@ data class Juego(
                 jugadorActivoID = turno.pasarTurno() // jugadorProximoTurno,
             )
         } catch (e: Exception) {
-            println("HUBO ERROR")
-            println(e.message)
+            Log.i(TAG, "HUBO ERROR")
+            Log.d(TAG,e.message.toString())
             return this.copy()
         }
     }
 
-    fun cantCartasEnManoJugadorActivo(): Unit {
-        println(
-            "Jugador-Activo: llega con ${getJugadorByID(jugadorActivoID).getCantCartasEnMano()} cartas"
+    fun cantCartasEnManoJugadorActivo() {
+        val TAG = "Juego->cantCartasEnManoJugadorActivo()"
+        Log.i(TAG,
+        "Jugador-Activo: con ${getJugadorByID(jugadorActivoID).getCantCartasEnMano()} cartas"
         )
     }
     /*
@@ -138,7 +139,7 @@ data class Juego(
      *  @return Juego con la carta aplicada
      */
     fun jugarCarta(jugadorObjetivo: Jugador? = null): Juego {
-        println("Juego->jugarCarta()")
+        val TAG = "Juego->jugarCarta()"
         // Juego toma la carta jugada
         val cartaJugada: Carta = this.tomarCartaJugada()
         // retiramos la carta de la mano del 'Jugado-Activo'
@@ -370,6 +371,9 @@ data class Juego(
         }[0]
     }
 
+    /**
+     * @return Jugador Marca/Desmarca una Carta
+     */
     fun marcarCarta(cartaID: String): Juego {
 //        println("Juego.marcarCarta()")
         // cambia el estado "selecciona" de la carta entre "true" y "false"
@@ -409,37 +413,4 @@ data class Juego(
         return this.pilaDescarte.getSize()
     }
 
-    fun turnoIA(): Juego {
-        try {
-            for (i in 0..10) {
-                this.bot?.let {
-                    val cartaID = it.play(this.getJugadorByID(this.jugadorActivoID), i)
-                    // marcar la carta
-                    this.marcarCarta(cartaID)
-
-                    val juegoNuevo = this.usarTurno(jugarCarta = true)
-
-                    // true => la jugada falló
-                    if (juegoNuevo == this) {
-                        // desmarcar la carta
-                        this.marcarCarta(cartaID)
-                    } else {
-                        return juegoNuevo
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            this.bot?.let {
-                for (i in 0..3) {
-                    val cartaID = it.play(this.getJugadorByID(this.jugadorActivoID), i)
-                    // marcar la carta
-                    this.marcarCarta(cartaID)
-                }
-                val juegoNuevo = this.usarTurno(descartarCarta = true)
-                return juegoNuevo
-            }
-        }
-        Log.w("Juego", "No debíese haber pasado por aquí, WTF!")
-        return this.copy()
-    }
 }

@@ -51,4 +51,13 @@ data class Mano(
         }
         return carta[0]
     }
+
+    fun getCartaByIndex(index: Int): Carta{
+        try{
+            val carta =  this.cartas.elementAt(index)
+            return carta
+        }catch(e: Exception){
+            throw CartaNoEnMano()
+        }
+    }
 }
