@@ -12,7 +12,7 @@ enum class Bot(val play: (Juego) -> Juego) {
     COPO({ juego -> copo(juego) }),
     MANU({ juego -> manu(juego) }),
     NICO({ juego -> nico(juego) }),
-    FENA({ juego -> fena(juego) }),
+    FER({ juego -> fer(juego) }),
     SANSON({ juego -> sanson(juego) }),
 }
 
@@ -82,14 +82,14 @@ fun nico(juego: Juego): Juego {
     return juego
 }
 
-/** Nombre Clave: Feña
+/** Nombre Clave: Fer
  * Comportamiento: Enfocado en Perder:
  * -> No usa Tratamientos
  * -> Organo
  * -> Medicina
  * -> Virus
  */
-fun fena(juego: Juego): Juego {
+fun fer(juego: Juego): Juego {
     return juego
 }
 

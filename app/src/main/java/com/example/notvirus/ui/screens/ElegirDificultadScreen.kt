@@ -72,7 +72,7 @@ fun ElegirDificultadScreen(
             )
 
             BtnSeleccion(
-                onClick = { navigateNext(Bot.FENA) },
+                onClick = { navigateNext(Bot.FER) },
                 texto = stringResource(R.string.seleccion_tutorial),
                 enabled = false,
             )

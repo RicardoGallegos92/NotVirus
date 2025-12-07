@@ -85,15 +85,16 @@ data class Juego(
             )
         } catch (e: Exception) {
             Log.i(TAG, "HUBO ERROR")
-            Log.d(TAG,e.message.toString())
+            Log.d(TAG, e.message.toString())
             return this.copy()
         }
     }
 
     fun cantCartasEnManoJugadorActivo() {
         val TAG = "Juego->cantCartasEnManoJugadorActivo()"
-        Log.i(TAG,
-        "Jugador-Activo: con ${getJugadorByID(jugadorActivoID).getCantCartasEnMano()} cartas"
+        Log.i(
+            TAG,
+            "Jugador-Activo: con ${getJugadorByID(jugadorActivoID).getCantCartasEnMano()} cartas"
         )
     }
     /*
@@ -149,7 +150,7 @@ data class Juego(
         when (cartaJugada.tipo) {
             CartaTipo.TRATAMIENTO -> {
                 // activar Efecto del TRATAMIENTO
-
+                juegoActualizado = juegoActualizado.usarTratamiento(cartaJugada);
                 // enviar 'Carta' a 'PilaDescarte'
                 juegoActualizado = juegoActualizado.descartarCarta(cartaJugada)
             }
@@ -350,8 +351,8 @@ data class Juego(
         }
     }
 
-    /** cambiar jugador en turno
-     * @return id del nuevo jugador en turno
+    /**
+     * @return id del siguiente jugador de turno
      */
     fun pasarTurno(): String {
 //        println("Juego.pasarTurno()")
@@ -413,4 +414,57 @@ data class Juego(
         return this.pilaDescarte.getSize()
     }
 
+    fun usarTratamiento(cartaJugada: Carta): Juego {
+        return when (cartaJugada.imagen) {
+            CartaImagen.TRATAMIENTO_CONTAGIO -> { usarContagio() }
+            CartaImagen.TRATAMIENTO_ERROR_MEDICO -> { usarErrorMedico() }
+            CartaImagen.TRATAMIENTO_GUANTE_LATEX -> { usarGuanteLatex() }
+            CartaImagen.TRATAMIENTO_ROBO_ORGANO -> { usarRoboOrgano() }
+            CartaImagen.TRATAMIENTO_TRASPLANTE -> { usarTrasplante() }
+            else -> { throw CartaSinTipo() }
+        }
+    }
+
+    fun usarContagio():Juego{
+        // Traslada todos los virus que puedas de tus órganos a los de otros jugadores.
+        // Sólo se podrán contagiar órganos libres, ni los infectados ni los vacunados.
+        return this
+    }
+
+    fun usarErrorMedico():Juego{
+        // intercambia Mesas de los Jugadores.
+        val jugOpID = pasarTurno()
+        val auxJuActMesa = this.getJugadorByID(jugadorActivoID).mesa
+        val auxJuOpMesa = this.getJugadorByID(jugOpID).mesa
+
+        val auxJuAct = this.getJugadorByID(jugadorActivoID).copy( mesa = auxJuOpMesa )
+        val auxJuOp = this.getJugadorByID(jugOpID).copy( mesa = auxJuActMesa )
+
+        return this.copy(
+            jugadores = this.jugadores.map{ jugador ->
+                when(jugador.id){
+                    jugadorActivoID -> auxJuAct
+                    jugOpID -> auxJuOp
+                    else -> jugador
+                }
+            }
+        )
+    }
+
+    fun usarGuanteLatex():Juego{
+        // todos los oponentes se descartan de todas las cartas de su mano.
+        return this
+    }
+
+    fun usarRoboOrgano():Juego{
+        // roba un órgano cualquiera al cuerpo de otro jugador.
+        return this
+    }
+
+    fun usarTrasplante():Juego{
+        // Intercambia un órgano por otro entre dos jugadores cualesquiera.
+        // Está prohibido trasplantar órganos inmunizados.
+        return this
+    }
 }
+

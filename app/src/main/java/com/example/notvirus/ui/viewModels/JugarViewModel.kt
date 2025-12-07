@@ -121,12 +121,24 @@ class JugarViewModel(
 
     fun jugadaBot(juego: Juego){
         viewModelScope.launch{
-            delay(1000)
+            delay(500)
             _uiState.update {
                 it.copy(
-                    juego = juego
+                    juego = juego,
+                    isOver = juego.jugadorGanadorID.isNotEmpty(),
                 )
             }
+        }
+        countCartasSelected()
+    }
+
+    /**
+     * Este debe activarse al cambiar el 'Jugador-Activo'
+     */
+    fun activarJugadaBot(juego: Juego){
+        viewModelScope.launch {
+            delay(1000)
+            jugadaBot(juego)
         }
     }
 
