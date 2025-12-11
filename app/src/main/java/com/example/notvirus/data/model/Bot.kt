@@ -49,11 +49,13 @@ fun copo(juego: Juego): Juego {
     } catch (e: Exception) {
         Log.i(TAG, e.message.toString())
         var juegoNuevo: Juego = juego.copy()
-        for (index in 0..2) {
-            val cartaID = jugadorActivo.getCartaManoByIndex(index).id
-            // marcar la carta
-            juegoNuevo = juegoNuevo.marcarCarta(cartaID)
-        }
+        try{
+            for (index in 0..2) {
+                val cartaID = jugadorActivo.getCartaManoByIndex(index).id
+                // marcar la carta
+                juegoNuevo = juegoNuevo.marcarCarta(cartaID)
+            }
+        }catch(e: Exception){}
         Log.i(TAG, "Se decarta Mano completa")
         juegoNuevo = juegoNuevo.usarTurno(descartarCarta = true)
         return juegoNuevo

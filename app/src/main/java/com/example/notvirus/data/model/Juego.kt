@@ -188,7 +188,7 @@ data class Juego(
             CartaTipo.VIRUS -> {
                 // jugador contrario
                 // (provisorio) -> se debe agregar funcion para seleccionar objetivo
-                val jugadorObjetivo = juegoActualizado.getJugadorByID(pasarTurno())
+                val jugadorObjetivo = juegoActualizado.getJugadorByID(seleccionarJugadorObjetivoId())
 
                 if (jugadorObjetivo.isPilaConEstado(cartaJugada.color, PilaEstado.CON_ORGANO)) {
                     juegoActualizado = juegoActualizado.pasarCartaToMesaJugador(
@@ -212,10 +212,10 @@ data class Juego(
     /**
      * @return id del jugador Objetivo
      */
-    fun seleccionarJugadorObjetivoId(): Jugador {
+    fun seleccionarJugadorObjetivoId(): String {
         // insertar magia
         // return jugadorSeleccionado.id
-        return getJugadorByID(pasarTurno())
+        return pasarTurno()
     }
 
     /**
@@ -398,7 +398,7 @@ data class Juego(
 ///        println("Juego.setGanador()")
         // -> el jugador ganó si el conteo (turnosParaGanar) de su mesa es 0
         return this.copy(
-            jugadorGanadorID = if (getJugadorByID(jugadorActivoID).getTurnosParaGanar() == 0) {
+            jugadorGanadorID = if (getJugadorByID(jugadorActivoID).getTurnosParaGanar() <= 0) {
                 jugadorActivoID
             } else {
                 ""
@@ -414,6 +414,9 @@ data class Juego(
         return this.pilaDescarte.getSize()
     }
 
+    /**
+     * Determina el efecto que se aplicará según el tratamiento usado
+     */
     fun usarTratamiento(cartaJugada: Carta): Juego {
         return when (cartaJugada.imagen) {
             CartaImagen.TRATAMIENTO_CONTAGIO -> { usarContagio() }
@@ -427,13 +430,34 @@ data class Juego(
 
     fun usarContagio():Juego{
         // Traslada todos los virus que puedas de tus órganos a los de otros jugadores.
-        // Sólo se podrán contagiar órganos libres, ni los infectados ni los vacunados.
-        return this
+        // Sólo se podrán contagiar órganos libres:
+        // -> NO infectados
+        // -> NO vacunados.
+        val jugOpID = seleccionarJugadorObjetivoId()
+
+        val mesaJugAct = this.getJugadorByID(jugadorActivoID).mesa
+        val mesaJugObj = this.getJugadorByID(jugOpID).mesa
+
+        val virusParaContagiar = mutableListOf<Carta>()
+        mesaJugAct.pilas.map{ pila: PilaDeColor ->
+            if( pila.cartas.size == 2 ){
+                if ( pila.cartas[1].tipo == CartaTipo.VIRUS){
+                    virusParaContagiar.add(pila.cartas[1])
+                }
+            }
+        }
+            TODO()
+
+        return this.copy(
+
+        )
     }
 
+    /** intercambia Mesas de los Jugadores.
+     * @return Juego con las mesas intercambiadas
+     */
     fun usarErrorMedico():Juego{
-        // intercambia Mesas de los Jugadores.
-        val jugOpID = pasarTurno()
+        val jugOpID = seleccionarJugadorObjetivoId()
         val auxJuActMesa = this.getJugadorByID(jugadorActivoID).mesa
         val auxJuOpMesa = this.getJugadorByID(jugOpID).mesa
 
@@ -453,17 +477,20 @@ data class Juego(
 
     fun usarGuanteLatex():Juego{
         // todos los oponentes se descartan de todas las cartas de su mano.
+        TODO()
         return this
     }
 
     fun usarRoboOrgano():Juego{
         // roba un órgano cualquiera al cuerpo de otro jugador.
+        TODO()
         return this
     }
 
     fun usarTrasplante():Juego{
         // Intercambia un órgano por otro entre dos jugadores cualesquiera.
         // Está prohibido trasplantar órganos inmunizados.
+        TODO()
         return this
     }
 }

@@ -13,9 +13,13 @@ data class Mesa(
     val turnosParaGanar: Int = 4, // int = [ 0, 4 ]
     val maxCartasEnPila: Int = 3,
 ) {
-    // Devuelve una copia actualizada de Mesa
+    /**
+     * @param nuevaCarta Carta para agregar a la Mesa
+     * @param colorPilaObjetivo indica el color de la pila en el que debe agregarse la [nuevaCarta]
+     * @return Mesa actualizada con la [carta] agregada
+      */
     fun agregarCarta(nuevaCarta: Carta, colorPilaObjetivo: CartaColor): Mesa {
-//        println("Mesa.agregarCarta()")
+        val TAG = "Mesa.agregarCarta()"
         var mesaAct = this.copy(
             pilas = this.pilas.map { pila: PilaDeColor ->
                 if (pila.color == colorPilaObjetivo) {
@@ -27,23 +31,7 @@ data class Mesa(
         )
         return mesaAct
     }
-/*
-    /**
-     * @param color color de la pila que se debe inmunizar
-     * @return Mesa con la pila indicada Inmunizada
-     */
-    fun inmunizarPila(color: CartaColor): Mesa {
-        return this.copy(
-            pilas = this.pilas.map { pila: PilaDeColor ->
-                if (pila.color == color) {
-                    pila.inmunizar()
-                } else {
-                    pila
-                }
-            }
-        )
-    }
-*/
+
     /**
      * @return Lista de cartas marcadas para Descartar
      */
@@ -102,16 +90,7 @@ data class Mesa(
     fun getEstadoPila(color: CartaColor): PilaEstado {
         return getPilaDeColor(color = color).estado
     }
-/*
-    fun actualizarEstados(): Mesa {
-        return this.copy(
-            pilas = this.pilas.map { pila: PilaDeColor ->
-                pila.actualizarEstado()
-            },
-            turnosParaGanar = this.calcularTurnosParaGanar()
-        )
-    }
-*/
+
     /** Calcula la menor cantidad de turno posibles para que el jugador gane la partida
      * basado unicamente en las cartas de la Mesa
      * @return cantidad de jugadas minimas
